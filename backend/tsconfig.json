@@ -9,7 +9,9 @@
     "baseUrl": "./",
     "paths": {
       "#controllers/*": ["src/controllers/*"],
-      "#schemas/*": ["src/schemas/*"]
-    }
+      "#schemas/*": ["src/models/*"]
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
   }
 }

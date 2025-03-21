@@ -18,7 +18,7 @@ export interface IOrder extends Document {
   createdAt: Date;
 }
 
-const OrderSchema = new Schema<IOrder>(
+const Order = new Schema<IOrder>(
   {
     customerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     items: [
@@ -41,4 +41,4 @@ const OrderSchema = new Schema<IOrder>(
   { timestamps: true }
 );
 
-export default mongoose.model<IOrder>("Order", OrderSchema);
+export default mongoose.model<IOrder>("Order", Order);

@@ -11,7 +11,7 @@ export interface IProduct extends Document {
   images: string[];
 }
 
-const ProductSchema = new Schema<IProduct>(
+const Product = new Schema<IProduct>(
   {
     storeId: { type: Schema.Types.ObjectId, ref: "Store", required: true },
     name: { type: String, required: true },
@@ -24,4 +24,4 @@ const ProductSchema = new Schema<IProduct>(
   { timestamps: true }
 );
 
-export default mongoose.model<IProduct>("Product", ProductSchema);
+export default mongoose.model<IProduct>("Product", Product);

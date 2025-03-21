@@ -9,7 +9,7 @@ export interface IStore extends Document {
   products: mongoose.Types.ObjectId[];
 }
 
-const StoreSchema = new Schema<IStore>(
+const Store = new Schema<IStore>(
   {
     ownerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
@@ -20,4 +20,4 @@ const StoreSchema = new Schema<IStore>(
   { timestamps: true }
 );
 
-export default mongoose.model<IStore>("Store", StoreSchema);
+export default mongoose.model<IStore>("Store", Store);

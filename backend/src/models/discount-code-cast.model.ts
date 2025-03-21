@@ -10,7 +10,7 @@ export interface IDiscountCodeCast extends Document {
   quantity: number;
 }
 
-const DiscountCodeCastSchema = new Schema<IDiscountCodeCast>(
+const DiscountCodeCast = new Schema<IDiscountCodeCast>(
   {
     code: { type: String, required: true, unique: true },
     type: { type: String, enum: ["productDiscount", "shippingDiscount"], required: true },
@@ -21,4 +21,4 @@ const DiscountCodeCastSchema = new Schema<IDiscountCodeCast>(
   { timestamps: true }
 );
 
-export default mongoose.model<IDiscountCodeCast>("DiscountCodeCast", DiscountCodeCastSchema);
+export default mongoose.model<IDiscountCodeCast>("DiscountCodeCast", DiscountCodeCast);

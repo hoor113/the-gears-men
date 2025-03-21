@@ -8,7 +8,7 @@ export interface IShipment extends Document {
   deliveryPersonnel: mongoose.Types.ObjectId;
 }
 
-const ShipmentSchema = new Schema<IShipment>(
+const Shipment = new Schema<IShipment>(
   {
     orderId: { type: Schema.Types.ObjectId, ref: "Order", required: true },
     status: { type: String, enum: ["processing", "inTransit", "delivered", "failed"], required: true },
@@ -18,4 +18,4 @@ const ShipmentSchema = new Schema<IShipment>(
   { timestamps: true }
 );
 
-export default mongoose.model<IShipment>("Shipment", ShipmentSchema);
+export default mongoose.model<IShipment>("Shipment", Shipment);

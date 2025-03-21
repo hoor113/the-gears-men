@@ -9,7 +9,7 @@ export interface IDiscountCode extends Document {
   // expiryDate: Date;
 }
 
-const DiscountCodeSchema = new Schema<IDiscountCode>(
+const DiscountCode = new Schema<IDiscountCode>(
   {
     uniqueCode: { type: Schema.Types.ObjectId, ref: "DiscountCodeCast", required: true },
     code: { type: String, required: true },
@@ -20,4 +20,4 @@ const DiscountCodeSchema = new Schema<IDiscountCode>(
   { timestamps: true }
 );
 
-export default mongoose.model<IDiscountCode>("DiscountCode", DiscountCodeSchema);
+export default mongoose.model<IDiscountCode>("DiscountCode", DiscountCode);

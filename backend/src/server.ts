@@ -1,6 +1,6 @@
 import { App } from "./app";
-import { AuthController } from "#controllers/authentication/authentication.controller";
-import { UserController } from "#controllers/user/user.controller";
+import { AuthController } from "#controllers/authentication.controller";
+import { UserController } from "#controllers/user.controller";
 
 const controllers = [
     AuthController, 

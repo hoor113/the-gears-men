@@ -1,45 +1,45 @@
-import { EUserRole, IUser } from "#schemas/user.model";
-import { plainToInstance } from "class-transformer";
-import { 
-    IsEmail, 
-    IsEnum, 
-    IsOptional, 
-    IsString, MinLength, 
-    ValidationArguments 
-} from "class-validator";
+import { EUserRole } from '#schemas/user.model';
+import {
+    IsEmail,
+    IsEnum,
+    IsOptional,
+    IsString,
+    MinLength,
+    ValidationArguments,
+} from 'class-validator';
 
 export class RegisterDto {
-    @IsString({ message: "Username must be a string." })
+    @IsString({ message: 'Username must be a string.' })
     username!: string;
 
-    @IsString({ message: "Full name must be a string." })
+    @IsString({ message: 'Full name must be a string.' })
     fullname!: string;
 
-    @IsEmail({}, { message: "Invalid email address." })
+    @IsEmail({}, { message: 'Invalid email address.' })
     email!: string;
 
-    @IsString({ message: "Password must be a string." })
-    @MinLength(6, { message: "Password must be at least 6 characters long." })
+    @IsString({ message: 'Password must be a string.' })
+    @MinLength(6, { message: 'Password must be at least 6 characters long.' })
     password!: string;
 
     @IsEnum(EUserRole, {
         message: (args: ValidationArguments) =>
-            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(", ")}`,
+            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
     })
     role!: EUserRole;
 
-    @IsString({ message: "Phone number must be a string." })
+    @IsString({ message: 'Phone number must be a string.' })
     phoneNumber!: string;
 
-    @IsString({ each: true, message: "Each address must be a string." })
+    @IsString({ each: true, message: 'Each address must be a string.' })
     addresses?: string[];
 
     @IsOptional()
-    @IsString({ message: "Avatar picture must be a valid URL string." })
+    @IsString({ message: 'Avatar picture must be a valid URL string.' })
     avatarPicture?: string;
 
     @IsOptional()
-    @IsString({ message: "Vehicle license number must be a string." })
+    @IsString({ message: 'Vehicle license number must be a string.' })
     vehicleLicenseNumber?: string;
 }
 
@@ -58,58 +58,58 @@ export class RefreshTokenDto {
 }
 
 export class RegisterResult {
-    @IsString({ message: "Username must be a string." })
+    @IsString({ message: 'Username must be a string.' })
     username!: string;
 
-    @IsString({ message: "Full name must be a string." })
+    @IsString({ message: 'Full name must be a string.' })
     fullname!: string;
 
-    @IsEmail({}, { message: "Invalid email address." })
+    @IsEmail({}, { message: 'Invalid email address.' })
     email!: string;
 
     @IsEnum(EUserRole, {
         message: (args: ValidationArguments) =>
-            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(", ")}`,
+            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
     })
     role!: EUserRole;
 
-    @IsString({ message: "Phone number must be a string." })
+    @IsString({ message: 'Phone number must be a string.' })
     phoneNumber!: string;
 
-    @IsString({ each: true, message: "Each address must be a string." })
+    @IsString({ each: true, message: 'Each address must be a string.' })
     addresses?: string[];
 
     @IsOptional()
-    @IsString({ message: "Avatar picture must be a valid URL string." })
+    @IsString({ message: 'Avatar picture must be a valid URL string.' })
     avatarPicture?: string;
 
     @IsOptional()
-    @IsString({ message: "Vehicle license number must be a string." })
+    @IsString({ message: 'Vehicle license number must be a string.' })
     vehicleLicenseNumber?: string;
 
-    @IsString({ message: "Access token must be a string." })
+    @IsString({ message: 'Access token must be a string.' })
     accessToken!: string;
 
-    @IsString({ message: "Refresh token must be a string." })
+    @IsString({ message: 'Refresh token must be a string.' })
     refreshToken!: string;
 }
 
 export class LoginResult {
-    @IsString({ message: "Access token must be a string." })
+    @IsString({ message: 'Access token must be a string.' })
     accessToken!: string;
 
-    @IsString({ message: "Refresh token must be a string." })
+    @IsString({ message: 'Refresh token must be a string.' })
     refreshToken!: string;
 
-    @IsString({ message: "User ID must be a string." })
+    @IsString({ message: 'User ID must be a string.' })
     userId!: string;
 
-    @IsString({ message: "Username must be a string." })
+    @IsString({ message: 'Username must be a string.' })
     username!: string;
 
     @IsEnum(EUserRole, {
         message: (args: ValidationArguments) =>
-            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(", ")}`,
+            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
     })
     role!: EUserRole;
 
@@ -118,9 +118,9 @@ export class LoginResult {
 }
 
 export class RefreshTokenResult {
-    @IsString({ message: "Access token must be a string." })
+    @IsString({ message: 'Access token must be a string.' })
     accessToken!: string;
 
-    @IsString({ message: "Refresh token must be a string." })
+    @IsString({ message: 'Refresh token must be a string.' })
     refreshToken!: string;
 }

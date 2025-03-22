@@ -1,19 +1,23 @@
-import { Service } from "typedi";
-import User, { EUserRole } from "#schemas/user.model";
+import User, { EUserRole } from '@/models/user.model';
+import bcrypt from 'bcrypt';
+import { JwtPayload } from 'jsonwebtoken';
+import { BaseResponse } from 'src/common/base-response';
 import {
-    RegisterDto,
-    RegisterResult,
+    generateRefreshToken,
+    generateToken,
+    verifyRefreshToken,
+} from 'src/config/jwt';
+import redis from 'src/config/redis';
+import { EHttpStatusCode } from 'src/utils/enum';
+import { Service } from 'typedi';
+import {
     LoginDto,
     LoginResult,
     RefreshTokenDto,
-    RefreshTokenResult
-} from "./dto/auth.dto";
-import { BaseResponse } from "src/common/base-response";
-import bcrypt from "bcrypt";
-import { generateToken, generateRefreshToken, verifyRefreshToken } from "src/config/jwt";
-import { JwtPayload } from "jsonwebtoken";
-import { EHttpStatusCode } from "src/utils/enum";
-import redis from "src/config/redis";
+    RefreshTokenResult,
+    RegisterDto,
+    RegisterResult,
+} from './dto/auth.dto';
 
 @Service()
 export class AuthService {
@@ -21,18 +25,20 @@ export class AuthService {
         return bcrypt.hash(password, 10);
     }
 
-    public async register(dto: RegisterDto): Promise<BaseResponse<RegisterResult>> {
+    public async register(
+        dto: RegisterDto,
+    ): Promise<BaseResponse<RegisterResult>> {
         try {
             if (await User.exists({ email: dto.email })) {
-                return BaseResponse.error("Email already exists");
+                return BaseResponse.error('Email already exists');
             }
 
             if (await User.exists({ username: dto.username })) {
-                return BaseResponse.error("Username already exists");
+                return BaseResponse.error('Username already exists');
             }
 
             if (dto.role === EUserRole.Admin) {
-                return BaseResponse.error("You cannot create an admin user");
+                return BaseResponse.error('You cannot create an admin user');
             }
 
             const hashedPassword = await this.hashPassword(dto.password);
@@ -45,9 +51,12 @@ export class AuthService {
                 phoneNumber: dto.phoneNumber,
                 addresses: dto.addresses,
                 avatarPicture: dto.avatarPicture,
-                vehicleLicenseNumber: dto.vehicleLicenseNumber
+                vehicleLicenseNumber: dto.vehicleLicenseNumber,
             });
-            const accessToken = generateToken(newUser._id.toString(), newUser.role);
+            const accessToken = generateToken(
+                newUser._id.toString(),
+                newUser.role,
+            );
             const refreshToken = generateRefreshToken(newUser._id.toString());
 
             newUser.refreshToken = refreshToken;
@@ -63,12 +72,21 @@ export class AuthService {
                 avatarPicture: newUser.avatarPicture,
                 vehicleLicenseNumber: newUser.vehicleLicenseNumber,
                 accessToken,
-                refreshToken
+                refreshToken,
             };
 
-            return BaseResponse.success(result, undefined, "Registration successful", EHttpStatusCode.CREATED);
+            return BaseResponse.success(
+                result,
+                undefined,
+                'Registration successful',
+                EHttpStatusCode.CREATED,
+            );
         } catch (error) {
-            return BaseResponse.error("Error registering user", EHttpStatusCode.INTERNAL_SERVER_ERROR, error);
+            return BaseResponse.error(
+                'Error registering user',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+                error,
+            );
         }
     }
 
@@ -76,7 +94,7 @@ export class AuthService {
         try {
             const user = await User.findOne({ email: dto.email });
             if (!user || !(await bcrypt.compare(dto.password, user.password))) {
-                return BaseResponse.error("Email or password is incorrect");
+                return BaseResponse.error('Email or password is incorrect');
             }
 
             const accessToken = generateToken(user._id.toString(), user.role);
@@ -91,33 +109,49 @@ export class AuthService {
                 email: user.email,
                 role: user.role,
                 accessToken,
-                refreshToken
+                refreshToken,
             };
 
-            return BaseResponse.success(result, undefined, "Login successful");
+            return BaseResponse.success(result, undefined, 'Login successful');
         } catch (error) {
-            return BaseResponse.error("Error logging in", EHttpStatusCode.INTERNAL_SERVER_ERROR, error);
+            return BaseResponse.error(
+                'Error logging in',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+                error,
+            );
         }
     }
 
-    public async refreshToken(dto: RefreshTokenDto): Promise<BaseResponse<RefreshTokenResult>> {
+    public async refreshToken(
+        dto: RefreshTokenDto,
+    ): Promise<BaseResponse<RefreshTokenResult>> {
         try {
             const decoded = verifyRefreshToken(dto.refreshToken) as JwtPayload;
-            if (!decoded || typeof decoded === "string") {
-                return BaseResponse.error("Invalid refresh token");
+            if (!decoded || typeof decoded === 'string') {
+                return BaseResponse.error('Invalid refresh token');
             }
 
-            const isBlacklisted = await redis.get(`blacklist:${dto.refreshToken}`);
+            const isBlacklisted = await redis.get(
+                `blacklist:${dto.refreshToken}`,
+            );
             if (isBlacklisted) {
-                return BaseResponse.error("Refresh token is blacklisted", EHttpStatusCode.UNAUTHORIZED);
+                return BaseResponse.error(
+                    'Refresh token is blacklisted',
+                    EHttpStatusCode.UNAUTHORIZED,
+                );
             }
 
             const user = await User.findById(decoded.userId);
             if (!user || user.refreshToken !== dto.refreshToken) {
-                return BaseResponse.error("Refresh token is expired or invalid");
+                return BaseResponse.error(
+                    'Refresh token is expired or invalid',
+                );
             }
 
-            const newAccessToken = generateToken(user._id.toString(), user.role);
+            const newAccessToken = generateToken(
+                user._id.toString(),
+                user.role,
+            );
             const newRefreshToken = generateRefreshToken(user._id.toString());
 
             user.refreshToken = newRefreshToken;
@@ -125,38 +159,60 @@ export class AuthService {
 
             const result: RefreshTokenResult = {
                 accessToken: newAccessToken,
-                refreshToken: newRefreshToken
+                refreshToken: newRefreshToken,
             };
 
-            return BaseResponse.success(result, undefined, "Token refreshed successfully");
+            return BaseResponse.success(
+                result,
+                undefined,
+                'Token refreshed successfully',
+            );
         } catch (error) {
-            return BaseResponse.error("Error refreshing token", EHttpStatusCode.INTERNAL_SERVER_ERROR, error);
+            return BaseResponse.error(
+                'Error refreshing token',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+                error,
+            );
         }
     }
 
     public async logout(accessToken: string): Promise<BaseResponse<boolean>> {
         try {
             const decoded = verifyRefreshToken(accessToken) as JwtPayload;
-            if (!decoded || typeof decoded === "string") {
-                return BaseResponse.error("Invalid token", EHttpStatusCode.UNAUTHORIZED);
+            if (!decoded || typeof decoded === 'string') {
+                return BaseResponse.error(
+                    'Invalid token',
+                    EHttpStatusCode.UNAUTHORIZED,
+                );
             }
 
             const user = await User.findById(decoded.id);
             if (!user || !user.refreshToken) {
-                return BaseResponse.error("User not found or already logged out", EHttpStatusCode.UNAUTHORIZED);
+                return BaseResponse.error(
+                    'User not found or already logged out',
+                    EHttpStatusCode.UNAUTHORIZED,
+                );
             }
 
             // Thêm refreshToken vào Redis blacklist
-            await redis.set(`blacklist:${accessToken}`, "1", 60 * 60 * 24 * 7); // Blacklist trong 7 ngày
-            await redis.set(`blacklist:${user.refreshToken}`, "1", 60 * 60 * 24 * 7); // Blacklist trong 7 ngày
+            await redis.set(`blacklist:${accessToken}`, '1', 60 * 60 * 24 * 7); // Blacklist trong 7 ngày
+            await redis.set(
+                `blacklist:${user.refreshToken}`,
+                '1',
+                60 * 60 * 24 * 7,
+            ); // Blacklist trong 7 ngày
 
             // Xóa refreshToken trong DB
             user.refreshToken = undefined;
             await user.save();
 
-            return BaseResponse.success(true, undefined, "Logout successful");
+            return BaseResponse.success(true, undefined, 'Logout successful');
         } catch (error) {
-            return BaseResponse.error("Error logging out", EHttpStatusCode.INTERNAL_SERVER_ERROR, error);
+            return BaseResponse.error(
+                'Error logging out',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+                error,
+            );
         }
     }
 }

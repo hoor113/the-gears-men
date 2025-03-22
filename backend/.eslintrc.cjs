@@ -1,17 +1,18 @@
+/** @type {import("eslint").Linter.Config} */
 module.exports = {
     env: {
-        node: true, // ✅ Chạy trên môi trường Node.js
-        es2021: true
+        node: true,
+        es2021: true,
     },
     extends: [
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
-        'plugin:prettier/recommended'
+        'plugin:prettier/recommended',
     ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module'
+        sourceType: 'module',
     },
     plugins: ['@typescript-eslint', 'prettier'],
     rules: {
@@ -20,13 +21,20 @@ module.exports = {
             {
                 argsIgnorePattern: '^_',
                 varsIgnorePattern: '^_',
-                caughtErrorsIgnorePattern: '^_'
-            }
+                caughtErrorsIgnorePattern: '^_',
+            },
         ],
-        'prettier/prettier': 'error',
+        'prettier/prettier': [
+            'error',
+            {
+                tabWidth: 4,
+                useTabs: false,
+            },
+        ],
         'arrow-body-style': 'off',
         'prefer-arrow-callback': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
-        // 'no-console': 'warn' // ✅ Cảnh báo khi dùng console.log
-    }
+        'sort-imports': ['warn', { ignoreDeclarationSort: true }],
+        'indent': ['error', 4],
+    },
 };

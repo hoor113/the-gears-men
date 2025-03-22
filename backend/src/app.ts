@@ -7,7 +7,6 @@ import compression from "compression";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import connectDB from "./config/database";
-import redisClient from "./config/redis";
 
 dotenv.config();
 
@@ -23,7 +22,6 @@ export class App {
 
     private async connectDatabase() {
         await connectDB();
-        // await redisClient.connect();
     }
 
     private setupMiddlewares() {

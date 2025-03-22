@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "src/config/jwt";
 import { BaseResponse } from "../common/base-response";
 import PUBLIC_ROUTES from "src/constants/public-endpoints";
+import redis from "src/config/redis";
 
-export const AuthMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const AuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   if (PUBLIC_ROUTES.includes(req.path)) {
     return next(); // Bỏ qua kiểm tra xác thực với public routes
   }
@@ -19,6 +20,10 @@ export const AuthMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
+    const isBlacklisted = await redis.get(`blacklist:${token}`);
+    if (isBlacklisted) {
+        return res.status(401).json(BaseResponse.error("Unauthorized", 401));
+    }
     verifyToken(token); 
     next();
   } catch (error) {

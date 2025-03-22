@@ -13,6 +13,7 @@ import bcrypt from "bcrypt";
 import { generateToken, generateRefreshToken, verifyRefreshToken } from "src/config/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { EHttpStatusCode } from "src/utils/enum";
+import redis from "src/config/redis";
 
 @Service()
 export class AuthService {
@@ -106,6 +107,11 @@ export class AuthService {
                 return BaseResponse.error("Invalid refresh token");
             }
 
+            const isBlacklisted = await redis.get(`blacklist:${dto.refreshToken}`);
+            if (isBlacklisted) {
+                return BaseResponse.error("Refresh token is blacklisted", EHttpStatusCode.UNAUTHORIZED);
+            }
+
             const user = await User.findById(decoded.userId);
             if (!user || user.refreshToken !== dto.refreshToken) {
                 return BaseResponse.error("Refresh token is expired or invalid");
@@ -128,13 +134,23 @@ export class AuthService {
         }
     }
 
-    public async logout(userId: string): Promise<BaseResponse<boolean>> {
+    public async logout(accessToken: string): Promise<BaseResponse<boolean>> {
         try {
-            const user = await User.findById(userId);
-            if (!user) {
-                return BaseResponse.error("User not found");
+            const decoded = verifyRefreshToken(accessToken) as JwtPayload;
+            if (!decoded || typeof decoded === "string") {
+                return BaseResponse.error("Invalid token", EHttpStatusCode.UNAUTHORIZED);
             }
 
+            const user = await User.findById(decoded.id);
+            if (!user || !user.refreshToken) {
+                return BaseResponse.error("User not found or already logged out", EHttpStatusCode.UNAUTHORIZED);
+            }
+
+            // Thêm refreshToken vào Redis blacklist
+            await redis.set(`blacklist:${accessToken}`, "1", 60 * 60 * 24 * 7); // Blacklist trong 7 ngày
+            await redis.set(`blacklist:${user.refreshToken}`, "1", 60 * 60 * 24 * 7); // Blacklist trong 7 ngày
+
+            // Xóa refreshToken trong DB
             user.refreshToken = undefined;
             await user.save();
 

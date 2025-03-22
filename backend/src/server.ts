@@ -1,11 +1,9 @@
-import { App } from "./app";
-import { AuthController } from "#controllers/auth.controller";
-import { UserController } from "#controllers/user.controller";
+import { AuthController } from '#controllers/auth.controller';
+import { UserController } from '#controllers/user.controller';
 
-const controllers = [
-    AuthController, 
-    UserController
-];
+import { App } from './app';
+
+const controllers = [AuthController, UserController];
 
 const app = new App(controllers);
 

@@ -1,5 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
-
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IStore extends Document {
   ownerId: mongoose.Types.ObjectId;
@@ -11,13 +10,13 @@ export interface IStore extends Document {
 
 const Store = new Schema<IStore>(
   {
-    ownerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    ownerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
     description: { type: String },
     location: { type: String },
-    products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+    products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.model<IStore>("Store", Store);
+export default mongoose.model<IStore>('Store', Store);

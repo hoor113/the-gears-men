@@ -22,7 +22,6 @@ export class UserController {
     async createUser(@Body() dto: CreateUserDto, @Res() res: Response) {
         try {
             const response = await this.userService.createUser(dto);
-
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

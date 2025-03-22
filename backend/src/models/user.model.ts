@@ -1,11 +1,11 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document, Schema } from 'mongoose';
 
 export enum EUserRole {
-    Customer = "customer",
-    StoreOwner = "storeOwner",
-    DeliveryPersonnel = "deliveryPersonnel",
-    DeliveryCompany = "deliveryCompany",
-    Admin = "admin",
+  Customer = 'customer',
+  StoreOwner = 'storeOwner',
+  DeliveryPersonnel = 'deliveryPersonnel',
+  DeliveryCompany = 'deliveryCompany',
+  Admin = 'admin',
 }
 
 export interface IUser extends Document<string> {
@@ -34,9 +34,9 @@ export const User = new Schema<IUser>(
     avatarPicture: { type: String },
     // storeId: { type: Schema.Types.ObjectId, ref: "Store" }, // Only for store owners
     vehicleLicenseNumber: { type: String }, // Only for delivery personnel
-    refreshToken: { type: String }
+    refreshToken: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.model<IUser>("User", User);
+export default mongoose.model<IUser>('User', User);

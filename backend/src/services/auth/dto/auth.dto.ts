@@ -1,4 +1,4 @@
-import { EUserRole } from '#schemas/user.model';
+import { EUserRole } from '@/models/user.model';
 import {
     IsEmail,
     IsEnum,

@@ -1,5 +1,5 @@
-import { AuthController } from '#controllers/auth.controller';
-import { UserController } from '#controllers/user.controller';
+import { AuthController } from '@/controllers/auth.controller';
+import { UserController } from '@/controllers/user.controller';
 
 import { App } from './app';
 

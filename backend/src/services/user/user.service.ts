@@ -1,4 +1,4 @@
-import User, { EUserRole } from '#schemas/user.model';
+import User, { EUserRole } from '@/models/user.model';
 import bcrypt from 'bcrypt';
 import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';

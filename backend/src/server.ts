@@ -3,7 +3,10 @@ import { UserController } from '@/controllers/user.controller';
 
 import { App } from './app';
 
-const controllers = [AuthController, UserController];
+const controllers = [
+    AuthController,
+    UserController /* Add more controllers here */,
+];
 
 const app = new App(controllers);
 

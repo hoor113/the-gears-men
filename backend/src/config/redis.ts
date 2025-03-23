@@ -48,7 +48,6 @@ export class RedisInstance {
         return RedisInstance.CacheClient;
     }
 
-    // ✅ Hàm set giá trị vào Redis
     public async set(
         key: string,
         value: string,
@@ -67,7 +66,6 @@ export class RedisInstance {
         }
     }
 
-    // ✅ Hàm get giá trị từ Redis
     public async get(key: string): Promise<string | null> {
         try {
             return await RedisInstance.CacheClient.get(key);
@@ -78,6 +76,5 @@ export class RedisInstance {
     }
 }
 
-// Xuất một instance duy nhất
 const redis = RedisInstance.getInstance();
 export default redis;

@@ -8,8 +8,9 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "#controllers/*": ["src/controllers/*"],
-      "#schemas/*": ["src/schemas/*"]
-    }
+      "@/*": ["src/*"]
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
   }
 }

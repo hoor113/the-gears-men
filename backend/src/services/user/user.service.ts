@@ -217,4 +217,38 @@ export class UserService {
             );
         }
     }
+
+    public async getManyUsers(
+        dto: GetAllUsersDto,
+    ): Promise<BaseResponse<UserDto[] | unknown>> {
+        try {
+            const searchableFields = ['username', 'fullname', 'email'];
+            const query = buildQuery(dto, searchableFields);
+
+            const totalRecords = await User.countDocuments(query);
+            const users = await User.find(query)
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount);
+
+            const userDtos: UserDto[] = users.map((user) => ({
+                id: user._id.toString(),
+                username: user.username,
+                fullname: user.fullname,
+                email: user.email,
+                role: user.role,
+                phoneNumber: user.phoneNumber,
+                addresses: user.addresses,
+                avatarPicture: user.avatarPicture,
+                vehicleLicenseNumber: user.vehicleLicenseNumber,
+            }));
+
+            return BaseResponse.success(userDtos, totalRecords);
+        } catch (error) {
+            return BaseResponse.error(
+                'Error fetching users',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+                error,
+            );
+        }
+    }
 }

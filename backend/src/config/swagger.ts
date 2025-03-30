@@ -3,10 +3,7 @@ import { getMetadataArgsStorage } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 
-// Import express
-
 export function setupSwagger(app: express.Application) {
-    // Sửa kiểu dữ liệu từ Express thành express.Application
     const storage = getMetadataArgsStorage();
     const spec = routingControllersToSpec(
         storage,

@@ -1,4 +1,5 @@
 import { EUserRole } from '@/models/user.model';
+import 'reflect-metadata';
 import {
     IsEmail,
     IsEnum,
@@ -29,6 +30,7 @@ export class UserDto extends EntityDto {
     @IsString({ message: 'Phone number must be a string.' })
     phoneNumber!: string;
 
+    @IsOptional()
     @IsString({ each: true, message: 'Each address must be a string.' })
     addresses?: string[];
 

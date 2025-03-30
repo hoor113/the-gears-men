@@ -127,22 +127,6 @@ export class UserController {
     }
     
 
-    @Put('/Update')
-    @UseBefore(ValidationMiddleware(UpdateUserDto))
-    async updateUser(@Body() dto: UpdateUserDto, @Res() res: Response) {
-        try {
-            const response = await this.userService.updateUser(dto);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
-
-
     async deleteManyUser(
         @QueryParams() query: { id: string },
         @Res() res: Response,

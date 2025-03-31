@@ -1,14 +1,18 @@
+import 'reflect-metadata';
 import compression from 'compression';
 import cors from 'cors';
 import dotenv from 'dotenv';
-// import { setupSwagger } from "./config/swagger";
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import 'reflect-metadata';
-import { useExpressServer } from 'routing-controllers';
+import { getMetadataArgsStorage, useExpressServer } from 'routing-controllers';
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
+import { routingControllersToSpec } from 'routing-controllers-openapi';
+import swaggerUi from 'swagger-ui-express';
 
 import connectDB from './config/database';
+import { AuthMiddleware } from './middlewares/auth.middleware';
 
 dotenv.config();
 
@@ -20,7 +24,8 @@ export class App {
         this.connectDatabase();
         this.setupMiddlewares();
         this.setupControllers(controllers);
-        // setupSwagger(this.app);
+        // this.initializeAuthentication();
+        this.initializeSwagger(controllers);
     }
 
     private async connectDatabase() {
@@ -39,11 +44,46 @@ export class App {
     private setupControllers(controllers: Function[]) {
         useExpressServer(this.app, {
             controllers,
-            routePrefix: '/api', // Định nghĩa prefix API
             defaultErrorHandler: false, // Tắt error handler mặc định của routing-controllers
         });
 
         console.log('Registered controllers:', controllers);
+    }
+
+    private initializeSwagger(controllers: Function[]) {
+        const schemas = validationMetadatasToSchemas({
+            refPointerPrefix: '#/components/schemas/',
+        });
+    
+        const routingControllersOptions = {
+            controllers: controllers,
+        };
+    
+        const storage = getMetadataArgsStorage();
+        const spec = routingControllersToSpec(storage, routingControllersOptions, {
+            components: {
+                schemas: schemas,
+                securitySchemes: {
+                    bearerAuth: {
+                        type: 'http',
+                        scheme: 'bearer',
+                        bearerFormat: 'JWT',
+                    },
+                },
+            },
+            security: [ { bearerAuth: [] } ],
+            info: {
+                description: 'Generated with `routing-controllers-openapi`',
+                title: 'A sample API',
+                version: '1.0.0',
+            },
+        });
+    
+        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
+    }
+
+    public initializeAuthentication() {
+        this.app.use(AuthMiddleware as express.RequestHandler);
     }
 
     public listen(port: number) {

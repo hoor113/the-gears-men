@@ -1,3 +1,4 @@
+import { StringEntityDto } from '@/common/entity-dto';
 import { authorizeRoles } from '@/middlewares/role.middleware';
 import { EUserRole } from '@/models/user.model';
 import { Response } from 'express';
@@ -48,7 +49,7 @@ export class UserController {
 
     @Get('/GetAll')
     @UseBefore(authorizeRoles([EUserRole.Admin]))
-    // @UseBefore(ValidationMiddleware(GetAllUsersDto))
+    @UseBefore(ValidationMiddleware(GetAllUsersDto))
     async getAllUsers(
         @QueryParams() dto: GetAllUsersDto,
         @Res() res: Response,
@@ -67,7 +68,7 @@ export class UserController {
 
     @Get('/GetById')
     async getUserById(
-        @QueryParams() query: { id: string },
+        @QueryParams() query: StringEntityDto,
         @Res() res: Response,
     ) {
         const id = query.id;
@@ -105,28 +106,7 @@ export class UserController {
 
     @Delete('/Delete')
     async deleteUser(
-        @QueryParams() query: { id: string },
-        @Res() res: Response,
-    ) {
-        const id = query.id;
-        if (!id) {
-            return res
-                .status(400)
-                .json({ success: false, message: 'Missing id parameter' });
-        }
-        try {
-            const response = await this.userService.deleteUser(id);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
-    async deleteManyUser(
-        @QueryParams() query: { id: string },
+        @QueryParams() query: StringEntityDto,
         @Res() res: Response,
     ) {
         const id = query.id;

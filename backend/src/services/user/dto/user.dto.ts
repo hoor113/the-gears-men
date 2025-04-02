@@ -100,10 +100,13 @@ export class UpdateUserDto extends EntityDto {
 
 export class GetAllUsersDto extends BaseGetAllDto {
     @IsOptional()
-    @IsString()
-    role?: string;
+    @IsEnum(EUserRole, {
+        message: (args: ValidationArguments) =>
+            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
+    })
+    role?: EUserRole;
 
     @IsOptional()
-    @IsString()
+    @IsEmail({}, { message: 'Invalid email address.' })
     email?: string;
 }

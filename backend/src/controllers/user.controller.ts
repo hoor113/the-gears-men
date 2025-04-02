@@ -1,3 +1,4 @@
+import { StringEntityDto } from '@/common/entity-dto';
 import { authorizeRoles } from '@/middlewares/role.middleware';
 import { EUserRole } from '@/models/user.model';
 import { Response } from 'express';
@@ -48,7 +49,7 @@ export class UserController {
 
     @Get('/GetAll')
     @UseBefore(authorizeRoles([EUserRole.Admin]))
-    // @UseBefore(ValidationMiddleware(GetAllUsersDto))
+    @UseBefore(ValidationMiddleware(GetAllUsersDto))
     async getAllUsers(
         @QueryParams() dto: GetAllUsersDto,
         @Res() res: Response,
@@ -67,7 +68,7 @@ export class UserController {
 
     @Get('/GetById')
     async getUserById(
-        @QueryParams() query: { id: string },
+        @QueryParams() query: StringEntityDto,
         @Res() res: Response,
     ) {
         const id = query.id;
@@ -105,7 +106,7 @@ export class UserController {
 
     @Delete('/Delete')
     async deleteUser(
-        @QueryParams() query: { id: string },
+        @QueryParams() query: StringEntityDto,
         @Res() res: Response,
     ) {
         const id = query.id;

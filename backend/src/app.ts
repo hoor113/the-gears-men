@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import compression from 'compression';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -7,7 +7,6 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import 'reflect-metadata';
 import { getMetadataArgsStorage, useExpressServer } from 'routing-controllers';
-import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 
@@ -54,31 +53,35 @@ export class App {
         const schemas = validationMetadatasToSchemas({
             refPointerPrefix: '#/components/schemas/',
         });
-    
+
         const routingControllersOptions = {
             controllers: controllers,
         };
-    
+
         const storage = getMetadataArgsStorage();
-        const spec = routingControllersToSpec(storage, routingControllersOptions, {
-            components: {
-                schemas: schemas,
-                securitySchemes: {
-                    bearerAuth: {
-                        type: 'http',
-                        scheme: 'bearer',
-                        bearerFormat: 'JWT',
+        const spec = routingControllersToSpec(
+            storage,
+            routingControllersOptions,
+            {
+                components: {
+                    schemas: schemas,
+                    securitySchemes: {
+                        bearerAuth: {
+                            type: 'http',
+                            scheme: 'bearer',
+                            bearerFormat: 'JWT',
+                        },
                     },
                 },
+                security: [{ bearerAuth: [] }],
+                info: {
+                    description: 'Generated with `routing-controllers-openapi`',
+                    title: 'A sample API',
+                    version: '1.0.0',
+                },
             },
-            security: [ { bearerAuth: [] } ],
-            info: {
-                description: 'Generated with `routing-controllers-openapi`',
-                title: 'A sample API',
-                version: '1.0.0',
-            },
-        });
-    
+        );
+
         this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
     }
 

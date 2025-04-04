@@ -30,7 +30,9 @@ export const authorizeRoles = (allowedRoles: string[]) => {
         } catch (error) {
             return res
                 .status(401)
-                .json(BaseResponse.error('Invalid or expired token', 401));
+                .json(
+                    BaseResponse.error('Invalid or expired token', 401, error),
+                );
         }
     };
 };
@@ -80,7 +82,9 @@ export const isSelfOrAuthorizedRoles = (allowedRoles: string[]) => {
         } catch (error) {
             return res
                 .status(401)
-                .json(BaseResponse.error('Invalid or expired token', 401));
+                .json(
+                    BaseResponse.error('Invalid or expired token', 401, error),
+                );
         }
     };
 };

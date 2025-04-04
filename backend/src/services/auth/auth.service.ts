@@ -53,13 +53,7 @@ export class AuthService {
                 avatarPicture: dto.avatarPicture,
                 vehicleLicenseNumber: dto.vehicleLicenseNumber,
             });
-            const accessToken = generateToken(
-                newUser._id.toString(),
-                newUser.role,
-            );
-            const refreshToken = generateRefreshToken(newUser._id.toString());
 
-            newUser.refreshToken = refreshToken;
             await newUser.save();
 
             const result: RegisterResult = {
@@ -71,8 +65,6 @@ export class AuthService {
                 addresses: newUser.addresses,
                 avatarPicture: newUser.avatarPicture,
                 vehicleLicenseNumber: newUser.vehicleLicenseNumber,
-                accessToken,
-                refreshToken,
             };
 
             return BaseResponse.success(

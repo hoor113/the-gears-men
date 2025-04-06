@@ -7,16 +7,15 @@ import {
     IsString,
     MinLength,
     ValidationArguments,
+    IsMongoId,
+    IsArray,
 } from 'class-validator';
 import { BaseGetAllDto } from 'src/common/base-get-all-dto';
 import { EntityDto } from 'src/common/entity-dto';
 
-export class CustomerDto extends EntityDto {
-    @IsString({ message: 'Username must be a string.' })
-    username!: string;
-
-    @IsString({ message: 'Full name must be a string.' })
-    fullname!: string;
+export class DeliveryCompanyDto extends EntityDto {
+    @IsString({ message: 'Company name must be a string.' })
+    companyName!: string;
 
     @IsEmail({}, { message: 'Invalid email address.' })
     email!: string;
@@ -31,79 +30,63 @@ export class CustomerDto extends EntityDto {
     phoneNumber!: string;
 
     @IsOptional()
-    @IsString({ each: true, message: 'Each address must be a string.' })
-    addresses?: string[];
+    @IsString({ message: 'Company address must be a string.' })
+    companyAddress?: string;
 
-    @IsOptional()
-    @IsString({ message: 'Avatar picture must be a valid URL string.' })
-    avatarPicture?: string;
-
-    @IsOptional()
-    @IsString({ message: 'Vehicle license number must be a string.' })
-    vehicleLicenseNumber?: string;
+    // @IsOptional()
+    // @IsString({ message: 'Company logo must be a valid URL string.' })
+    // companyLogo?: string;
 }
 
-// export class CreateUserDto {
-//     @IsString({ message: 'Username must be a string.' })
-//     username!: string;
+/**
+ * DTO for getting orders from stores
+ */
+export class GetOrderFromStoreDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID' })
+    deliveryCompanyId?: string;
+    
+    @IsOptional()
+    @IsEnum(['shipped'], {
+        message: 'Order status must be "shipped" for delivery company orders'
+    })
+    orderStatus?: 'shipped';
+}
 
-//     @IsString({ message: 'Full name must be a string.' })
-//     fullname!: string;
+/**
+ * DTO for assigning orders to delivery personnel and updating status to shippedToWarehouse
+ */
+export class SendOrderToDeliveryPersonnelDto {
+    @IsMongoId({ message: 'Order ID must be a valid MongoDB ID' })
+    orderId!: string;
+    
+    @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID' })
+    deliveryPersonnelId!: string;
+    
+    // No need to include orderStatus as it's automatically set to 'shippedToWarehouse'
+}
 
-//     @IsEmail({}, { message: 'Invalid email address.' })
-//     email!: string;
+/**
+ * DTO for retrieving delivery personnel
+ */
+export class GetDeliveryPersonnelDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID' })
+    deliveryCompanyId?: string;
+    
+    @IsOptional()
+    @IsString({ message: 'Area code must be a string' })
+    areaCode?: string;
+}
 
-//     @IsString({ message: 'Password must be a string.' })
-//     @MinLength(6, { message: 'Password must be at least 6 characters long.' })
-//     password!: string;
-
-//     @IsEnum(EUserRole, {
-//         message: (args: ValidationArguments) =>
-//             `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
-//     })
-//     role!: EUserRole;
-
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
-
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses?: string[];
-
-//     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
-
-//     @IsOptional()
-//     @IsString({ message: 'Vehicle license number must be a string.' })
-//     vehicleLicenseNumber?: string;
-// }
-
-// export class UpdateUserDto extends EntityDto {
-//     @IsOptional()
-//     @IsString()
-//     fullname?: string;
-
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
-
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses!: string[];
-
-//     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
-
-//     @IsOptional()
-//     @IsString({ message: 'Vehicle license number must be a string.' })
-//     vehicleLicenseNumber?: string;
-// }
-
-// export class GetAllUsersDto extends BaseGetAllDto {
-//     @IsOptional()
-//     @IsString()
-//     role?: string;
-
-//     @IsOptional()
-//     @IsString()
-//     email?: string;
-// }
+/**
+ * DTO for adding delivery personnel to company
+ */
+export class AddDeliveryPersonnelDto {
+    @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID' })
+    deliveryCompanyId!: string;
+    
+    @IsArray({ message: 'Personnel IDs must be an array' })
+    @IsMongoId({ each: true, message: 'Each personnel ID must be a valid MongoDB ID' })
+    personnelIds!: string[];
+}

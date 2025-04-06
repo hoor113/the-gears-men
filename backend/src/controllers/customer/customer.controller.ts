@@ -6,6 +6,7 @@ import {
     JsonController,
     Get,
     Post,
+    Put,
     Delete,
     Req,
     Res,
@@ -14,6 +15,12 @@ import {
 import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
 import { CustomerService } from 'src/services/customer/customer.service';
 import { EHttpStatusCode } from 'src/utils/enum';
+import {
+    GetItemsDto,
+    GetStoresDto, 
+    MakeOrderDto, 
+    CancelOrderDto
+} from '@/services/customer/dto/customer.dto';
 
 @JsonController("/customer")
 export class CustomerController {
@@ -70,8 +77,8 @@ export class CustomerController {
             });
         }
     }
-    
-    @Delete("/order")
+
+    @Put("/order")
     @UseBefore(ValidationMiddleware(CancelOrderDto))
     @UseBefore(authorizeRoles([EUserRole.Customer]))
     async cancelOrder(@Body() dto: CancelOrderDto, @Res() res: Response) {

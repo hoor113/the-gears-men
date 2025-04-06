@@ -5,6 +5,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IDiscountCode extends Document {
     uniqueCode: mongoose.Types.ObjectId;
     code: string;
+    isUsed: boolean;
     // type: "productDiscount" | "shippingDiscount";
     // discountAmount: number;
     // expiryDate: Date;
@@ -18,6 +19,7 @@ const DiscountCode = new Schema<IDiscountCode>(
             required: true,
         },
         code: { type: String, required: true },
+        isUsed: { type: Boolean, default: false },
         // type: { type: String, enum: ["productDiscount", "shippingDiscount"], required: true },
         // discountAmount: { type: Number, required: true },
         // expiryDate: { type: Date, required: true },

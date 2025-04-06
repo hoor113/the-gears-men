@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import {
     IsEmail,
     IsEnum,
+    IsNumber,
     IsOptional,
     IsString,
     MinLength,
@@ -10,100 +11,118 @@ import {
 } from 'class-validator';
 import { BaseGetAllDto } from 'src/common/base-get-all-dto';
 import { EntityDto } from 'src/common/entity-dto';
+import { UserDto } from '@/services/user/dto/user.dto';
+import { Type } from 'class-transformer';
+import { IsArray, ValidateNested } from 'class-validator';
 
-export class CustomerDto extends EntityDto {
-    @IsString({ message: 'Username must be a string.' })
-    username!: string;
+export class CustomerDto extends UserDto {
+    // @IsString({ message: 'Username must be a string.' })
+    // username!: string;
 
-    @IsString({ message: 'Full name must be a string.' })
-    fullname!: string;
+    // @IsString({ message: 'Full name must be a string.' })
+    // fullname!: string;
 
-    @IsEmail({}, { message: 'Invalid email address.' })
-    email!: string;
+    // @IsEmail({}, { message: 'Invalid email address.' })
+    // email!: string;
 
-    @IsEnum(EUserRole, {
-        message: (args: ValidationArguments) =>
-            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
-    })
-    role!: EUserRole;
+    // @IsEnum(EUserRole, {
+    //     message: (args: ValidationArguments) =>
+    //         `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
+    // })
+    // role!: EUserRole;
 
-    @IsString({ message: 'Phone number must be a string.' })
-    phoneNumber!: string;
+    // @IsString({ message: 'Phone number must be a string.' })
+    // phoneNumber!: string;
 
-    @IsOptional()
-    @IsString({ each: true, message: 'Each address must be a string.' })
-    addresses?: string[];
+    // @IsOptional()
+    // @IsString({ each: true, message: 'Each address must be a string.' })
+    // addresses?: string[];
 
-    @IsOptional()
-    @IsString({ message: 'Avatar picture must be a valid URL string.' })
-    avatarPicture?: string;
-
-    @IsOptional()
-    @IsString({ message: 'Vehicle license number must be a string.' })
-    vehicleLicenseNumber?: string;
+    // @IsOptional()
+    // @IsString({ message: 'Avatar picture must be a valid URL string.' })
+    // avatarPicture?: string;
 }
 
-// export class CreateUserDto {
-//     @IsString({ message: 'Username must be a string.' })
-//     username!: string;
+export class GetItemsDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+    
+    @IsOptional()
+    @IsNumber()
+    price?: string;
 
-//     @IsString({ message: 'Full name must be a string.' })
-//     fullname!: string;
+    @IsOptional()
+    @IsString()
+    category?: string;
+}
+export class GetStoresDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+    
+    @IsOptional()
+    @IsString()
+    location?: string;
+}
 
-//     @IsEmail({}, { message: 'Invalid email address.' })
-//     email!: string;
+export class OrderItemDto {
+    @IsString({ message: 'Item ID must be a string.' })
+    itemId!: string;
 
-//     @IsString({ message: 'Password must be a string.' })
-//     @MinLength(6, { message: 'Password must be at least 6 characters long.' })
-//     password!: string;
+    @IsNumber({}, { message: 'Quantity must be a number.' })
+    quantity!: number;
 
-//     @IsEnum(EUserRole, {
-//         message: (args: ValidationArguments) =>
-//             `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
-//     })
-//     role!: EUserRole;
+    @IsOptional()
+    @IsString({ message: 'Product discount code must be a string.' })
+    productDiscountCode?: string;
 
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
+    @IsOptional()
+    @IsString({ message: 'Shipping discount code must be a string.' })
+    shippingDiscountCode?: string;
+}
 
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses?: string[];
+export class MakeOrderDto {
+    @IsString({ message: 'Order ID must be a string.' })
+    orderId!: string;
 
-//     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
+    @IsString({ message: 'Customer ID must be a string.' })
+    customerId!: string;
 
-//     @IsOptional()
-//     @IsString({ message: 'Vehicle license number must be a string.' })
-//     vehicleLicenseNumber?: string;
-// }
+    @IsArray({ message: 'Items must be an array.' })
+    @ValidateNested({ each: true })
+    @Type(() => OrderItemDto)
+    items!: OrderItemDto[];
 
-// export class UpdateUserDto extends EntityDto {
-//     @IsOptional()
-//     @IsString()
-//     fullname?: string;
+    @IsString({ message: 'Payment method must be a string.' })
+    paymentMethod!: string;
 
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
+    @IsString({ message: 'Shipping address must be a string.' })
+    shippingAddress!: string;
 
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses!: string[];
+    @IsEnum(
+        { pending: 'pending', shipped: 'shipped', delivered: 'delivered', cancelled: 'cancelled' },
+        {
+            message: (args: ValidationArguments) =>
+                `${args.value} is not a valid order status. Accepted statuses are: pending, shipped, delivered, cancelled`,
+        },
+    )
+    orderStatus!: 'pending' | 'shipped' | 'delivered' | 'cancelled';
+}
 
-//     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
+export class CancelOrderDto {
+    @IsString({ message: 'Order ID must be a string.' })
+    orderId!: string;
 
-//     @IsOptional()
-//     @IsString({ message: 'Vehicle license number must be a string.' })
-//     vehicleLicenseNumber?: string;
-// }
+    @IsString({ message: 'Customer ID must be a string.' })
+    customerId!: string;
 
-// export class GetAllUsersDto extends BaseGetAllDto {
-//     @IsOptional()
-//     @IsString()
-//     role?: string;
-
-//     @IsOptional()
-//     @IsString()
-//     email?: string;
-// }
+    @IsEnum(
+        { pending: 'pending', shipped: 'shipped', delivered: 'delivered', cancelled: 'cancelled' },
+        {
+            message: (args: ValidationArguments) =>
+                `${args.value} is not a valid order status. Accepted statuses are: pending, shipped, delivered, cancelled`,
+        },
+    )
+    orderStatus!: 'pending' | 'shipped' | 'delivered' | 'cancelled';
+}

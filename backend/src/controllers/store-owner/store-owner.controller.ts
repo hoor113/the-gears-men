@@ -16,6 +16,7 @@ import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
 import { StoreOwnerService } from 'src/services/store-owner/store-owner.service';
 import {
     GetOrderFromCustomerDto,
+    CreateStoreDto,
     ConfirmAndSendOrderToDeliveryCompanyDto,
 } from 'src/services/store-owner/dto/store-owner.dto';
 import { EHttpStatusCode } from 'src/utils/enum';
@@ -28,12 +29,12 @@ export class StoreOwnerController {
         this.storeOwnerService = new StoreOwnerService();
     }
 
-    @Get("/create-store")
+    @Post("/store")
     @UseBefore(ValidationMiddleware(CreateStoreDto))
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
-    async getOrderFromCustomer(@Body() dto: GetOrderFromCustomerDto, @Res() res: Response) {
+    async createStore(@Body() dto: CreateStoreDto, @Res() res: Response) {
         try {
-            const response = await this.storeOwnerService.getOrderFromCustomer(dto);
+            const response = await this.storeOwnerService.createStore(dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({
@@ -63,9 +64,9 @@ export class StoreOwnerController {
     @Put("/order")
     @UseBefore(ValidationMiddleware(ConfirmAndSendOrderToDeliveryCompanyDto))
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
-    async confirmAndSendOrderToDeliveryCompany(@Body() req: ConfirmAndSendOrderToDeliveryCompanyDto, @Res() res: Response) {
+    async confirmAndSendOrderToDeliveryCompany(@Body() dto: ConfirmAndSendOrderToDeliveryCompanyDto, @Res() res: Response) {
         try {
-            const response = await this.storeOwnerService.confirmAndSendOrderToDeliveryCompany();
+            const response = await this.storeOwnerService.confirmAndSendOrderToDeliveryCompany(dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({
@@ -74,5 +75,5 @@ export class StoreOwnerController {
                 statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
             });
         }
-    }   
+    }
 }

@@ -7,103 +7,97 @@ import {
     IsString,
     MinLength,
     ValidationArguments,
+    IsMongoId,
+    IsDate,
 } from 'class-validator';
 import { BaseGetAllDto } from 'src/common/base-get-all-dto';
 import { EntityDto } from 'src/common/entity-dto';
 
-export class CustomerDto extends EntityDto {
-    @IsString({ message: 'Username must be a string.' })
-    username!: string;
 
-    @IsString({ message: 'Full name must be a string.' })
-    fullname!: string;
+export class DeliveryPersonnelDto extends EntityDto {
+    // @IsString({ message: 'Username must be a string.' })
+    // username!: string;
 
-    @IsEmail({}, { message: 'Invalid email address.' })
-    email!: string;
+    // @IsString({ message: 'Full name must be a string.' })
+    // fullname!: string;
 
-    @IsEnum(EUserRole, {
-        message: (args: ValidationArguments) =>
-            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
-    })
-    role!: EUserRole;
+    // @IsEmail({}, { message: 'Invalid email address.' })
+    // email!: string;
 
-    @IsString({ message: 'Phone number must be a string.' })
-    phoneNumber!: string;
+    // @IsEnum(EUserRole, {
+    //     message: (args: ValidationArguments) =>
+    //         `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
+    // })
+    // role!: EUserRole;
 
-    @IsOptional()
-    @IsString({ each: true, message: 'Each address must be a string.' })
-    addresses?: string[];
+    // @IsString({ message: 'Phone number must be a string.' })
+    // phoneNumber!: string;
 
-    @IsOptional()
-    @IsString({ message: 'Avatar picture must be a valid URL string.' })
-    avatarPicture?: string;
+    // @IsOptional()
+    // @IsMongoId({ message: 'Company ID must be a valid MongoDB ID.' })
+    // companyId?: string;
 
-    @IsOptional()
-    @IsString({ message: 'Vehicle license number must be a string.' })
-    vehicleLicenseNumber?: string;
+    // @IsOptional()
+    // @IsString({ message: 'Area code must be a string.' })
+    // areaCode?: string;
+
+    // @IsOptional()
+    // @IsString({ message: 'Vehicle license number must be a string.' })
+    // vehicleLicenseNumber?: string;
+
+    // @IsOptional()
+    // @IsString({ message: 'Avatar picture must be a valid URL string.' })
+    // avatarPicture?: string;
 }
 
-// export class CreateUserDto {
-//     @IsString({ message: 'Username must be a string.' })
-//     username!: string;
+/**
+ * DTO for getting assigned orders
+ */
+export class GetAssignedOrdersDto extends BaseGetAllDto {
+    @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID' })
+    deliveryPersonnelId!: string;
+    
+    @IsOptional()
+    @IsEnum(['shipped'], {
+        message: 'Order status must be "shipped" for delivery personnel orders'
+    })
+    orderStatus?: 'shipped';
+}
 
+/**
+ * DTO for confirming order delivery
+ */
+export class ConfirmOrderDeliveredDto {
+    @IsMongoId({ message: 'Order ID must be a valid MongoDB ID' })
+    orderId!: string;
+    
+    @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID' })
+    deliveryPersonnelId!: string;
+    
+    @IsDate({ message: 'Delivery confirmation must be a date.' })
+    deliveryDate!: string; // Could be a signature, photo ID, etc.
+}
+
+/**
+ * DTO for updating delivery personnel profile
+ */
+// export class UpdateDeliveryProfileDto {
+//     @IsMongoId({ message: 'Personnel ID must be a valid MongoDB ID' })
+//     personnelId!: string;
+    
+//     @IsOptional()
 //     @IsString({ message: 'Full name must be a string.' })
-//     fullname!: string;
-
-//     @IsEmail({}, { message: 'Invalid email address.' })
-//     email!: string;
-
-//     @IsString({ message: 'Password must be a string.' })
-//     @MinLength(6, { message: 'Password must be at least 6 characters long.' })
-//     password!: string;
-
-//     @IsEnum(EUserRole, {
-//         message: (args: ValidationArguments) =>
-//             `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
-//     })
-//     role!: EUserRole;
-
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
-
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses?: string[];
-
-//     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
-
-//     @IsOptional()
-//     @IsString({ message: 'Vehicle license number must be a string.' })
-//     vehicleLicenseNumber?: string;
-// }
-
-// export class UpdateUserDto extends EntityDto {
-//     @IsOptional()
-//     @IsString()
 //     fullname?: string;
-
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
-
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses!: string[];
-
+    
 //     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
-
+//     @IsString({ message: 'Phone number must be a string.' })
+//     phoneNumber?: string;
+    
 //     @IsOptional()
 //     @IsString({ message: 'Vehicle license number must be a string.' })
 //     vehicleLicenseNumber?: string;
-// }
-
-// export class GetAllUsersDto extends BaseGetAllDto {
+    
 //     @IsOptional()
-//     @IsString()
-//     role?: string;
-
-//     @IsOptional()
-//     @IsString()
-//     email?: string;
+//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
+//     avatarPicture?: string;
 // }

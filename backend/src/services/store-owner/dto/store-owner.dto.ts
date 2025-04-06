@@ -7,103 +7,155 @@ import {
     IsString,
     MinLength,
     ValidationArguments,
+    IsMongoId,
+    IsNumber,
+    Min,
+    IsUrl,
+    IsArray,
+    ValidateNested,
 } from 'class-validator';
 import { BaseGetAllDto } from 'src/common/base-get-all-dto';
 import { EntityDto } from 'src/common/entity-dto';
+import { Type } from 'class-transformer';
 
-export class CustomerDto extends EntityDto {
-    @IsString({ message: 'Username must be a string.' })
-    username!: string;
-
-    @IsString({ message: 'Full name must be a string.' })
-    fullname!: string;
-
-    @IsEmail({}, { message: 'Invalid email address.' })
-    email!: string;
-
-    @IsEnum(EUserRole, {
-        message: (args: ValidationArguments) =>
-            `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
-    })
-    role!: EUserRole;
-
-    @IsString({ message: 'Phone number must be a string.' })
-    phoneNumber!: string;
-
-    @IsOptional()
-    @IsString({ each: true, message: 'Each address must be a string.' })
-    addresses?: string[];
-
-    @IsOptional()
-    @IsString({ message: 'Avatar picture must be a valid URL string.' })
-    avatarPicture?: string;
-
-    @IsOptional()
-    @IsString({ message: 'Vehicle license number must be a string.' })
-    vehicleLicenseNumber?: string;
+export class StoreOwnerDto extends EntityDto {
+    @IsString()
+    name!: string;
 }
 
-// export class CreateUserDto {
-//     @IsString({ message: 'Username must be a string.' })
-//     username!: string;
+/**
+ * DTO for getting orders from customers
+ */
+export class GetOrderFromCustomerDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID' })
+    storeId?: string;
+    
+    @IsOptional()
+    @IsEnum(['pending', 'shipped', 'delivered', 'cancelled'], {
+        message: 'Order status must be one of: pending, shipped, delivered, cancelled'
+    })
+    orderStatus?: 'pending' | 'shipped' | 'delivered' | 'cancelled';
+}
 
-//     @IsString({ message: 'Full name must be a string.' })
-//     fullname!: string;
+/**
+ * DTO for creating a new store
+ */
+export class CreateStoreDto {
+    @IsString({ message: 'Name must be a string' })
+    name!: string;
+    
+    @IsString({ message: 'Location must be a string' })
+    location!: string;
+    
+    @IsMongoId({ message: 'Store owner ID must be a valid MongoDB ID' })
+    storeOwnerId!: string;
+    
+    @IsOptional()
+    @IsString({ message: 'Description must be a string' })
+    description?: string;
+}
 
-//     @IsEmail({}, { message: 'Invalid email address.' })
-//     email!: string;
+/**
+ * DTO for confirming an order and sending it to a delivery company
+ */
+export class ConfirmAndSendOrderToDeliveryCompanyDto {
+    @IsMongoId({ message: 'Order ID must be a valid MongoDB ID' })
+    orderId!: string;
+    
+    @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID' })
+    deliveryCompanyId!: string;
+}
 
-//     @IsString({ message: 'Password must be a string.' })
-//     @MinLength(6, { message: 'Password must be at least 6 characters long.' })
-//     password!: string;
+/**
+ * DTO for adding a product to a store
+ */
+export class AddProductDto {
+    @IsString({ message: 'Name must be a string' })
+    name!: string;
+    
+    @IsNumber({}, { message: 'Price must be a number' })
+    @Min(0, { message: 'Price must be greater than or equal to 0' })
+    price!: number;
+    
+    @IsOptional()
+    @IsString({ message: 'Description must be a string' })
+    description?: string;
+    
+    @IsString({ message: 'Category must be a string' })
+    category!: string;
+    
+    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID' })
+    storeId!: string;
+    
+    @IsOptional()
+    @IsUrl({}, { message: 'Image URL must be a valid URL' })
+    imageUrl?: string;
+    
+    @IsNumber({}, { message: 'Stock must be a number' })
+    @Min(0, { message: 'Stock must be greater than or equal to 0' })
+    stock!: number;
+}
 
-//     @IsEnum(EUserRole, {
-//         message: (args: ValidationArguments) =>
-//             `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
-//     })
-//     role!: EUserRole;
+/**
+ * DTO for updating order status
+ */
+export class UpdateOrderStatusDto {
+    @IsMongoId({ message: 'Order ID must be a valid MongoDB ID' })
+    orderId!: string;
+    
+    @IsEnum(['pending', 'shipped', 'delivered', 'cancelled'], {
+        message: 'Order status must be one of: pending, shipped, delivered, cancelled'
+    })
+    orderStatus!: 'pending' | 'shipped' | 'delivered' | 'cancelled';
+}
 
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
+/**
+ * DTO for updating product information
+ */
+export class UpdateProductDto {
+    @IsMongoId({ message: 'Product ID must be a valid MongoDB ID' })
+    productId!: string;
+    
+    @IsOptional()
+    @IsString({ message: 'Name must be a string' })
+    name?: string;
+    
+    @IsOptional()
+    @IsNumber({}, { message: 'Price must be a number' })
+    @Min(0, { message: 'Price must be greater than or equal to 0' })
+    price?: number;
+    
+    @IsOptional()
+    @IsString({ message: 'Description must be a string' })
+    description?: string;
+    
+    @IsOptional()
+    @IsString({ message: 'Category must be a string' })
+    category?: string;
+    
+    @IsOptional()
+    @IsUrl({}, { message: 'Image URL must be a valid URL' })
+    imageUrl?: string;
+    
+    @IsOptional()
+    @IsNumber({}, { message: 'Stock must be a number' })
+    @Min(0, { message: 'Stock must be greater than or equal to 0' })
+    stock?: number;
+}
 
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses?: string[];
-
-//     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
-
-//     @IsOptional()
-//     @IsString({ message: 'Vehicle license number must be a string.' })
-//     vehicleLicenseNumber?: string;
-// }
-
-// export class UpdateUserDto extends EntityDto {
-//     @IsOptional()
-//     @IsString()
-//     fullname?: string;
-
-//     @IsString({ message: 'Phone number must be a string.' })
-//     phoneNumber!: string;
-
-//     @IsString({ each: true, message: 'Each address must be a string.' })
-//     addresses!: string[];
-
-//     @IsOptional()
-//     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-//     avatarPicture?: string;
-
-//     @IsOptional()
-//     @IsString({ message: 'Vehicle license number must be a string.' })
-//     vehicleLicenseNumber?: string;
-// }
-
-// export class GetAllUsersDto extends BaseGetAllDto {
-//     @IsOptional()
-//     @IsString()
-//     role?: string;
-
-//     @IsOptional()
-//     @IsString()
-//     email?: string;
-// }
+/**
+ * DTO for getting store products
+ */
+export class GetStoreProductsDto extends BaseGetAllDto {
+    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID' })
+    storeId!: string;
+    
+    @IsOptional()
+    @IsString()
+    category?: string;
+    
+    @IsOptional()
+    @IsString()
+    name?: string;
+}

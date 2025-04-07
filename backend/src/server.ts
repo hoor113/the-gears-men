@@ -1,9 +1,10 @@
 import { AuthController } from '@/controllers/auth.controller';
 import { UserController } from '@/controllers/user.controller';
+import { ProductController } from './controllers/product.controller';
 
 import { App } from './app';
 
-const controllers = [AuthController, UserController];
+const controllers = [AuthController, UserController, ProductController];
 
 const app = new App(controllers);
 

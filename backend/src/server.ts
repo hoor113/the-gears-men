@@ -1,19 +1,18 @@
 import { AuthController } from '@/controllers/auth.controller';
 import { UserController } from '@/controllers/user.controller';
-import { CustomerController } from '@/controllers/customer/customer.controller';
-import { StoreOwnerController } from '@/controllers/store-owner/store-owner.controller';
-import { DeliveryCompanyController } from '@/controllers/delivery-company/delivery-company.controller';
-import { DeliveryPersonnelController } from '@/controllers/delivery-personnel/delivery-personnel.controller';
+import { OrderController } from './controllers/order.controller';
+import { ProductController } from './controllers/product.controller';
+import { StoreController } from './controllers/store.controller';
 
-import { App } from './app';
+import { App } from '@/app';
 
 const controllers = [
     AuthController,
     UserController,
-    CustomerController,
-    StoreOwnerController,
-    DeliveryCompanyController,
-    DeliveryPersonnelController
+    OrderController,
+    ProductController,
+    StoreController,
+    //DiscountCodeController,
 ];
 
 const app = new App(controllers);

@@ -5,6 +5,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IDiscountCodeCast extends Document {
     code: string;
     type: 'productDiscount' | 'shippingDiscount';
+    discountPercentage: number;
     discountAmount: number;
     expiryDate: Date;
     // add amounts (cast)
@@ -19,6 +20,7 @@ const DiscountCodeCast = new Schema<IDiscountCodeCast>(
             enum: ['productDiscount', 'shippingDiscount'],
             required: true,
         },
+        discountPercentage: { type: Number, required: true },
         discountAmount: { type: Number, required: true },
         expiryDate: { type: Date, required: true },
         quantity: { type: Number, required: true },

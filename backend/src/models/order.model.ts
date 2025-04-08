@@ -4,18 +4,19 @@ export interface IOrderItem {
     productId: mongoose.Types.ObjectId;
     quantity: number;
     // storeId: mongoose.Types.ObjectId;
-    productDiscountCode?: mongoose.Types.ObjectId; // For product price reduction
-    shippingDiscountCode?: mongoose.Types.ObjectId; // For shipping price reduction
     shippingCompanyId?: mongoose.Types.ObjectId;
     deliveryPersonnel?: mongoose.Types.ObjectId;
-    deliveryDate?: Date; // Date of delivery
+    shippingDiscountCode?: mongoose.Types.ObjectId;
+    productDiscountCode?: mongoose.Types.ObjectId;
 }
 
 export interface IOrder extends Document {
     customerId: mongoose.Types.ObjectId;
     items: IOrderItem[];
-    orderStatus: 'pending' | 'confirmed' | 'shippedToWarehouse' | 'delivered' | 'cancelled';
+    orderStatus: 'pending' | 'confirmed' | 'cancelled';
     paymentMethod: 'card' | 'cash';
+    shippingAddress: string;
+    price: number;
     createdAt: Date;
 }
 
@@ -34,7 +35,9 @@ const Order = new Schema<IOrder>(
                     required: true,
                 },
                 quantity: { type: Number, required: true },
-                storeId: { type: Schema.Types.ObjectId, ref: "Store", required: true },
+                // storeId: { type: Schema.Types.ObjectId, ref: "Store", required: true },
+                shippingCompanyId: { type: Schema.Types.ObjectId, ref: 'User' }, // Delivery company
+                deliveryPersonnel: { type: Schema.Types.ObjectId, ref: 'User' }, // Individual delivery
                 productDiscountCode: {
                     type: Schema.Types.ObjectId,
                     ref: 'DiscountCode',
@@ -43,17 +46,17 @@ const Order = new Schema<IOrder>(
                     type: Schema.Types.ObjectId,
                     ref: 'DiscountCode',
                 },
-                shippingCompanyId: { type: Schema.Types.ObjectId, ref: 'User' }, // Delivery company
-                deliveryPersonnel: { type: Schema.Types.ObjectId, ref: 'User' }, // Individual delivery
-                deliveryDate: { type: Date }, // Date of delivery
             },
         ],
         orderStatus: {
             type: String,
-            enum: ['pending', 'confirmed', 'shippedToWarehouse', 'delivered', 'cancelled'],
+            enum: ['pending', 'confirmed', 'cancelled'],
             default: 'pending',
         },
         paymentMethod: { type: String, enum: ['card', 'cash'], required: true },
+        shippingAddress: { type: String, required: true },
+        price: { type: Number, required: true },
+        createdAt: { type: Date, default: Date.now },
     },
     { timestamps: true },
 );

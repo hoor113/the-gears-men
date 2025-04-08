@@ -1,20 +1,25 @@
-import { Service } from 'typedi';
+import { Service, Container } from 'typedi';
 import { CronJob } from 'cron';
 import Order, { EOrderStatus } from '@/models/order.model';
+import Shipment, { EShipmentStatus } from '@/models/shipment.model';
 import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';
 import mongoose from 'mongoose';
 import redis from 'src/config/redis';
+import { ShipmentService } from '@/services/shipment/shipment.service';
 
 @Service()
 export class OrderCronService {
     private orderConfirmationJob: CronJob;
+    private shipmentService: ShipmentService;
     
     // For testing: 3 minutes instead of 24 hours
     private readonly CONFIRMATION_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes in milliseconds
     // private readonly CONFIRMATION_TIMEOUT_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     
     constructor() {
+        this.shipmentService = Container.get(ShipmentService);
+        
         // Run every minute to check for orders that need confirmation (more frequent for testing)
         this.orderConfirmationJob = new CronJob('* * * * *', async () => {
             await this.processOrderConfirmations();
@@ -50,8 +55,9 @@ export class OrderCronService {
                 if (now.getTime() >= confirmationTimeMs) {
                     // Time to confirm the order
                     await this.confirmOrder(orderId);
-                    // Remove from tracking after processing
-                    await redis.getClient().del(key);
+                    
+                    // Remove from tracking after processing - immediately dispose the job
+                    await this.disposeOrderConfirmationJob(orderId);
                 }
             }
         } catch (error) {
@@ -93,17 +99,15 @@ export class OrderCronService {
      */
     public async cancelOrderConfirmation(orderId: string | mongoose.Types.ObjectId): Promise<void> {
         try {
-            const orderIdStr = orderId.toString();
-            // Remove from Redis to prevent auto-confirmation
-            await redis.getClient().del(`order_confirmation:${orderIdStr}`);
-            console.log(`Cancelled scheduled confirmation for order ${orderIdStr}`);
+            await this.disposeOrderConfirmationJob(orderId);
+            console.log(`Cancelled scheduled confirmation for order ${orderId}`);
         } catch (error) {
             console.error(`Error cancelling confirmation for order ${orderId}:`, error);
         }
     }
 
     /**
-     * Confirm an order by changing its status to confirmed
+     * Confirm an order by changing its status to confirmed and create shipments for each item
      */
     private async confirmOrder(orderId: string): Promise<void> {
         try {
@@ -122,9 +126,44 @@ export class OrderCronService {
             order.orderStatus = EOrderStatus.Confirmed;
             await order.save();
             
-            console.log(`Order ${orderId} automatically confirmed after timeout period`);
+            // Create shipment records for items using the ShipmentService
+            const shipmentsCreated = await this.shipmentService.createShipmentsForOrder(orderId);
+            
+            if (shipmentsCreated) {
+                console.log(`Order ${orderId} automatically confirmed after timeout period with shipments created`);
+            } else {
+                console.error(`Order ${orderId} was confirmed but there was an issue creating the shipments`);
+            }
         } catch (error) {
             console.error(`Error confirming order ${orderId}:`, error);
+        }
+    }
+
+    /**
+     * Dispose of a scheduled order confirmation job
+     * This is used both for cancellations and after successful confirmations
+     */
+    public async disposeOrderConfirmationJob(orderId: string | mongoose.Types.ObjectId): Promise<void> {
+        try {
+            const orderIdStr = typeof orderId === 'string' ? orderId : orderId.toString();
+            
+            // Remove the order from Redis tracking
+            await redis.getClient().del(`order_confirmation:${orderIdStr}`);
+            
+            console.log(`Disposed confirmation job for order ${orderIdStr}`);
+        } catch (error) {
+            console.error(`Error disposing confirmation job for order ${orderId}:`, error);
+        }
+    }
+
+    /**
+     * Dispose method to be called when the service is no longer needed
+     * Useful for application shutdown
+     */
+    public dispose(): void {
+        if (this.orderConfirmationJob) {
+            this.orderConfirmationJob.stop();
+            console.log('Order confirmation cron job stopped');
         }
     }
 }

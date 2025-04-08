@@ -10,6 +10,8 @@ import { getMetadataArgsStorage, useExpressServer } from 'routing-controllers';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
+import { Container } from 'typedi';
+import { OrderCronService } from './services/cron/order-cron.service';
 
 import connectDB from './config/database';
 import { AuthMiddleware } from './middlewares/auth.middleware';
@@ -26,6 +28,7 @@ export class App {
         this.setupControllers(controllers);
         // this.initializeAuthentication();
         this.initializeSwagger(controllers);
+        this.initializeServices();
     }
 
     private async connectDatabase() {
@@ -80,6 +83,12 @@ export class App {
         });
     
         this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
+    }
+
+    private initializeServices() {
+        // Initialize the OrderCronService singleton
+        Container.get(OrderCronService);
+        console.log('🕒 Cron service initialized successfully');
     }
 
     public initializeAuthentication() {

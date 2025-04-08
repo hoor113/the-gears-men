@@ -1,0 +1,1 @@
+export const DELIVERY_VAT = 0.1; // 10% VAT for delivery

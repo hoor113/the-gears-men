@@ -28,8 +28,7 @@ const Shipment = new Schema<IShipment>(
         estimatedDelivery: { type: Date, required: true },
         deliveryPersonnel: {
             type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
+            ref: 'User'
         },
     },
     { timestamps: true },

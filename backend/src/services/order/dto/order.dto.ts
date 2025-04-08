@@ -20,7 +20,7 @@ export class OrderDto extends EntityDto {
     shippingAddress!: string; // Required
 
     @IsNumber({}, { message: 'Price must be a number.' })
-    price!: number; // Required
+    totalPrice!: number; // Required
 
     @IsOptional()
     @IsString({ message: 'Delivery personnel ID must be a string.' })
@@ -41,6 +41,9 @@ export class OrderItemDto extends EntityDto {
     @IsOptional()
     @IsString({ message: 'Shipping discount code must be a string.' })
     shippingDiscountCode?: string;
+
+    @IsNumber({}, { message: 'Price must be a number.' })
+    price!: number; // Required
 }
 
 export class CreateOrderDto extends EntityDto {

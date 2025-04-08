@@ -2,9 +2,14 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 // add another discount schema
 
+export enum EDiscountCodeType {
+    ProductDiscount = 'productDiscount',
+    ShippingDiscount = 'shippingDiscount'
+}
+
 export interface IDiscountCodeCast extends Document {
     code: string;
-    type: 'productDiscount' | 'shippingDiscount';
+    type: EDiscountCodeType;
     discountPercentage: number;
     discountAmount: number;
     expiryDate: Date;
@@ -17,7 +22,7 @@ const DiscountCodeCast = new Schema<IDiscountCodeCast>(
         code: { type: String, required: true, unique: true },
         type: {
             type: String,
-            enum: ['productDiscount', 'shippingDiscount'],
+            enum: Object.values(EDiscountCodeType),
             required: true,
         },
         discountPercentage: { type: Number, required: true },

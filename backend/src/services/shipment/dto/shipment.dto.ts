@@ -16,6 +16,7 @@ export class ShipmentDto extends EntityDto {
     @IsString({ message: 'Estimated delivery must be a string.' })
     estimatedDelivery!: string; // Required
 
+    @IsOptional()
     @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID.' })
-    deliveryPersonnel!: string; // Required
+    deliveryPersonnel?: string;
 }

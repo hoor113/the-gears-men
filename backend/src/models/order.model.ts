@@ -11,12 +11,14 @@ export enum EPaymentMethod {
 }
 
 export interface IOrderItem {
+    _id: mongoose.Types.ObjectId;
     productId: mongoose.Types.ObjectId;
     quantity: number;
     shippingCompanyId?: mongoose.Types.ObjectId;
     deliveryPersonnel?: mongoose.Types.ObjectId;
     shippingDiscountCode?: mongoose.Types.ObjectId;
     productDiscountCode?: mongoose.Types.ObjectId;
+    price: number;
 }
 
 export interface IOrder extends Document {
@@ -25,7 +27,7 @@ export interface IOrder extends Document {
     orderStatus: EOrderStatus;
     paymentMethod: EPaymentMethod;
     shippingAddress: string;
-    price: number;
+    totalPrice: number;
     createdAt: Date;
 }
 
@@ -38,6 +40,10 @@ const Order = new Schema<IOrder>(
         },
         items: [
             {
+                _id: { 
+                    type: Schema.Types.ObjectId, 
+                    default: () => new mongoose.Types.ObjectId() 
+                },
                 productId: {
                     type: Schema.Types.ObjectId,
                     ref: 'Product',
@@ -54,6 +60,10 @@ const Order = new Schema<IOrder>(
                     type: Schema.Types.ObjectId,
                     ref: 'DiscountCode',
                 },
+                price: {
+                    type: Number,
+                    required: true,
+                }
             },
         ],
         orderStatus: {
@@ -63,7 +73,7 @@ const Order = new Schema<IOrder>(
         },
         paymentMethod: { type: String, enum: ['card', 'cash'], required: true },
         shippingAddress: { type: String, required: true },
-        price: { type: Number, required: true },
+        totalPrice: { type: Number, required: true },
         createdAt: { type: Date, default: Date.now },
     },
     { timestamps: true },

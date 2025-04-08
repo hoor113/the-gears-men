@@ -8,77 +8,77 @@ export class ProductDto extends EntityDto {
 }
 
 class ImageDto extends EntityDto {
-    @IsString()
+    @IsString({ message: 'Image URL must be a string.' })
     imageUrl!: string; // Required
 }
 
 export class GetProductsDto extends BaseGetAllDto {
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'Product name must be a string.' })
     name?: string;
 
     @IsOptional()
-    @IsNumber()
+    @IsNumber({}, { message: 'Price must be a number.' })
     price?: number;
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'Category must be a string.' })
     category?: string;
 }
 
 export class AddProductDto extends EntityDto {
-    @IsMongoId()
+    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
     storeId!: string; // Required
 
-    @IsString()
+    @IsString({ message: 'Product name must be a string.' })
     name!: string; // Required
 
-    @IsString()
+    @IsString({ message: 'Description must be a string.' })
     description!: string; // Required
 
-    @IsNumber()
+    @IsNumber({}, { message: 'Price must be a number.' })
     price!: number; // Required
 
-    @IsNumber()
+    @IsNumber({}, { message: 'Stock must be a number.' })
     stock!: number; // Required
 
-    @IsString()
+    @IsString({ message: 'Category must be a string.' })
     category!: string; // Required
 
     @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
+    @IsArray({ message: 'Image URLs must be an array.' })
+    @ValidateNested({ each: true, message: 'Each image must be valid.' })
     @Type(() => ImageDto)
     imageUrl?: ImageDto[];
 }
 
 export class UpdateProductDto extends EntityDto {
-    @IsString()
+    @IsString({ message: 'Product ID must be a string.' })
     productId!: string; // Required
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'Product name must be a string.' })
     name?: string;
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'Description must be a string.' })
     description?: string;
 
     @IsOptional()
-    @IsNumber()
+    @IsNumber({}, { message: 'Price must be a number.' })
     price?: number;
 
     @IsOptional()
-    @IsNumber()
+    @IsNumber({}, { message: 'Stock must be a number.' })
     stock?: number;
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'Category must be a string.' })
     category?: string;
 
     @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
+    @IsArray({ message: 'Image URLs must be an array.' })
+    @ValidateNested({ each: true, message: 'Each image must be valid.' })
     @Type(() => ImageDto)
     imageUrl?: ImageDto[];
 }

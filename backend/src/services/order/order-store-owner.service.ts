@@ -8,14 +8,8 @@ import { EHttpStatusCode } from 'src/utils/enum';
 import { buildQuery } from 'src/utils/utils';
 import { Service } from 'typedi';
 import {
-    CreateOrderDto,
-    CancelOrderDto,
     GetOrderFromCustomerDto,
     ConfirmAndSendOrderToDeliveryCompanyDto,
-    GetOrderFromStoreDto,
-    SendOrderToDeliveryPersonnelDto,
-    GetAssignedOrdersDto,
-    ConfirmOrderDeliveredDto,
     OrderDto
 } from 'src/services/order/dto/order.dto';
 

@@ -1,9 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export enum EShipmentStatus {
+    Pending = 'pending',
+    Confirmed = 'confirmed',
+    Stored = 'stored',
+    Delivered = 'delivered',
+    Failed = 'failed',
+}
+
 export interface IShipment extends Document {
     orderId: mongoose.Types.ObjectId;
     orderItemId: mongoose.Types.ObjectId;
-    status: 'pending' | 'stored' | 'delivered' | 'failed';
+    status: EShipmentStatus;
     estimatedDelivery: Date;
     deliveryPersonnel: mongoose.Types.ObjectId;
 }
@@ -14,7 +22,7 @@ const Shipment = new Schema<IShipment>(
         orderItemId: { type: Schema.Types.ObjectId, required: true },
         status: {
             type: String,
-            enum: ['pending', 'stored', 'delivered', 'failed'],
+            enum: Object.values(EShipmentStatus),
             required: true,
         },
         estimatedDelivery: { type: Date, required: true },

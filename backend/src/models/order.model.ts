@@ -1,9 +1,18 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export enum EOrderStatus {
+    Pending = 'pending',
+    Confirmed = 'confirmed',
+    Cancelled = 'cancelled',
+}
+export enum EPaymentMethod {
+    Card = 'card',
+    Cash = 'cash',
+}
+
 export interface IOrderItem {
     productId: mongoose.Types.ObjectId;
     quantity: number;
-    // storeId: mongoose.Types.ObjectId;
     shippingCompanyId?: mongoose.Types.ObjectId;
     deliveryPersonnel?: mongoose.Types.ObjectId;
     shippingDiscountCode?: mongoose.Types.ObjectId;
@@ -13,8 +22,8 @@ export interface IOrderItem {
 export interface IOrder extends Document {
     customerId: mongoose.Types.ObjectId;
     items: IOrderItem[];
-    orderStatus: 'pending' | 'confirmed' | 'cancelled';
-    paymentMethod: 'card' | 'cash';
+    orderStatus: EOrderStatus;
+    paymentMethod: EPaymentMethod;
     shippingAddress: string;
     price: number;
     createdAt: Date;
@@ -35,7 +44,6 @@ const Order = new Schema<IOrder>(
                     required: true,
                 },
                 quantity: { type: Number, required: true },
-                // storeId: { type: Schema.Types.ObjectId, ref: "Store", required: true },
                 shippingCompanyId: { type: Schema.Types.ObjectId, ref: 'User' }, // Delivery company
                 deliveryPersonnel: { type: Schema.Types.ObjectId, ref: 'User' }, // Individual delivery
                 productDiscountCode: {
@@ -50,8 +58,8 @@ const Order = new Schema<IOrder>(
         ],
         orderStatus: {
             type: String,
-            enum: ['pending', 'confirmed', 'cancelled'],
-            default: 'pending',
+            enum: Object.values(EOrderStatus),
+            default: EOrderStatus.Pending,
         },
         paymentMethod: { type: String, enum: ['card', 'cash'], required: true },
         shippingAddress: { type: String, required: true },

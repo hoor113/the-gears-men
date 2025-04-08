@@ -1,8 +1,9 @@
 import { AuthController } from '@/controllers/auth.controller';
 import { UserController } from '@/controllers/user.controller';
-import { OrderController } from './controllers/order.controller';
-import { ProductController } from './controllers/product.controller';
-import { StoreController } from './controllers/store.controller';
+import { OrderController } from '@/controllers/order.controller';
+import { ProductController } from '@/controllers/product.controller';
+import { StoreController } from '@/controllers/store.controller';
+import { FileController } from '@/controllers/file.controller';
 
 import { App } from '@/app';
 
@@ -12,6 +13,7 @@ const controllers = [
     OrderController,
     ProductController,
     StoreController,
+    FileController
     //DiscountCodeController,
 ];
 

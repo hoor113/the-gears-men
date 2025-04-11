@@ -1,3 +1,4 @@
+import { ITimestamps } from '@/common/entity-dto';
 import mongoose, { Document, Schema } from 'mongoose';
 
 export enum EUserRole {
@@ -8,7 +9,7 @@ export enum EUserRole {
     Admin = 'admin',
 }
 
-export interface IUser extends Document<string> {
+export interface IUser extends Document<string>, ITimestamps {
     username: string;
     fullname: string;
     email: string;

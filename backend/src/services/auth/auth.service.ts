@@ -57,6 +57,7 @@ export class AuthService {
             await newUser.save();
 
             const result: RegisterResult = {
+                id: newUser._id.toString(),
                 username: newUser.username,
                 fullname: newUser.fullname,
                 email: newUser.email,
@@ -65,6 +66,8 @@ export class AuthService {
                 addresses: newUser.addresses,
                 avatarPicture: newUser.avatarPicture,
                 vehicleLicenseNumber: newUser.vehicleLicenseNumber,
+                createdAt: newUser.createdAt,
+                updatedAt: newUser.updatedAt,
             };
 
             return BaseResponse.success(
@@ -96,6 +99,7 @@ export class AuthService {
             await user.save();
 
             const result: LoginResult = {
+                authenticated: true,
                 userId: user._id.toString(),
                 username: user.username,
                 email: user.email,

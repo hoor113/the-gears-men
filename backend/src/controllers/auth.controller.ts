@@ -15,14 +15,11 @@ import {
     RegisterDto,
 } from 'src/services/auth/dto/auth.dto';
 import { EHttpStatusCode } from 'src/utils/enum';
+import Container from 'typedi';
 
 @JsonController('/auth')
 export class AuthController {
-    private authService: AuthService;
-
-    constructor() {
-        this.authService = new AuthService();
-    }
+    private authService = Container.get(AuthService);
 
     @Post('/register')
     @UseBefore(ValidationMiddleware(RegisterDto))
@@ -54,7 +51,7 @@ export class AuthController {
         }
     }
 
-    @Post('/refresh-token')
+    @Post('/refresh')
     @UseBefore(ValidationMiddleware(RefreshTokenDto))
     async refreshToken(@Body() dto: RefreshTokenDto, @Res() res: Response) {
         try {

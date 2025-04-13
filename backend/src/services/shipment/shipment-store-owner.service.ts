@@ -1,50 +1,55 @@
-import User, { EUserRole } from '@/models/user.model';
-import Order from '@/models/order.model';
-import DiscountCode from '@/models/discount-code.model';
-import DiscountCodeCast from '@/models/discount-code-cast.model';
+import Shipment, { EShipmentStatus } from '@/models/shipment.model';
 import mongoose from 'mongoose';
 import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';
 import { buildQuery } from 'src/utils/utils';
 import { Service } from 'typedi';
 import {
-    GetOrderFromCustomerDto,
-    ConfirmAndSendOrderToDeliveryCompanyDto,
-    OrderDto
-} from 'src/services/order/dto/order.dto';
+    ShipmentDto,
+    GetShipmentFromCustomerDto,
+    ConfirmAndSendShipmentToDeliveryCompanyDto,
+} from 'src/services/shipment/dto/shipment.dto';
 
 @Service()
-export class OrderStoreOwnerService {
-    public async getOrderFromCustomer(dto: GetOrderFromCustomerDto): Promise<BaseResponse<OrderDto | unknown>> {
+export class ShipmentStoreOwnerService {
+    public async getShipmentsFromCustomer(
+        dto: GetShipmentFromCustomerDto)
+        : Promise<BaseResponse<ShipmentDto[] | unknown>> {
         try {
-            const { storeId, orderStatus } = dto;
-
             // Build base query
             const query = buildQuery(dto);
-
-            // Add specific filters
-            if (storeId) {
-                query['items.storeId'] = new mongoose.Types.ObjectId(storeId);
-            }
-
-            if (orderStatus) {
-                query.orderStatus = orderStatus;
-            }
-
-            // Find orders that match the criteria
-            const orders = await Order.find(query)
-                .populate('customerId', 'username fullname email phoneNumber')
-                .populate('items.productId')
+            
+            // Set status to pending
+            query.status = EShipmentStatus.Pending;
+            
+            // Find shipments that match the criteria
+            const shipments = await Shipment.find(query)
+                .populate({
+                    path: 'orderId',
+                    select: 'shippingAddress createdAt'
+                })
+                .populate({
+                    path: 'orderId',
+                    populate: {
+                        path: 'customerId',
+                        select: 'email phoneNumber'
+                    }
+                })
+                .populate({
+                    path: 'orderItemId',
+                    model: 'Order.items'
+                })
                 .limit(dto.maxResultCount)
                 .skip(dto.skipCount)
                 .sort({ createdAt: -1 });
+            
 
-            const total = await Order.countDocuments(query);
-
+            const total = await Shipment.countDocuments(query);
+            
             return BaseResponse.success(
-                orders,
+                shipments,
                 total,
-                'Orders retrieved successfully',
+                'Pending shipments retrieved successfully',
                 EHttpStatusCode.OK
             );
         } catch (error) {
@@ -54,24 +59,24 @@ export class OrderStoreOwnerService {
             );
         }
     }
-    // TODO
-    public async confirmAndSendOrderToDeliveryCompany(
-        dto: ConfirmAndSendOrderToDeliveryCompanyDto
-    ): Promise<BaseResponse<OrderDto | unknown>> {
+    
+    public async confirmAndSendShipmentToDeliveryCompany(
+        dto: ConfirmAndSendShipmentToDeliveryCompanyDto
+    ): Promise<BaseResponse<ShipmentDto | unknown>> {
         try {
-            const { orderId, deliveryCompanyId } = dto;
+            const { shipmentId, deliveryCompanyId } = dto;
 
             // Find the order and update its status to confirmed
-            const order = await Order.findByIdAndUpdate(
-                orderId,
+            const shipment = await Shipment.findByIdAndUpdate(
+                shipmentId,
                 {
-                    orderStatus: 'confirmed',
-                    'items.$[].shippingCompanyId': new mongoose.Types.ObjectId(deliveryCompanyId)
+                    orderStatus: EShipmentStatus.Confirmed,
+                    deliveryCompany: new mongoose.Types.ObjectId(deliveryCompanyId)
                 },
                 { new: true }
             );
 
-            if (!order) {
+            if (!shipment) {
                 return BaseResponse.error(
                     'Order not found',
                     EHttpStatusCode.NOT_FOUND
@@ -79,7 +84,7 @@ export class OrderStoreOwnerService {
             }
 
             return BaseResponse.success(
-                order,
+                shipment,
                 undefined,
                 'Order confirmed and sent to delivery company',
                 EHttpStatusCode.OK

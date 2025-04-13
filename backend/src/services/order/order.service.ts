@@ -1,10 +1,10 @@
-import User, { EUserRole } from '@/models/user.model';
+import { DELIVERY_VAT } from 'src/constants/delivery-vat'
 import Order, { EOrderStatus } from '@/models/order.model';
 import Product from '@/models/product.model';
 import mongoose from 'mongoose';
 import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';
-import { Service, Inject, Container } from 'typedi';
+import { Service, Container } from 'typedi';
 import {
     CreateOrderDto,
     CancelOrderDto,
@@ -12,6 +12,7 @@ import {
 } from 'src/services/order/dto/order.dto';
 import { OrderCronService } from '@/services/cron/cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
+import { DiscountCodeDto } from 'src/services/discount-code/dto/discount-code.dto';
 
 @Service()
 export class OrderService {
@@ -53,30 +54,40 @@ export class OrderService {
                     );
                 }
 
-                // Create the order item
-                const orderItem: any = {
-                    productId: new mongoose.Types.ObjectId(item.productId),
-                    quantity: item.quantity,
-                    price: product.price * item.quantity
-                };
+                let price: number = product.price * item.quantity;
+                let shippingPrice: number = price * DELIVERY_VAT;
+                let productDiscountCode: string | null = null;
+                let shippingDiscountCode: string | null = null;
 
                 // Process product discount code if provided
                 if (item.productDiscountCode) {
                     const result = await this.discountCodeService.validateProductDiscountCode(item.productDiscountCode);
                     if (!result.success) {
-                        return result as BaseResponse<unknown>;
+                        return result as BaseResponse<DiscountCodeDto>;
                     }
-                    orderItem.productDiscountCode = result.data;
+                    productDiscountCode = result.data?.code || null;
+                    price -= (result.data?.discountPercentage || 0) * price; // Apply discount amount to price
+                    price -= result.data?.discountAmount || 0; // Apply discount percentage to price
                 }
 
                 // Process shipping discount code if provided
                 if (item.shippingDiscountCode) {
                     const result = await this.discountCodeService.validateShippingDiscountCode(item.shippingDiscountCode);
                     if (!result.success) {
-                        return result as BaseResponse<unknown>;
+                        return result as BaseResponse<DiscountCodeDto>;
                     }
-                    orderItem.shippingDiscountCode = result.data;
+                    shippingDiscountCode = result.data?.code || null;
+                    shippingPrice -= (result.data?.discountPercentage || 0) * shippingPrice; // Apply discount amount to price
+                    shippingPrice -= result.data?.discountAmount || 0; // Apply discount percentage to price
                 }
+
+                // Create the order item
+                const orderItem: any = {
+                    productId: new mongoose.Types.ObjectId(item.productId),
+                    quantity: item.quantity,
+                    price,
+                    shippingPrice
+                };
 
                 // Reduce stock quantity
                 product.stock -= item.quantity;

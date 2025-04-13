@@ -1,24 +1,21 @@
 import { Service, Container } from 'typedi';
 import { CronJob } from 'cron';
 import Order, { EOrderStatus } from '@/models/order.model';
-import Shipment, { EShipmentStatus } from '@/models/shipment.model';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
 import mongoose from 'mongoose';
 import redis from 'src/config/redis';
-import { ShipmentService } from '@/services/shipment/shipment-customer.service';
+import { CronShipmentService } from '@/services/shipment/shipment-cron.service';
 
 @Service()
 export class OrderCronService {
     private orderConfirmationJob: CronJob;
-    private shipmentService: ShipmentService;
+    private shipmentService: CronShipmentService;
     
     // For testing: 3 minutes instead of 24 hours
     private readonly CONFIRMATION_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes in milliseconds
     // private readonly CONFIRMATION_TIMEOUT_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     
     constructor() {
-        this.shipmentService = Container.get(ShipmentService);
+        this.shipmentService = Container.get(CronShipmentService);
         
         // Run every minute to check for orders that need confirmation (more frequent for testing)
         this.orderConfirmationJob = new CronJob('* * * * *', async () => {
@@ -126,7 +123,7 @@ export class OrderCronService {
             order.orderStatus = EOrderStatus.Confirmed;
             await order.save();
             
-            // Create shipment records for items using the ShipmentService
+            // Create shipment records for items using the CustomerShipmentService
             const shipmentsCreated = await this.shipmentService.createShipmentsForOrder(orderId);
             
             if (shipmentsCreated) {

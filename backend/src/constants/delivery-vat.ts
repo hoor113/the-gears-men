@@ -1,1 +1,1 @@
-export const DELIVERY_VAT = 0.1; // 10% VAT for delivery
+export const DELIVERY_VAT = 0.05; // 5% VAT for delivery

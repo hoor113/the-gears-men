@@ -11,55 +11,52 @@ import {
 } from 'src/services/shipment/dto/shipment.dto';
 
 @Service()
-export class ShipmentService {
+export class CronShipmentService {
     /**
      * Create shipments for all items in an order
      * @param orderId - The ID of the order
      * @returns Promise<boolean> - True if shipments were created successfully
      */
-    public async createShipmentsForOrder(orderId: string | mongoose.Types.ObjectId): Promise<boolean> {
+    public async createShipmentsForOrder(orderId: string): Promise<BaseResponse<ShipmentDto[]>> {
         try {
-            const order = await Order.findById(orderId);
+            const order = await Order.findById(new mongoose.Types.ObjectId(orderId));
             
             if (!order) {
-                console.error(`Order ${orderId} not found when creating shipments`);
-                return false;
+                return BaseResponse.error(`Order ${orderId} not found`, EHttpStatusCode.NOT_FOUND);
             }
             
+            let shipments: ShipmentDto[] = [];
             // Create shipment records for each item in the order
             for (const item of order.items) {
-                // Calculate estimated delivery date (3 days from now)
+                // Calculate estimated delivery date (4 days from now)
                 const estimatedDelivery = new Date();
-                estimatedDelivery.setDate(estimatedDelivery.getDate() + 3);
+                estimatedDelivery.setDate(estimatedDelivery.getDate() + 4);
                 
-                // Create shipment DTO
-                const shipmentDto: Partial<ShipmentDto> = {
-                    orderId: (order._id as mongoose.Types.ObjectId).toString(),
-                    orderItemId: item._id.toString(),
-                    status: EShipmentStatus.Pending,
-                    estimatedDelivery: estimatedDelivery.toISOString()
-                    // deliveryPersonnel is required in the DTO but not available yet
-                    // we'll modify the model to make it optional
-                };
                 
                 // Create a shipment record for this order item
                 const shipment = new Shipment({
-                    orderId: order._id,
                     orderItemId: item._id,
                     status: EShipmentStatus.Pending,
                     estimatedDelivery
-                    // deliveryPersonnel field will be assigned later by delivery company
                 });
                 
                 await shipment.save();
+                shipments.push({
+                    id: shipment._id as mongoose.Types.ObjectId,
+                    orderItemId: shipment.orderItemId,
+                    status: shipment.status,
+                    estimatedDelivery: shipment.estimatedDelivery,
+                    deliveryPersonnel: shipment.deliveryPersonnel
+                });
                 console.log(`Created shipment for order item ${item._id} in order ${orderId}`);
             }
             
             console.log(`Successfully created ${order.items.length} shipments for order ${orderId}`);
-            return true;
+            return BaseResponse.success(shipments, undefined, `Shipments created successfully for order ${orderId}`, EHttpStatusCode.OK);
         } catch (error) {
             console.error(`Error creating shipments for order ${orderId}:`, error);
-            return false;
+            return BaseResponse.error(
+                (error as Error)?.message || 'Internal Server Error');
         }
     }
     

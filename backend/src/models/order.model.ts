@@ -19,6 +19,7 @@ export interface IOrderItem {
     shippingDiscountCode?: mongoose.Types.ObjectId;
     productDiscountCode?: mongoose.Types.ObjectId;
     price: number;
+    shippingPrice: number;
 }
 
 export interface IOrder extends Document {
@@ -61,7 +62,11 @@ const Order = new Schema<IOrder>(
                 price: {
                     type: Number,
                     required: true,
-                }
+                },
+                shippingPrice: {
+                    type: Number,
+                    required: true
+                },
             },
         ],
         orderStatus: {

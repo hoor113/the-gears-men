@@ -4,7 +4,12 @@ import DiscountCodeCast, { EDiscountCodeType } from '@/models/discount-code-cast
 import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';
 import mongoose from 'mongoose';
-import { CreateDiscountCodeCastDto, ValidateDiscountCodeDto } from './dto/discount-code.dto';
+import {
+    DiscountCodeDto,
+    DiscountCodeCastDto,
+    CreateDiscountCodeCastDto,
+    ValidateDiscountCodeDto
+} from './dto/discount-code.dto';
 
 @Service()
 export class DiscountCodeService {
@@ -13,11 +18,11 @@ export class DiscountCodeService {
      * @param createDto The data to create the discount code cast
      * @returns The created discount code cast
      */
-    public async createDiscountCodeCast(createDto: CreateDiscountCodeCastDto): Promise<BaseResponse<any>> {
+    public async createDiscountCodeCast(createDto: CreateDiscountCodeCastDto): Promise<BaseResponse<DiscountCodeCastDto>> {
         try {
             // Ensure either discountPercentage or discountAmount is provided, but not both
-            if ((createDto.discountPercentage && createDto.discountAmount) || 
-               (!createDto.discountPercentage && !createDto.discountAmount)) {
+            if ((createDto.discountPercentage && createDto.discountAmount) ||
+                (!createDto.discountPercentage && !createDto.discountAmount)) {
                 return BaseResponse.error(
                     'A discount code must have either a percentage OR an amount, but not both and not neither',
                     EHttpStatusCode.BAD_REQUEST
@@ -27,33 +32,53 @@ export class DiscountCodeService {
             // If percentage is provided, set amount to 0 and vice versa
             const discountCodeCastData = {
                 ...createDto,
-                discountPercentage: createDto.discountPercentage || 0,
-                discountAmount: createDto.discountAmount || 0
+                discountPercentage: createDto.discountPercentage || null,
+                discountAmount: createDto.discountAmount || null
             };
 
             // Create the discount code cast
             const discountCodeCast = new DiscountCodeCast(discountCodeCastData);
             await discountCodeCast.save();
 
-            // Generate the specified quantity of discount codes
-            const discountCodes = [];
-            for (let i = 0; i < createDto.quantity; i++) {
-                const uniqueCode = `${createDto.code}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+            this.createDiscountCodesFromCast(discountCodeCast);
+
+            return BaseResponse.success({
+                _id: discountCodeCast._id,
+                code: discountCodeCast.code,
+                type: discountCodeCast.type,
+                quantity: discountCodeCast.quantity,
+                discountPercentage: discountCodeCast.discountPercentage,
+                discountAmount: discountCodeCast.discountAmount,
+                expiryDate: discountCodeCast.expiryDate
+            });
+        } catch (error: any) {
+            return BaseResponse.error(
+                error.message || 'Failed to create discount code cast',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    private async createDiscountCodesFromCast(cast: DiscountCodeCastDto): Promise<BaseResponse<DiscountCodeDto[]>> {
+        // Generate the specified quantity of discount codes
+        try {
+            const discountCodes: DiscountCodeDto[] = [];
+            for (let i = 0; i < cast.quantity; i++) {
                 discountCodes.push({
-                    uniqueCode: discountCodeCast._id,
-                    code: uniqueCode,
+                    code: cast.code,
+                    type: cast.type,
+                    discountPercentage: cast.discountPercentage,
+                    discountAmount: cast.discountAmount,
+                    expiryDate: cast.expiryDate,
                     isUsed: false
                 });
             }
 
             // Save the discount codes
-            const savedCodes = await DiscountCode.insertMany(discountCodes);
-
-            return BaseResponse.success({
-                discountCodeCast,
-                discountCodes: savedCodes
-            });
-        } catch (error: any) {
+            await DiscountCode.insertMany(discountCodes);
+            return BaseResponse.success(discountCodes);
+        }
+        catch (error: any) {
             return BaseResponse.error(
                 error.message || 'Failed to create discount code cast',
                 EHttpStatusCode.INTERNAL_SERVER_ERROR
@@ -66,13 +91,9 @@ export class DiscountCodeService {
      * @param code The discount code to validate
      * @returns Object containing validation result and discount code ID if valid
      */
-    public async validateProductDiscountCode(code: string): Promise<BaseResponse<{
-        discountId: mongoose.Types.ObjectId,
-        discountType: string,
-        discountValue: number
-    } | null>> {
+    public async validateProductDiscountCode(code: mongoose.Types.ObjectId): Promise<BaseResponse<DiscountCodeDto>> {
         // Find the discount code
-        const discountCode = await DiscountCode.findOne({ code });
+        const discountCode = await DiscountCode.findOne({ _id: code });
 
         // Verify the discount code exists
         if (!discountCode) {
@@ -113,8 +134,8 @@ export class DiscountCodeService {
 
         // Determine discount type (percentage or fixed amount)
         const discountType = discountCodeCast.discountPercentage > 0 ? 'percentage' : 'fixed';
-        const discountValue = discountType === 'percentage' ? 
-            discountCodeCast.discountPercentage : 
+        const discountValue = discountType === 'percentage' ?
+            discountCodeCast.discountPercentage :
             discountCodeCast.discountAmount;
 
         // Mark the discount code as used
@@ -122,9 +143,12 @@ export class DiscountCodeService {
         await discountCode.save();
 
         return BaseResponse.success({
-            discountId: discountCode._id as mongoose.Types.ObjectId,
-            discountType,
-            discountValue
+            code: discountCode.code,
+            type: discountCodeCast.type,
+            discountPercentage: discountCodeCast.discountPercentage,
+            discountAmount: discountCodeCast.discountAmount,
+            expiryDate: discountCodeCast.expiryDate,
+            isUsed: true
         });
     }
 
@@ -133,13 +157,9 @@ export class DiscountCodeService {
      * @param code The discount code to validate
      * @returns Object containing validation result and discount code ID if valid
      */
-    public async validateShippingDiscountCode(code: string): Promise<BaseResponse<{
-        discountId: mongoose.Types.ObjectId,
-        discountType: string,
-        discountValue: number
-    } | null>> {
+    public async validateShippingDiscountCode(code: mongoose.Types.ObjectId): Promise<BaseResponse<DiscountCodeDto>> {
         // Find the discount code
-        const discountCode = await DiscountCode.findOne({ code });
+        const discountCode = await DiscountCode.findOne({ _id: code });
 
         // Verify the discount code exists
         if (!discountCode) {
@@ -180,8 +200,8 @@ export class DiscountCodeService {
 
         // Determine discount type (percentage or fixed amount)
         const discountType = discountCodeCast.discountPercentage > 0 ? 'percentage' : 'fixed';
-        const discountValue = discountType === 'percentage' ? 
-            discountCodeCast.discountPercentage : 
+        const discountValue = discountType === 'percentage' ?
+            discountCodeCast.discountPercentage :
             discountCodeCast.discountAmount;
 
         // Mark the shipping discount code as used
@@ -189,9 +209,12 @@ export class DiscountCodeService {
         await discountCode.save();
 
         return BaseResponse.success({
-            discountId: discountCode._id as mongoose.Types.ObjectId,
-            discountType,
-            discountValue
+            code: discountCode.code,
+            type: discountCodeCast.type,
+            discountPercentage: discountCodeCast.discountPercentage,
+            discountAmount: discountCodeCast.discountAmount,
+            expiryDate: discountCodeCast.expiryDate,
+            isUsed: true
         });
     }
 }

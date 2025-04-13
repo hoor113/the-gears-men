@@ -9,18 +9,21 @@ export enum EShipmentStatus {
 }
 
 export interface IShipment extends Document {
-    orderId: mongoose.Types.ObjectId;
     orderItemId: mongoose.Types.ObjectId;
     status: EShipmentStatus;
     estimatedDelivery: Date;
     deliveryCompany?: mongoose.Types.ObjectId;
     deliveryPersonnel?: mongoose.Types.ObjectId;
+    deliveryDate?: Date;
 }
 
 const Shipment = new Schema<IShipment>(
     {
-        orderId: { type: Schema.Types.ObjectId, ref: 'Order', required: true },
-        orderItemId: { type: Schema.Types.ObjectId, required: true },
+        orderItemId: { 
+            type: Schema.Types.ObjectId, 
+            ref: 'Order.items._id',
+            required: true 
+        },
         status: {
             type: String,
             enum: Object.values(EShipmentStatus),
@@ -35,6 +38,9 @@ const Shipment = new Schema<IShipment>(
             type: Schema.Types.ObjectId,
             ref: 'User'
         },
+        deliveryDate: {
+            type: Date,
+        }
     },
     { timestamps: true },
 );

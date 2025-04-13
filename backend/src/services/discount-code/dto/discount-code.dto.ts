@@ -36,11 +36,42 @@ export class EitherPercentageOrAmountConstraint implements ValidatorConstraintIn
     }
 }
 
+export class BaseDiscountCodeDto {
+    @IsString()
+    code!: string;
+
+    @IsEnum(EDiscountCodeType)
+    type!: EDiscountCodeType;
+
+    @Validate(EitherPercentageOrAmountConstraint)
+    @IsNumber()
+    @Min(0)
+    discountPercentage?: number;
+
+    @IsNumber()
+    @Min(0)
+    discountAmount?: number;
+
+    @IsDate()
+    @Type(() => Date)
+    expiryDate!: Date;
+}
+
 // DTO for discount code response
-export class DiscountCodeDto {
-    code!: mongoose.Types.ObjectId;
+export class DiscountCodeDto extends BaseDiscountCodeDto {
+    @IsMongoId()
+    @IsOptional()
     customerId?: mongoose.Types.ObjectId;
+
+    @IsBoolean()
     isUsed!: boolean;
+}
+
+// DTO for discount code cast response
+export class DiscountCodeCastDto extends BaseDiscountCodeDto {
+    @IsNumber()
+    @Min(1)
+    quantity!: number;
 }
 
 // DTO for creating a new discount code cast
@@ -70,6 +101,7 @@ export class CreateDiscountCodeCastDto {
     @Min(1)
     quantity!: number;
 }
+
 
 // DTO for assigning a discount code to a customer
 export class AssignDiscountCodeDto {

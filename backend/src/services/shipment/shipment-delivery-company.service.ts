@@ -1,5 +1,5 @@
 import User, { EUserRole } from '@/models/user.model';
-import Order from '@/models/order.model';
+import Shipment, { EShipmentStatus } from '@/models/shipment.model';
 import DiscountCode from '@/models/discount-code.model';
 import DiscountCodeCast from '@/models/discount-code-cast.model';
 import mongoose from 'mongoose';
@@ -8,20 +8,14 @@ import { EHttpStatusCode } from 'src/utils/enum';
 import { buildQuery } from 'src/utils/utils';
 import { Service } from 'typedi';
 import {
-    CreateOrderDto,
-    CancelOrderDto,
-    GetOrderFromCustomerDto,
-    ConfirmAndSendOrderToDeliveryCompanyDto,
-    GetOrderFromStoreDto,
-    SendOrderToDeliveryPersonnelDto,
-    GetAssignedOrdersDto,
-    ConfirmOrderDeliveredDto,
-    OrderDto
-} from 'src/services/order/dto/order.dto';
+    ShipmentDto,
+    GetShipmentFromStoreDto,
+    SendShipmentToDeliveryPersonnelDto,
+} from 'src/services/shipment/dto/shipment.dto';
 
 @Service()
-export class OrderDeliveryCompanyService {
-    public async getOrderFromStore(dto: GetOrderFromStoreDto): Promise<BaseResponse<OrderDto | unknown>> {
+export class ShipmentDeliveryCompanyService {
+    public async getShipmentFromStore(dto: GetShipmentFromStoreDto): Promise<BaseResponse<ShipmentDto[] | unknown>> {
         try {
             const { deliveryCompanyId } = dto;
 
@@ -33,7 +27,7 @@ export class OrderDeliveryCompanyService {
             const query = {
                 ...baseQuery,
                 'items.shippingCompanyId': deliveryCompanyId ? new mongoose.Types.ObjectId(deliveryCompanyId) : undefined,
-                orderStatus: 'confirmed'
+                shipmentStatus: EShipmentStatus.Pending,
             };
 
             // Remove undefined values
@@ -41,8 +35,8 @@ export class OrderDeliveryCompanyService {
                 query[key] === undefined && delete query[key]
             );
 
-            // Find orders that match the criteria
-            const orders = await Order.find(query)
+            // Find shipments that match the criteria
+            const shipments = await Shipment.find(query)
                 .populate('customerId', 'username fullname email phoneNumber')
                 .populate('items.productId')
                 .populate('items.deliveryPersonnel', 'username fullname phoneNumber')
@@ -50,12 +44,12 @@ export class OrderDeliveryCompanyService {
                 .skip(dto.skipCount)
                 .sort({ createdAt: -1 });
 
-            const total = await Order.countDocuments(query);
+            const total = await Shipment.countDocuments(query);
 
             return BaseResponse.success(
-                orders,
+                shipments,
                 total,
-                'Orders retrieved successfully',
+                'Shipments retrieved successfully',
                 EHttpStatusCode.OK
             );
         } catch (error) {
@@ -66,9 +60,9 @@ export class OrderDeliveryCompanyService {
         }
     }
 
-    public async sendOrderToDeliveryPersonnel(dto: SendOrderToDeliveryPersonnelDto): Promise<BaseResponse<OrderDto | unknown>> {
+    public async sendShipmentToDeliveryPersonnel(dto: SendShipmentToDeliveryPersonnelDto): Promise<BaseResponse<ShipmentDto | unknown>> {
         try {
-            const { orderId, deliveryPersonnelId } = dto;
+            const { shipmentId, deliveryPersonnelId } = dto;
 
             // Check if the delivery personnel exists and belongs to the right company
             const deliveryPersonnel = await User.findById(deliveryPersonnelId);
@@ -80,27 +74,27 @@ export class OrderDeliveryCompanyService {
                 );
             }
 
-            // Update order to assign delivery personnel and change status to shippedToWarehouse
-            const order = await Order.findByIdAndUpdate(
-                orderId,
+            // Update shipment to assign delivery personnel and change status to shippedToWarehouse
+            const shipment = await Shipment.findByIdAndUpdate(
+                shipmentId,
                 {
                     'items.$[].deliveryPersonnel': new mongoose.Types.ObjectId(deliveryPersonnelId),
-                    orderStatus: 'shippedToWarehouse' // Automatically update status
+                    shipmentStatus: EShipmentStatus.Stored // Automatically update status
                 },
                 { new: true }
             ).populate('items.deliveryPersonnel');
 
-            if (!order) {
+            if (!shipment) {
                 return BaseResponse.error(
-                    'Order not found',
+                    'Shipment not found',
                     EHttpStatusCode.NOT_FOUND
                 );
             }
 
             return BaseResponse.success(
-                order,
+                shipment,
                 undefined,
-                'Order assigned to delivery personnel and marked as shipped to warehouse',
+                'Shipment assigned to delivery personnel and marked as shipped to warehouse',
                 EHttpStatusCode.OK
             );
         } catch (error) {

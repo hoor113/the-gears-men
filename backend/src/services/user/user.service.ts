@@ -90,7 +90,7 @@ export class UserService {
 
     public async getAllUsers(
         dto: GetAllUsersDto,
-    ): Promise<BaseResponse<UserDto[] | unknown>> {
+    ): Promise<BaseResponse<UserDto[]>> {
         try {
             const searchableFields = ['username', 'fullname', 'email'];
             const query = buildQuery(dto, searchableFields);

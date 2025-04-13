@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 // add another discount schema
 
 export interface IDiscountCode extends Document {
-    code: mongoose.Types.ObjectId;
+    code: string;
     customerId?: mongoose.Types.ObjectId;
     isUsed: boolean;
 }
@@ -11,7 +11,7 @@ export interface IDiscountCode extends Document {
 const DiscountCode = new Schema<IDiscountCode>(
     {
         code: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: 'DiscountCodeCast',
             required: true,
         },

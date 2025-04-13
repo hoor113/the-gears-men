@@ -1,6 +1,4 @@
-
 export const ALL_PERMISSIONS = {
-
   Staff_GetAll: 'Staff.GetAll',
   Staff_Create: 'Staff.Create',
   Staff_Update: 'Staff.Update',
@@ -36,12 +34,8 @@ export const ALL_PERMISSIONS = {
   Fine_Admin: 'Fine.Admin',
   Fine_GetAll: 'Fine.GetAll',
   Fine_Client: 'Fine.Client',
-
-
-
 };
 
 export const PERMISSION_NAMES_VI = {
   'Pages.SmartSocial': 'Smart Social',
-
 };

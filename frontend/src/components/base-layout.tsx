@@ -8,9 +8,7 @@ const BaseLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SnackbarProvider maxSnack={3} preventDuplicate>
       <NiceModal.Provider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </NiceModal.Provider>
     </SnackbarProvider>
   );

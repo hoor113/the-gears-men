@@ -4,13 +4,13 @@ import { EHttpStatusCode } from 'src/utils/enum';
 export class BaseResponse<T> {
     success: boolean;
     message?: string;
-    data?: T;
+    result?: T;
     resultCount?: number;
     errors?: any;
     statusCode: EHttpStatusCode;
 
     constructor(
-        data?: T,
+        result?: T,
         message = 'Success',
         success = true,
         resultCount?: number,
@@ -19,21 +19,21 @@ export class BaseResponse<T> {
     ) {
         this.success = success;
         this.message = message;
-        this.data = data;
+        this.result = result;
         this.resultCount = resultCount;
         this.errors = errors;
         this.statusCode = statusCode;
     }
 
     static success<T>(
-        data: T,
+        result: T,
         resultCount?: number,
         message = 'Success',
         statusCode = EHttpStatusCode.OK,
     ) {
         try {
             return new BaseResponse<T>(
-                data,
+                result,
                 message,
                 true,
                 resultCount,
@@ -52,11 +52,11 @@ export class BaseResponse<T> {
         message: string,
         statusCode = EHttpStatusCode.BAD_REQUEST,
         errors?: any,
-        data?: T,
+        result?: T,
     ) {
         try {
             return new BaseResponse<T>(
-                data,
+                result,
                 message,
                 false,
                 undefined,

@@ -283,9 +283,8 @@ const InputDetail = (props: TInputDetailProps) => {
                 ? R.compose(
                     R.join(', '),
                     R.map((selected: ILVPair<any>) => selected.label),
-                    R.filter(
-                      (option: ILVPair<any>) =>
-                        (selecteds as any)?.includes(option.value),
+                    R.filter((option: ILVPair<any>) =>
+                      (selecteds as any)?.includes(option.value),
                     ),
                   )(field.options || ([] as ILVPair<any>[]))
                 : ''

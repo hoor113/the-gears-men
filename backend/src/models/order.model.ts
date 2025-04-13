@@ -14,8 +14,8 @@ export interface IOrderItem {
     _id: mongoose.Types.ObjectId;
     productId: mongoose.Types.ObjectId;
     quantity: number;
-    shippingCompanyId?: mongoose.Types.ObjectId;
-    deliveryPersonnel?: mongoose.Types.ObjectId;
+    // shippingCompanyId?: mongoose.Types.ObjectId;
+    // deliveryPersonnel?: mongoose.Types.ObjectId;
     shippingDiscountCode?: mongoose.Types.ObjectId;
     productDiscountCode?: mongoose.Types.ObjectId;
     price: number;
@@ -50,8 +50,6 @@ const Order = new Schema<IOrder>(
                     required: true,
                 },
                 quantity: { type: Number, required: true },
-                shippingCompanyId: { type: Schema.Types.ObjectId, ref: 'User' }, // Delivery company
-                deliveryPersonnel: { type: Schema.Types.ObjectId, ref: 'User' }, // Individual delivery
                 productDiscountCode: {
                     type: Schema.Types.ObjectId,
                     ref: 'DiscountCode',

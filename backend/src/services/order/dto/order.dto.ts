@@ -22,9 +22,9 @@ export class OrderDto extends EntityDto {
     @IsNumber({}, { message: 'Price must be a number.' })
     totalPrice!: number; // Required
 
-    @IsOptional()
-    @IsString({ message: 'Delivery personnel ID must be a string.' })
-    deliveryPersonnelId?: string;
+    // @IsOptional()
+    // @IsString({ message: 'Delivery personnel ID must be a string.' })
+    // deliveryPersonnelId?: string;
 }
 
 export class OrderItemDto extends EntityDto {
@@ -74,6 +74,7 @@ export class CancelOrderDto extends EntityDto {
     customerId!: string; // Required
 }
 
+/* Export to /services/shipment 
 export class GetOrderFromCustomerDto extends BaseGetAllDto {
     @IsOptional()
     @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
@@ -122,3 +123,4 @@ export class ConfirmOrderDeliveredDto extends EntityDto {
     @IsString({ message: 'Delivery date must be a string.' })
     deliveryDate!: string; // Required
 }
+ */

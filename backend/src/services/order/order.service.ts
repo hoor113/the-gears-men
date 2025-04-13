@@ -14,7 +14,7 @@ import { OrderCronService } from '@/services/cron/cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
 
 @Service()
-export class OrderCustomerService {
+export class OrderService {
     private orderCronService: OrderCronService;
     private discountCodeService: DiscountCodeService;
 

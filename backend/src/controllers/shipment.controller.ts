@@ -15,63 +15,27 @@ import {
 import { AuthMiddleware } from 'src/middlewares/auth.middleware';
 import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
 import {
-    CancelOrderDto,
-    CreateOrderDto,
-} from 'src/services/order/dto/order.dto';
-import { OrderService } from '@/services/order/order.service';
-// import { OrderStoreOwnerService } from '@/services/order/order-store-owner.service';
-// import { OrderDeliveryCompanyService } from '@/services/order/order-delivery-company.service';
+
+} from 'src/services/shipment/dto/shipment.dto';
+import { OrderStoreOwnerService } from '@/services/order/order-store-owner.service';
+import { OrderDeliveryCompanyService } from '@/services/order/order-delivery-company.service';
 // import { OrderDeliveryPersonnelService } from '@/services/order/order-delivery-personnel.service';
 import { EHttpStatusCode } from 'src/utils/enum';
 import { EUserRole } from '@/models/user.model';
 
 @UseBefore(AuthMiddleware)
-@JsonController('/orders')
-export class OrderController {
-    private orderService: OrderService;
-    // private orderStoreOwnerService: OrderStoreOwnerService;
-    // private orderDeliveryCompanyService: OrderDeliveryCompanyService;
+@JsonController('/shipments')
+export class ShipmentController {
+    private orderStoreOwnerService: OrderStoreOwnerService;
+    private orderDeliveryCompanyService: OrderDeliveryCompanyService;
     // private orderDeliveryPersonnelService: OrderDeliveryPersonnelService;
 
     constructor() {
-        this.orderService = new OrderService();
-        // this.orderStoreOwnerService = new OrderStoreOwnerService();
-        // this.orderDeliveryCompanyService = new OrderDeliveryCompanyService();
+        this.orderStoreOwnerService = new OrderStoreOwnerService();
+        this.orderDeliveryCompanyService = new OrderDeliveryCompanyService();
         // this.orderDeliveryPersonnelService = new OrderDeliveryPersonnelService();
     }
 
-    // Customer endpoints
-    @Post('/create')
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
-    @UseBefore(ValidationMiddleware(CreateOrderDto))
-    async createOrder(@Body() dto: CreateOrderDto, @Res() res: Response) {
-        try {
-            const response = await this.orderService.createOrder(dto);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
-
-    @Post('/cancel')
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
-    @UseBefore(ValidationMiddleware(CancelOrderDto))
-    async cancelOrder(@Body() dto: CancelOrderDto, @Res() res: Response) {
-        try {
-            const response = await this.orderService.cancelOrder(dto);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
 /*       Move all to shipment.controller.ts
     // Store Owner endpoints
     @Get('/')
@@ -209,7 +173,7 @@ export class OrderController {
         
     //     try {
     //         // Implement this method in one of your services or create a new shared method
-    //         const response = await this.orderService.getOrderById(id);
+    //         const response = await this.orderCustomerService.getOrderById(id);
     //         return res.status(response.statusCode).json(response);
     //     } catch (error) {
     //         return res.status(500).json({
@@ -237,7 +201,7 @@ export class OrderController {
         
     //     try {
     //         // Implement this method in one of your services or create a shared method
-    //         const response = await this.orderService.deleteOrder(id);
+    //         const response = await this.orderCustomerService.deleteOrder(id);
     //         return res.status(response.statusCode).json(response);
     //     } catch (error) {
     //         return res.status(500).json({

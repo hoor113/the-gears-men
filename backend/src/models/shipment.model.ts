@@ -13,7 +13,8 @@ export interface IShipment extends Document {
     orderItemId: mongoose.Types.ObjectId;
     status: EShipmentStatus;
     estimatedDelivery: Date;
-    deliveryPersonnel: mongoose.Types.ObjectId;
+    deliveryCompany?: mongoose.Types.ObjectId;
+    deliveryPersonnel?: mongoose.Types.ObjectId;
 }
 
 const Shipment = new Schema<IShipment>(
@@ -26,6 +27,10 @@ const Shipment = new Schema<IShipment>(
             required: true,
         },
         estimatedDelivery: { type: Date, required: true },
+        deliveryCompany: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
         deliveryPersonnel: {
             type: Schema.Types.ObjectId,
             ref: 'User'

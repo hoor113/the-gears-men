@@ -6,7 +6,7 @@ import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';
 import mongoose from 'mongoose';
 import redis from 'src/config/redis';
-import { ShipmentService } from '@/services/shipment/shipment.service';
+import { ShipmentService } from '@/services/shipment/shipment-customer.service';
 
 @Service()
 export class OrderCronService {

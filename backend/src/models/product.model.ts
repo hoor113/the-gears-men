@@ -12,7 +12,8 @@ export enum EProductCategory {
     Cameras = 'cameras',
     SmartHome = 'smartHome',
     HomeAppliances = 'homeAppliances',
-    Gaming = 'gaming'
+    Gaming = 'gaming',
+    Others = 'others',
 }
 
 export interface IProduct extends Document {

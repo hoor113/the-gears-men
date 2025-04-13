@@ -11,6 +11,7 @@ import {
     UseBefore,
 } from 'routing-controllers';
 import { AuthMiddleware } from 'src/middlewares/auth.middleware';
+import { authorizeRoles } from 'src/middlewares/role.middleware'
 import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
 import {
     CreateProductDto,
@@ -20,6 +21,7 @@ import {
 } from 'src/services/product/dto/product.dto';
 import { ProductService } from 'src/services/product/product.service';
 import { EHttpStatusCode } from 'src/utils/enum';
+import { EUserRole } from '@/models/user.model';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/products')
@@ -31,6 +33,7 @@ export class ProductController {
     }
 
     @Post('/Create')
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     @UseBefore(ValidationMiddleware(CreateProductDto))
     async createProduct(@Body() dto: CreateProductDto, @Res() res: Response) {
         try {
@@ -87,6 +90,7 @@ export class ProductController {
     }
 
     @Put('/Update')
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     @UseBefore(ValidationMiddleware(UpdateProductDto))
     async updateProduct(@Body() dto: UpdateProductDto, @Res() res: Response) {
         try {
@@ -102,6 +106,7 @@ export class ProductController {
     }
 
     @Delete('/Delete')
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     async deleteProduct(
         @QueryParams() query: { id: string },
         @Res() res: Response,

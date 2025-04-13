@@ -37,4 +37,3 @@ export interface IDownloadTempFileInput {
 export type TBaseCrudCol = GridColDef & {
   hide?: boolean;
 };
-

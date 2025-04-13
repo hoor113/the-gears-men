@@ -1,4 +1,3 @@
-/* eslint-disable no-extra-boolean-cast */
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Link, Stack, TextField, Typography } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -18,9 +17,7 @@ import { ILoginInput } from '@/services/auth/auth.model';
 import authService from '@/services/auth/auth.service';
 
 const loginSchema = yup.object({
-  name: yup
-    .string()
-    .required(i18n.t('userNameOrEmailAddress-required')),
+  email: yup.string().required(i18n.t('userNameOrEmailAddress-required')),
   password: yup.string().required(i18n.t('password-required')),
 });
 
@@ -55,12 +52,9 @@ const LoginPage = () => {
     },
     onError: (err: any) => {
       appService.hideLoadingModal();
-      enqueueSnackbar(
-        err.response.data.message || t('Đã có lỗi xảy ra'),
-        {
-          variant: 'error',
-        },
-      );
+      enqueueSnackbar(err.response.data.message || t('Đã có lỗi xảy ra'), {
+        variant: 'error',
+      });
     },
   });
 
@@ -89,9 +83,7 @@ const LoginPage = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `url('https://i.imgur.com/0pL1DHx.png')`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
+          backgroundColor: 'grey.400',
           backgroundPosition: 'bottom',
           zIndex: 0,
         }}
@@ -144,14 +136,14 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <TextField
               fullWidth
-              label={t('Tên người dùng hoặc Email')}
-              error={!!errors.name?.message}
-              helperText={errors.name?.message}
+              label={t('Email')}
+              error={!!errors.email?.message}
+              helperText={errors.email?.message}
               disabled={loginLoading}
               required
               margin="dense"
               style={{ marginBottom: 12 }}
-              {...register('name')}
+              {...register('email')}
             />
             <PasswordInput
               fullWidth

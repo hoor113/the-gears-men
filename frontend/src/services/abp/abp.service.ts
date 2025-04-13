@@ -1,8 +1,8 @@
 import { IBaseHttpResponse } from '@/base/base.model';
 import { httpService } from '@/base/http-service';
 
-import { IAbpConfiguration } from './abp.model';
 import { IUserInfo } from '../auth/auth.model';
+import { IAbpConfiguration } from './abp.model';
 
 class AbpService {
   async getConfigurations() {
@@ -17,9 +17,7 @@ class AbpService {
   }
 
   async getCurLoginInfo() {
-    const response = await httpService.request<
-      IBaseHttpResponse<IUserInfo>
-    >({
+    const response = await httpService.request<IBaseHttpResponse<IUserInfo>>({
       url: '/users/MyInfo',
       method: 'GET',
     });

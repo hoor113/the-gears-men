@@ -22,7 +22,7 @@ class AuthService {
     );
 
     const data = response.data.result;
-
+    console.log('login', response);
     Cookies.set('accessToken', data.accessToken);
     Cookies.set('refreshToken', data.refreshToken);
 
@@ -30,6 +30,7 @@ class AuthService {
   }
 
   async getUserInfo() {
+    console.log('getUserInfo');
     const accessToken = Cookies.get('accessToken');
     if (!accessToken) {
       throw new Error('Access token is required');

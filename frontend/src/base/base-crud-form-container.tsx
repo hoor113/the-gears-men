@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 // import { RhfDevTool } from '@/components/custom-rhf-devtool';
-
 import BaseBeautyViewField from './base-beauty-view-field';
 import BaseFormInput from './base-form-input';
 import { TBaseFormMode } from './base.model';

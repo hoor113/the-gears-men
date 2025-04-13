@@ -1,4 +1,4 @@
-import { IUserInfo } from "../auth/auth.model";
+import { IUserInfo } from '../auth/auth.model';
 
 export interface IAbpConfiguration {
   roleId: number;
@@ -13,6 +13,5 @@ export interface IAbpState {
   permissions: string[];
   curLoginInfo?: IUserInfo;
 }
-
 
 export type TAbpActionType = 'setPermissions' | 'setCurLoginInfo';

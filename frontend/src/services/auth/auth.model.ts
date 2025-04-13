@@ -52,7 +52,7 @@ export interface GetUserInfoApiParams {
   accessToken: string;
 }
 
-export interface IUserInfo  {
+export interface IUserInfo {
   id: string;
   userName: string;
   fullName: string;

@@ -1,8 +1,8 @@
 import User, { EUserRole } from '@/models/user.model';
 import bcrypt from 'bcrypt';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
-import { buildQuery } from 'src/utils/utils';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
+import { buildQuery } from '@/utils/utils';
 import { Service } from 'typedi';
 import {
     CreateUserDto,

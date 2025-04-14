@@ -1,8 +1,8 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
 
 export function ValidationMiddleware(dtoClass: any) {
     return async (req: Request, res: Response, next: NextFunction) => {

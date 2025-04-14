@@ -17,15 +17,15 @@ import {
     Res,
     UseBefore,
 } from 'routing-controllers';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     CreateUserDto,
     GetAllUsersDto,
     UpdateUserDto,
-} from 'src/services/user/dto/user.dto';
-import { UserService } from 'src/services/user/user.service';
-import { EHttpStatusCode } from 'src/utils/enum';
+} from '@/services/user/dto/user.dto';
+import { UserService } from '@/services/user/user.service';
+import { EHttpStatusCode } from '@/utils/enum';
 import Container from 'typedi';
 
 @UseBefore(AuthMiddleware)

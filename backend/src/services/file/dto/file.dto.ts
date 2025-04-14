@@ -13,3 +13,12 @@ export class UploadResponseDto {
     @IsString()
     publicId!: string;
 }
+
+export class UploadManyResponseDto {
+    @IsString({ each: true, message: 'Each url must be a string.' })
+    urls!: string[];
+
+    @IsString()
+    publicId!: string;
+}
+

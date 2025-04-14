@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { verifyToken } from 'src/config/jwt';
-import redis from 'src/config/redis';
-import PUBLIC_ROUTES from 'src/constants/public-endpoints';
+import { verifyToken } from '@/config/jwt';
+import redis from '@/config/redis';
+import PUBLIC_ROUTES from '@/constants/public-endpoints';
 import { BaseResponse } from '../common/base-response';
 
 export const AuthMiddleware = async (

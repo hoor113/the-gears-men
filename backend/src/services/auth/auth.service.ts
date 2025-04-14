@@ -1,14 +1,14 @@
 import User, { EUserRole } from '@/models/user.model';
 import bcrypt from 'bcrypt';
 import { JwtPayload } from 'jsonwebtoken';
-import { BaseResponse } from 'src/common/base-response';
+import { BaseResponse } from '@/common/base-response';
 import {
     generateRefreshToken,
     generateToken,
     verifyRefreshToken,
-} from 'src/config/jwt';
-import redis from 'src/config/redis';
-import { EHttpStatusCode } from 'src/utils/enum';
+} from '@/config/jwt';
+import redis from '@/config/redis';
+import { EHttpStatusCode } from '@/utils/enum';
 import { Service } from 'typedi';
 import {
     LoginDto,

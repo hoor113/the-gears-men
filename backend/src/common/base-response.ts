@@ -1,5 +1,5 @@
 import { HttpError } from 'routing-controllers';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { EHttpStatusCode } from '@/utils/enum';
 
 export class BaseResponse<T> {
     success: boolean;

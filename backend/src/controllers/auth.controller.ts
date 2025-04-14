@@ -7,14 +7,14 @@ import {
     Res,
     UseBefore,
 } from 'routing-controllers';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
-import { AuthService } from 'src/services/auth/auth.service';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
+import { AuthService } from '@/services/auth/auth.service';
 import {
     LoginDto,
     RefreshTokenDto,
     RegisterDto,
-} from 'src/services/auth/dto/auth.dto';
-import { EHttpStatusCode } from 'src/utils/enum';
+} from '@/services/auth/dto/auth.dto';
+import { EHttpStatusCode } from '@/utils/enum';
 import Container from 'typedi';
 
 @JsonController('/auth')

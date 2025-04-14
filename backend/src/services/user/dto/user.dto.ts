@@ -9,7 +9,7 @@ import {
     ValidationArguments,
 } from 'class-validator';
 import 'reflect-metadata';
-import { BaseGetAllDto, BaseGetOneResult } from 'src/common/base-get-all-dto';
+import { BaseGetAllDto, BaseGetOneResult } from '@/common/base-get-all-dto';
 
 export class UserDto extends BaseGetOneResult<string> {
     @IsString({ message: 'Username must be a string.' })

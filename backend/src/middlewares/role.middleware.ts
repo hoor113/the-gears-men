@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
-import { BaseResponse } from 'src/common/base-response';
-import { verifyToken } from 'src/config/jwt';
+import { BaseResponse } from '@/common/base-response';
+import { verifyToken } from '@/config/jwt';
 
 export const authorizeRoles = (allowedRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {

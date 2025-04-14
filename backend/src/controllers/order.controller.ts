@@ -9,6 +9,7 @@ import {
     Post,
     Put,
     QueryParams,
+    Req,
     Res,
     UseBefore,
 } from 'routing-controllers';
@@ -19,34 +20,38 @@ import {
     CreateOrderDto,
 } from 'src/services/order/dto/order.dto';
 import { OrderService } from '@/services/order/order.service';
-// import { OrderStoreOwnerService } from '@/services/order/order-store-owner.service';
-// import { OrderDeliveryCompanyService } from '@/services/order/order-delivery-company.service';
-// import { OrderDeliveryPersonnelService } from '@/services/order/order-delivery-personnel.service';
 import { EHttpStatusCode } from 'src/utils/enum';
 import { EUserRole } from '@/models/user.model';
+import { BaseResponse } from '@/common/base-response';
+import { JwtPayload } from 'jsonwebtoken';
+import { verifyToken } from 'src/config/jwt';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/orders')
 export class OrderController {
     private orderService: OrderService;
-    // private orderStoreOwnerService: OrderStoreOwnerService;
-    // private orderDeliveryCompanyService: OrderDeliveryCompanyService;
-    // private orderDeliveryPersonnelService: OrderDeliveryPersonnelService;
 
     constructor() {
         this.orderService = new OrderService();
-        // this.orderStoreOwnerService = new OrderStoreOwnerService();
-        // this.orderDeliveryCompanyService = new OrderDeliveryCompanyService();
-        // this.orderDeliveryPersonnelService = new OrderDeliveryPersonnelService();
     }
 
     // Customer endpoints
-    @Post('/create')
     @UseBefore(authorizeRoles([EUserRole.Customer]))
+    @Post('/create')
     @UseBefore(ValidationMiddleware(CreateOrderDto))
-    async createOrder(@Body() dto: CreateOrderDto, @Res() res: Response) {
+    async createOrder(@Req() req: Request,  @Body() dto: CreateOrderDto, @Res() res: Response) {
         try {
-            const response = await this.orderService.createOrder(dto);
+            const authHeader = (req.headers as any)?.authorization;
+            const token = authHeader?.split(' ')[1];
+            if (!token) {
+                return res
+                    .status(401)
+                    .json(BaseResponse.error('Token missing', 401));
+            }
+            const decoded = verifyToken(token) as JwtPayload;
+            console.log('decoded', decoded);
+            const customerId = decoded.id;
+            const response = await this.orderService.createOrder(customerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({
@@ -60,9 +65,19 @@ export class OrderController {
     @Post('/cancel')
     @UseBefore(authorizeRoles([EUserRole.Customer]))
     @UseBefore(ValidationMiddleware(CancelOrderDto))
-    async cancelOrder(@Body() dto: CancelOrderDto, @Res() res: Response) {
+    async cancelOrder(@Req() req: Request , @Body() dto: CancelOrderDto, @Res() res: Response) {
         try {
-            const response = await this.orderService.cancelOrder(dto);
+            const authHeader = (req.headers as any)?.authorization;
+            const token = authHeader?.split(' ')[1];
+            if (!token) {
+                return res
+                    .status(401)
+                    .json(BaseResponse.error('Token missing', 401));
+            }
+            const decoded = verifyToken(token) as JwtPayload;
+            console.log('decoded', decoded);
+            const customerId = decoded.id;
+            const response = await this.orderService.cancelOrder(customerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({
@@ -72,179 +87,4 @@ export class OrderController {
             });
         }
     }
-/*       Move all to shipment.controller.ts
-    // Store Owner endpoints
-    @Get('/')
-    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
-    @UseBefore(ValidationMiddleware(GetOrderFromCustomerDto))
-    async getOrdersFromCustomer(
-        @QueryParams() dto: GetOrderFromCustomerDto,
-        @Res() res: Response,
-    ) {
-        try {
-            const response = await this.orderStoreOwnerService.getOrderFromCustomer(dto);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
-
-    @Post('/confirm')
-    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
-    @UseBefore(ValidationMiddleware(ConfirmAndSendOrderToDeliveryCompanyDto))
-    async confirmAndSendToDeliveryCompany(
-        @Body() dto: ConfirmAndSendOrderToDeliveryCompanyDto,
-        @Res() res: Response,
-    ) {
-        try {
-            const response = await this.orderStoreOwnerService.confirmAndSendOrderToDeliveryCompany(dto);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
-
-    // Delivery Company endpoints
-    @Get('/')
-    @UseBefore(authorizeRoles([EUserRole.DeliveryCompany]))
-    @UseBefore(ValidationMiddleware(GetOrderFromStoreDto))
-    async getOrdersFromStore(
-        @QueryParams() dto: GetOrderFromStoreDto,
-        @Res() res: Response,
-    ) {
-        try {
-            const response = await this.orderDeliveryCompanyService.getOrderFromStore(dto);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
-
-    @Post('/confirm')
-    @UseBefore(authorizeRoles([EUserRole.DeliveryCompany]))
-    @UseBefore(ValidationMiddleware(SendOrderToDeliveryPersonnelDto))
-    async sendToDeliveryPersonnel(
-        @Body() dto: SendOrderToDeliveryPersonnelDto,
-        @Res() res: Response,
-    ) {
-        try {
-            const response = await this.orderDeliveryCompanyService.sendOrderToDeliveryPersonnel(dto);
-            return res.status(response.statusCode).json(response);
-        } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: (error as any)?.message || 'Internal Server Error',
-                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-            });
-        }
-    }
- */
-
-    // Delivery Personnel endpoints
-    // @Get('/assigned')
-    // @UseBefore(authorizeRoles([EUserRole.DeliveryPersonnel]))
-    // @UseBefore(ValidationMiddleware(GetAssignedOrdersDto))
-    // async getAssignedOrders(
-    //     @QueryParams() dto: GetAssignedOrdersDto,
-    //     @Res() res: Response,
-    // ) {
-    //     try {
-    //         const response = await this.orderDeliveryPersonnelService.getAssignedOrders(dto);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
-
-    // @Post('/confirm-delivered')
-    // @UseBefore(authorizeRoles([EUserRole.DeliveryPersonnel]))
-    // @UseBefore(ValidationMiddleware(ConfirmOrderDeliveredDto))
-    // async confirmOrderDelivered(
-    //     @Body() dto: ConfirmOrderDeliveredDto,
-    //     @Res() res: Response,
-    // ) {
-    //     try {
-    //         const response = await this.orderDeliveryPersonnelService.confirmOrderDelivered(dto);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
-
-    // Admin access - for convenience
-    // @Get('/detail')
-    // @UseBefore(authorizeRoles([EUserRole.Admin, EUserRole.Customer, EUserRole.StoreOwner, EUserRole.DeliveryCompany, EUserRole.DeliveryPersonnel]))
-    // async getOrderById(
-    //     @QueryParams() query: StringEntityDto,
-    //     @Res() res: Response,
-    // ) {
-    //     const id = query.id;
-    //     if (!id) {
-    //         return res.status(400).json({ 
-    //             success: false, 
-    //             message: 'Missing id parameter',
-    //             statusCode: EHttpStatusCode.BAD_REQUEST
-    //         });
-    //     }
-        
-    //     try {
-    //         // Implement this method in one of your services or create a new shared method
-    //         const response = await this.orderService.getOrderById(id);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Order Not Found',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
-
-    // @Delete('/')
-    // @UseBefore(authorizeRoles([EUserRole.Admin]))
-    // async deleteOrder(
-    //     @QueryParams() query: StringEntityDto,
-    //     @Res() res: Response,
-    // ) {
-    //     const id = query.id;
-    //     if (!id) {
-    //         return res.status(400).json({ 
-    //             success: false, 
-    //             message: 'Missing id parameter',
-    //             statusCode: EHttpStatusCode.BAD_REQUEST
-    //         });
-    //     }
-        
-    //     try {
-    //         // Implement this method in one of your services or create a shared method
-    //         const response = await this.orderService.deleteOrder(id);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
 }

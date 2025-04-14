@@ -18,152 +18,129 @@ import {
 import { Type } from 'class-transformer';
 import mongoose from 'mongoose';
 import { BaseGetAllDto } from 'src/common/base-get-all-dto';
-import { EDiscountCodeType } from 'src/models/discount-code-cast.model';
+import { EDiscountCodeType, EDiscountCalculationMethod } from 'src/models/discount-code-cast.model';
 
-@ValidatorConstraint({ name: 'eitherPercentageOrAmount', async: false })
-export class EitherPercentageOrAmountConstraint implements ValidatorConstraintInterface {
-    validate(value: any, args: ValidationArguments) {
-        const obj = args.object as any;
-        const hasPercentage = obj.discountPercentage !== undefined && obj.discountPercentage > 0;
-        const hasAmount = obj.discountAmount !== undefined && obj.discountAmount > 0;
-        
-        // Either percentage or amount, but not both and not neither
-        return (hasPercentage && !hasAmount) || (!hasPercentage && hasAmount);
-    }
-
-    defaultMessage() {
-        return 'A discount code must have either a percentage OR an amount, but not both and not neither';
-    }
-}
 
 export class BaseDiscountCodeDto {
-    @IsString()
+    @IsString({message: 'Code must be a string.'})
     code!: string;
 
-    @IsEnum(EDiscountCodeType)
+    @IsEnum(EDiscountCodeType, {message: 'Type must be a valid discount code type.'})
     type!: EDiscountCodeType;
 
-    @Validate(EitherPercentageOrAmountConstraint)
-    @IsNumber()
-    @Min(0)
-    discountPercentage?: number;
+    @IsEnum(EDiscountCalculationMethod, {message: 'Discount calculation method must be a valid method.'})
+    discountCalculationMethod!: EDiscountCalculationMethod;
 
-    @IsNumber()
-    @Min(0)
-    discountAmount?: number;
+    @IsNumber({}, {message: 'Discount quantity must be a number.'})
+    @Min(0, {message: 'Discount quantity must be at least 0.'})
+    discountQuantity!: number;
 
-    @IsDate()
+    @IsDate({message: 'Expiry date must be a valid date.'})
     @Type(() => Date)
     expiryDate!: Date;
 }
 
 // DTO for discount code response
 export class DiscountCodeDto extends BaseDiscountCodeDto {
-    @IsMongoId()
-    @IsOptional()
-    customerId?: mongoose.Types.ObjectId;
+    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
+    customerId!: mongoose.Types.ObjectId;
 
-    @IsBoolean()
+    @IsBoolean({message: 'isUsed must be a boolean value.'})
     isUsed!: boolean;
 }
 
 // DTO for discount code cast response
 export class DiscountCodeCastDto extends BaseDiscountCodeDto {
-    @IsNumber()
-    @Min(1)
+    @IsNumber({}, {message: 'Quantity must be a number.'})
+    @Min(1, {message: 'Quantity must be at least 1.'})
     quantity!: number;
 }
 
 // DTO for creating a new discount code cast
 export class CreateDiscountCodeCastDto {
-    @IsString()
+    @IsString({message: 'Code must be a string.'})
     code!: string;
 
-    @IsEnum(EDiscountCodeType)
+    @IsEnum(EDiscountCodeType, {message: 'Type must be a valid discount code type.'})
     type!: EDiscountCodeType;
 
-    @Validate(EitherPercentageOrAmountConstraint)
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    discountPercentage?: number;
+    @IsEnum(EDiscountCalculationMethod, {message: 'Discount calculation method must be a valid method.'})
+    discountCalculationMethod!: EDiscountCalculationMethod;
 
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    discountAmount?: number;
+    @IsNumber({}, {message: 'Discount quantity must be a number.'})
+    @Min(0, {message: 'Discount quantity must be at least 0.'})
+    discountQuantity!: number;
 
-    @IsDate()
+    @IsDate({message: 'Expiry date must be a valid date.'})
     @Type(() => Date)
     expiryDate!: Date;
 
-    @IsNumber()
-    @Min(1)
+    @IsNumber({}, {message: 'Quantity must be a number.'})
+    @Min(1, {message: 'Quantity must be at least 1.'})
     quantity!: number;
 }
 
-
 // DTO for assigning a discount code to a customer
 export class AssignDiscountCodeDto {
-    @IsMongoId()
+    @IsMongoId({message: 'Discount code ID must be a valid MongoDB identifier.'})
     discountCodeId!: mongoose.Types.ObjectId;
     
-    @IsMongoId()
+    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
     customerId!: mongoose.Types.ObjectId;
 }
 
 // DTO for updating a discount code
 export class UpdateDiscountCodeDto {
     @IsOptional()
-    @IsMongoId()
+    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
     customerId?: mongoose.Types.ObjectId;
 
     @IsOptional()
-    @IsBoolean()
+    @IsBoolean({message: 'isUsed must be a boolean value.'})
     isUsed?: boolean;
 }
 
 // DTO for validating a general discount code
 export class ValidateDiscountCodeDto {
-    @IsMongoId()
+    @IsMongoId({message: 'Code ID must be a valid MongoDB identifier.'})
     codeId!: mongoose.Types.ObjectId;
     
-    @IsMongoId()
+    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
     customerId!: mongoose.Types.ObjectId;
 }
 
 // DTO for validating a product discount code
 export class ValidateProductDiscountCodeDto {
-    @IsMongoId()
+    @IsMongoId({message: 'Code ID must be a valid MongoDB identifier.'})
     codeId!: mongoose.Types.ObjectId;
     
-    @IsMongoId()
+    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
     customerId!: mongoose.Types.ObjectId;
     
-    @IsMongoId()
+    @IsMongoId({message: 'Product ID must be a valid MongoDB identifier.'})
     productId!: mongoose.Types.ObjectId;
 }
 
 // DTO for validating a shipping discount code
 export class ValidateShippingDiscountCodeDto {
-    @IsMongoId()
+    @IsMongoId({message: 'Code ID must be a valid MongoDB identifier.'})
     codeId!: mongoose.Types.ObjectId;
     
-    @IsMongoId()
+    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
     customerId!: mongoose.Types.ObjectId;
 }
 
 // DTO for searching and filtering discount codes
 export class GetAllDiscountCodesDto extends BaseGetAllDto {
     @IsOptional()
-    @IsEnum(EDiscountCodeType)
+    @IsEnum(EDiscountCodeType, {message: 'Type must be a valid discount code type.'})
     type?: EDiscountCodeType;
 
     @IsOptional()
-    @IsBoolean()
+    @IsBoolean({message: 'isUsed must be a boolean value.'})
     isUsed?: boolean;
     
     @IsOptional()
-    @IsMongoId()
+    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
     customerId?: mongoose.Types.ObjectId;
 }

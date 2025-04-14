@@ -8,11 +8,13 @@ import { Service, Container } from 'typedi';
 import {
     CreateOrderDto,
     CancelOrderDto,
-    OrderDto
+    OrderDto,
+    OrderItemDto
 } from 'src/services/order/dto/order.dto';
 import { OrderCronService } from '@/services/cron/cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
 import { DiscountCodeDto } from 'src/services/discount-code/dto/discount-code.dto';
+import { EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
 
 @Service()
 export class OrderService {
@@ -25,10 +27,9 @@ export class OrderService {
         this.discountCodeService = Container.get(DiscountCodeService);
     }
 
-    public async createOrder(dto: CreateOrderDto): Promise<BaseResponse<OrderDto | unknown>> {
+    public async createOrder(customerId: string, dto: CreateOrderDto): Promise<BaseResponse<OrderDto | DiscountCodeDto>> {
         try {
             const {
-                customerId,
                 items,
                 paymentMethod,
                 shippingAddress,
@@ -54,8 +55,8 @@ export class OrderService {
                     );
                 }
 
-                let price: number = product.price * item.quantity;
-                let shippingPrice: number = price * DELIVERY_VAT;
+                let productPrice: number = product.price * item.quantity;
+                let shippingPrice: number = productPrice * DELIVERY_VAT;
                 let productDiscountCode: string | null = null;
                 let shippingDiscountCode: string | null = null;
 
@@ -65,9 +66,12 @@ export class OrderService {
                     if (!result.success) {
                         return result as BaseResponse<DiscountCodeDto>;
                     }
-                    productDiscountCode = result.data?.code || null;
-                    price -= (result.data?.discountPercentage || 0) * price; // Apply discount amount to price
-                    price -= result.data?.discountAmount || 0; // Apply discount percentage to price
+                    if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.Percentage) {
+                        productPrice -= ((result as any).data?.discountQuantity || 0) * productPrice; // Apply discount amount to price
+                    }
+                    else if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.FixedAmount) {
+                        productPrice -= ((result as any).data?.discountQuantity || 0); // Apply discount percentage to price
+                    }
                 }
 
                 // Process shipping discount code if provided
@@ -76,17 +80,24 @@ export class OrderService {
                     if (!result.success) {
                         return result as BaseResponse<DiscountCodeDto>;
                     }
-                    shippingDiscountCode = result.data?.code || null;
-                    shippingPrice -= (result.data?.discountPercentage || 0) * shippingPrice; // Apply discount amount to price
-                    shippingPrice -= result.data?.discountAmount || 0; // Apply discount percentage to price
+                    shippingDiscountCode = (result as any)?.data?.code || null;
+
+                    if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.Percentage) {
+                        shippingPrice -= ((result as any).data?.discountQuantity || 0) * shippingPrice; // Apply discount amount to price
+                    }
+                    else if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.FixedAmount) {
+                        shippingPrice -= ((result as any).data?.discountQuantity || 0); // Apply discount percentage to price
+                    }
                 }
 
                 // Create the order item
                 const orderItem: any = {
                     productId: new mongoose.Types.ObjectId(item.productId),
                     quantity: item.quantity,
-                    price,
-                    shippingPrice
+                    price: productPrice,
+                    shippingPrice,
+                    productDiscountCode: item.productDiscountCode || null,
+                    shippingDiscountCode: item.shippingDiscountCode || null,
                 };
 
                 // Reduce stock quantity
@@ -94,8 +105,8 @@ export class OrderService {
                 await product.save();
 
                 // Add to total price
-                totalPrice += orderItem.price;
-                
+                productPrice += orderItem.price;
+
                 // Add item to order items
                 orderItems.push(orderItem);
             }
@@ -109,19 +120,37 @@ export class OrderService {
                 totalPrice
             });
 
+            const orderDto: OrderDto = {
+                id: (order._id as mongoose.Types.ObjectId).toString(),
+                customerId: order.customerId.toString(),
+                items: order.items.map((item: any) => ({
+                    id: (item._id as mongoose.Types.ObjectId).toString(),
+                    productId: item.productId.toString(),
+                    quantity: item.quantity,
+                    productDiscountCode: item.productDiscountCode,
+                    shippingDiscountCode: item.shippingDiscountCode,
+                    price: item.price,
+                    shippingPrice: item.shippingPrice,
+                })),
+                orderStatus: order.orderStatus,
+                paymentMethod: order.paymentMethod,
+                shippingAddress: order.shippingAddress,
+                totalPrice: order.totalPrice,
+            }
+
             await order.save();
             this.orderCronService.scheduleOrderConfirmation(order._id as mongoose.Types.ObjectId); // Schedule confirmation job
-            return BaseResponse.success(order, undefined, 'Order created successfully', EHttpStatusCode.OK);
+            return BaseResponse.success(orderDto, undefined, 'Order created successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async cancelOrder(dto: CancelOrderDto): Promise<BaseResponse<OrderDto | unknown>> {
+    public async cancelOrder(customerId: string, dto: CancelOrderDto): Promise<BaseResponse<OrderDto | unknown>> {
         try {
             const {
                 orderId,
-                customerId
+                // customerId
             } = dto;
 
             // First, find the order without updating it
@@ -131,13 +160,13 @@ export class OrderService {
                 return BaseResponse.error('Order not found or does not belong to this customer', EHttpStatusCode.NOT_FOUND);
             }
 
-            // Only restore stock if the order is not already cancelled
+            // Only reorder stock if the order is not already cancelled
             if (order.orderStatus !== EOrderStatus.Cancelled) {
                 // Return products to inventory
                 for (const item of order.items) {
                     const product = await Product.findById(item.productId);
                     if (product) {
-                        // Restore stock quantity
+                        // Reorder stock quantity
                         product.stock += item.quantity;
                         await product.save();
                     }
@@ -147,9 +176,28 @@ export class OrderService {
                 order.orderStatus = EOrderStatus.Cancelled;
                 await order.save();
             }
-
+            
             this.orderCronService.cancelOrderConfirmation(orderId); // Cancel confirmation job
-            return BaseResponse.success(order, undefined, 'Order cancelled successfully', EHttpStatusCode.OK);
+
+            const orderDto: OrderDto = {
+                id: (order._id as mongoose.Types.ObjectId).toString(),
+                customerId: order.customerId.toString(),
+                items: order.items.map((item: any) => ({
+                    id: (item._id as mongoose.Types.ObjectId).toString(),
+                    productId: item.productId.toString(),
+                    quantity: item.quantity,
+                    productDiscountCode: item.productDiscountCode,
+                    shippingDiscountCode: item.shippingDiscountCode,
+                    price: item.price,
+                    shippingPrice: item.shippingPrice,
+                })),
+                orderStatus: order.orderStatus,
+                paymentMethod: order.paymentMethod,
+                shippingAddress: order.shippingAddress,
+                totalPrice: order.totalPrice,
+            }
+
+            return BaseResponse.success(orderDto, undefined, 'Order cancelled successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }

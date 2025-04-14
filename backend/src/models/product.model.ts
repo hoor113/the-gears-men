@@ -1,19 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export enum EProductCategory {
-    Phones = 'phones',
-    Laptops = 'laptops',
-    PC = 'pc',
-    Tablets = 'tablets',
-    Accessories = 'accessories',
-    Wearables = 'wearables',
-    TV = 'tv',
-    Audio = 'audio',
-    Cameras = 'cameras',
-    SmartHome = 'smartHome',
-    HomeAppliances = 'homeAppliances',
-    Gaming = 'gaming',
-    Others = 'others',
+    Phone = 'Phone',
+    Laptop = 'Laptop',
+    PC = 'PC',
+    Tablet = 'Tablet',
+    Accessories = 'Accessories',
+    Wearable = 'Wearable',
+    TV = 'TV',
+    Audio = 'Audio',
+    Camera = 'Camera',
+    SmartHome = 'SmartHome',
+    HomeAppliance = 'HomeAppliance',
+    Gaming = 'Gaming',
+    Others = 'Others',
 }
 
 export interface IProduct extends Document {

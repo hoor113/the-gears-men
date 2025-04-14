@@ -1,7 +1,5 @@
 import User, { EUserRole } from '@/models/user.model';
 import Shipment, { EShipmentStatus } from '@/models/shipment.model';
-import DiscountCode from '@/models/discount-code.model';
-import DiscountCodeCast from '@/models/discount-code-cast.model';
 import mongoose from 'mongoose';
 import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';
@@ -15,20 +13,24 @@ import {
 
 @Service()
 export class ShipmentDeliveryCompanyService {
-    public async getShipmentFromStore(dto: GetShipmentFromStoreDto): Promise<BaseResponse<ShipmentDto[] | unknown>> {
+    public async getShipmentFromStore(companyId: string, dto: GetShipmentFromStoreDto): Promise<BaseResponse<ShipmentDto[] | unknown>> {
         try {
-            const { deliveryCompanyId } = dto;
+            // const { deliveryCompanyId } = dto;
+            const deliveryCompanyId = new mongoose.Types.ObjectId(companyId);
+            // Check if the delivery company exists
 
             // Build base query using the utility function
-            const baseQuery = buildQuery(dto);
+            const query = buildQuery(dto);
+            query.deliveryCompany = deliveryCompanyId;
+            query.status = EShipmentStatus.Confirmed; // Set status to pending
 
             // Add delivery company specific filter
             // ????
-            const query = {
-                ...baseQuery,
-                'items.shippingCompanyId': deliveryCompanyId ? new mongoose.Types.ObjectId(deliveryCompanyId) : undefined,
-                shipmentStatus: EShipmentStatus.Pending,
-            };
+            // const query = {
+            //     ...query,
+            //     'items.shippingCompanyId': deliveryCompanyId ? new mongoose.Types.ObjectId(deliveryCompanyId) : undefined,
+            //     shipmentStatus: EShipmentStatus.Pending,
+            // };
 
             // Remove undefined values
             Object.keys(query).forEach(key =>
@@ -37,9 +39,6 @@ export class ShipmentDeliveryCompanyService {
 
             // Find shipments that match the criteria
             const shipments = await Shipment.find(query)
-                .populate('customerId', 'username fullname email phoneNumber')
-                .populate('items.productId')
-                .populate('items.deliveryPersonnel', 'username fullname phoneNumber')
                 .limit(dto.maxResultCount)
                 .skip(dto.skipCount)
                 .sort({ createdAt: -1 });
@@ -78,11 +77,11 @@ export class ShipmentDeliveryCompanyService {
             const shipment = await Shipment.findByIdAndUpdate(
                 shipmentId,
                 {
-                    'items.$[].deliveryPersonnel': new mongoose.Types.ObjectId(deliveryPersonnelId),
-                    shipmentStatus: EShipmentStatus.Stored // Automatically update status
+                    deliveryPersonnel: new mongoose.Types.ObjectId(deliveryPersonnelId),
+                    status: EShipmentStatus.Stored // Automatically update status
                 },
                 { new: true }
-            ).populate('items.deliveryPersonnel');
+            );
 
             if (!shipment) {
                 return BaseResponse.error(

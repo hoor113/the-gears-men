@@ -1,10 +1,11 @@
 import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
+import mongoose from 'mongoose';
 import { BaseGetAllDto } from 'src/common/base-get-all-dto';
 import { EntityDto } from 'src/common/entity-dto';
 
 export class StoreDto extends EntityDto {
     @IsMongoId({ message: 'Store owner ID must be a valid MongoDB ID.' })
-    storeOwnerId!: string;
+    ownerId!: mongoose.Types.ObjectId; // Required
     
     @IsString({ message: 'Store name must be a string.' })
     name!: string;
@@ -19,7 +20,7 @@ export class StoreDto extends EntityDto {
     @IsOptional()
     @IsArray({ message: 'Products must be an array.' })
     @IsMongoId({ each: true, message: 'Each product ID must be a valid MongoDB ID.' })
-    products?: string[];
+    products?: mongoose.Types.ObjectId[];
 }
 
 export class GetStoresDto extends BaseGetAllDto {
@@ -32,9 +33,9 @@ export class GetStoresDto extends BaseGetAllDto {
     location?: string;
 }
 
-export class CreateStoreDto extends EntityDto {
+export class CreateStoreDto {
     @IsMongoId({ message: 'Store owner ID must be a valid MongoDB ID.' })
-    storeOwnerId!: string; // Required
+    ownerId!: mongoose.Types.ObjectId; // Required
 
     @IsString({ message: 'Store name must be a string.' })
     name!: string; // Required

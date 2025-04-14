@@ -31,8 +31,8 @@ export class StoreController {
         this.storeService = new StoreService();
     }
 
-    @Post('/')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
+    @Post('/')
     @UseBefore(ValidationMiddleware(CreateStoreDto))
     async createStore(@Body() dto: CreateStoreDto, @Res() res: Response) {
         try {
@@ -49,7 +49,7 @@ export class StoreController {
 
     @Get('/')
     @UseBefore(ValidationMiddleware(GetStoresDto))
-    async getStores(@QueryParams() dto: GetStoresDto, @Res() res: Response) {
+    async getStores(@Body() dto: GetStoresDto, @Res() res: Response) {
         try {
             const response = await this.storeService.getStores(dto);
             return res.status(response.statusCode).json(response);

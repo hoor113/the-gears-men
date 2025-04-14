@@ -15,7 +15,7 @@ import {
 export class UserService {
     public async createUser(
         dto: CreateUserDto,
-    ): Promise<BaseResponse<UserDto | unknown>> {
+    ): Promise<BaseResponse<UserDto>> {
         try {
             const {
                 username,
@@ -127,7 +127,7 @@ export class UserService {
     public async getUserById(
         id: string,
         role: EUserRole,
-    ): Promise<BaseResponse<UserDto | unknown>> {
+    ): Promise<BaseResponse<UserDto>> {
         try {
             const user = await User.findById(id);
             if (!user) {
@@ -202,7 +202,7 @@ export class UserService {
 
     public async deleteUser(
         id: string,
-    ): Promise<BaseResponse<boolean | unknown>> {
+    ): Promise<BaseResponse<boolean>> {
         try {
             const deletedUser = await User.findByIdAndDelete(id);
             if (!deletedUser) {

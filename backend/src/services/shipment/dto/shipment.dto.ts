@@ -6,6 +6,9 @@ import { EShipmentStatus } from 'src/models/shipment.model';
 import { BaseGetAllDto } from 'src/common/base-get-all-dto';
 
 export class ShipmentDto extends EntityDto {
+    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
+    storeId!: mongoose.Types.ObjectId; // Required
+
     @IsMongoId({ message: 'Shipment item ID must be a valid MongoDB ID.' })
     orderItemId!: mongoose.Types.ObjectId; // Required
 
@@ -22,30 +25,18 @@ export class ShipmentDto extends EntityDto {
     @IsOptional()
     @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID.' })
     deliveryPersonnel?: mongoose.Types.ObjectId; // Optional
+
+    @IsOptional()
+    @IsMongoId({ message: 'Shipment canceller must be a valid MongoDB ID.' })
+    canceller?: string; // Optional
 }
-
-// export class ShipmentQueryDto extends ShipmentDto {
-//     @IsString({ message: 'Shipping address must be a string.' })
-//     shippingAddress!: string; // Required
-
-//     @IsDate({ message: 'Created at must be a date.' })
-//     @Type(() => Date)
-//     createdAt!: Date; // Required
-    
-//     @IsString({ message: 'Customer email must be a string.' })
-//     email!: string; // Required
-
-//     @IsString({ message: 'Customer phone number must be a string.' })
-//     phoneNumber!: string; // Required
-// }
-//Fixing
 
 export class GetShipmentFromCustomerDto extends BaseGetAllDto {
-    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
-    storeId!: string;
+    // @IsString({ message: 'Store ID must be a valid MongoDB ID.' })
+    // storeId!: string; // Required
 }
 
-export class ConfirmAndSendShipmentToDeliveryCompanyDto extends EntityDto {
+export class ConfirmAndSendShipmentToDeliveryCompanyDto {
     @IsMongoId({ message: 'Shipment ID must be a valid MongoDB ID.' })
     shipmentId!: string; // Required
 
@@ -54,9 +45,9 @@ export class ConfirmAndSendShipmentToDeliveryCompanyDto extends EntityDto {
 }
 
 export class GetShipmentFromStoreDto extends BaseGetAllDto {
-    @IsOptional()
-    @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID.' })
-    deliveryCompanyId?: string;
+
+    // @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID.' })
+    // deliveryCompanyId!: string;
 }
 
 export class SendShipmentToDeliveryPersonnelDto extends EntityDto {
@@ -73,13 +64,13 @@ export class GetAssignedShipmentsDto extends BaseGetAllDto {
     deliveryPersonnelId?: string; // Required
 }
 
-export class ConfirmShipmentDeliveredDto extends EntityDto {
+export class ConfirmShipmentDeliveredDto{
     @IsMongoId({ message: 'Shipment ID must be a valid MongoDB ID.' })
     shipmentId!: string; // Required
 
-    @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID.' })
-    deliveryPersonnelId!: string; // Required
+    // @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID.' })
+    // deliveryPersonnelId!: string; // Required
 
-    @IsString({ message: 'Delivery date must be a string.' })
-    deliveryDate!: string; // Required
+    // @IsString({ message: 'Delivery date must be a string.' })
+    // deliveryDate!: string; // Required
 }

@@ -4,7 +4,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IDiscountCode extends Document {
     code: string;
-    customerId?: mongoose.Types.ObjectId;
+    customerId: mongoose.Types.ObjectId;
     isUsed: boolean;
 }
 

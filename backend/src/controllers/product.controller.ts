@@ -106,7 +106,7 @@ export class ProductController {
     }
 
     @Delete('/')
-    @UseBefore(authorizeRoles(['StoreOwner']))
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     async deleteProduct(
         @QueryParams() query: StringEntityDto,
         @Res() res: Response,

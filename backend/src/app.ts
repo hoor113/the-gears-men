@@ -10,7 +10,7 @@ import { getMetadataArgsStorage, useExpressServer } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { Container } from 'typedi';
-import { OrderCronService } from './services/cron/order-cron.service';
+import { OrderCronService } from 'src/services/cron/cron.service';
 
 import connectDB from './config/database';
 import { AuthMiddleware } from './middlewares/auth.middleware';

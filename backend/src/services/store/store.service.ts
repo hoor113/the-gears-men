@@ -13,7 +13,7 @@ import { Service } from 'typedi';
 
 @Service()
 export class StoreService {
-    public async getUserStores(userId: string): Promise<BaseResponse<StoreDto | unknown>> {
+    public async getUserStores(userId: string): Promise<BaseResponse<StoreDto[]>> {
         try {
             const userObjectId = new mongoose.Types.ObjectId(userId);
 
@@ -21,8 +21,17 @@ export class StoreService {
                 ownerId: userObjectId
             });
 
+            const storesDto: StoreDto[] = stores.map((store) => ({
+                id: (store._id as mongoose.Types.ObjectId).toString(),
+                ownerId: store.ownerId,
+                name: store.name,
+                location: store.location,
+                description: store.description,
+                products: store.products,
+            }));
+
             return BaseResponse.success(
-                stores,
+                storesDto,
                 stores.length,
                 'Stores retrieved successfully',
                 EHttpStatusCode.OK
@@ -35,34 +44,38 @@ export class StoreService {
         }
     }
 
-    public async getStores(dto: GetStoresDto): Promise<BaseResponse<StoreDto | unknown>> {
+    public async getStores(dto: GetStoresDto): Promise<BaseResponse<StoreDto[]>> {
         try {
-            // const {
-            //     name,
-            //     location,
-            // } = dto;
             const searchableFields = ['name', 'location'];
             const query = buildQuery(dto, searchableFields);
-            const stores = await Store.find(query).populate('stores');
+            const stores = await Store.find(query);
             const totalStores = await Store.countDocuments({ role: EUserRole.Customer });
-            return BaseResponse.success(stores, totalStores, 'Stores retrieved successfully', EHttpStatusCode.OK);
+            const storesDto: StoreDto[] = stores.map((store) => ({
+                id: (store._id as mongoose.Types.ObjectId).toString(),
+                ownerId: store.ownerId,
+                name: store.name,
+                location: store.location,
+                description: store.description,
+                products: store.products,
+            }));
+            return BaseResponse.success(storesDto, totalStores, 'Stores retrieved successfully', EHttpStatusCode.OK);
         }
         catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async createStore(dto: CreateStoreDto): Promise<BaseResponse<StoreDto | unknown>> {
+    public async createStore(dto: CreateStoreDto): Promise<BaseResponse<StoreDto>> {
         try {
             const {
-                storeOwnerId,
+                ownerId,
                 name,
                 location,
                 description
             } = dto;
 
             const store = new Store({
-                ownerId: new mongoose.Types.ObjectId(storeOwnerId),
+                ownerId,
                 name,
                 location,
                 description,
@@ -71,8 +84,17 @@ export class StoreService {
 
             await store.save();
 
+            const storeDto: StoreDto = {
+                id: (store._id as mongoose.Types.ObjectId).toString(),
+                ownerId: store.ownerId,
+                name: store.name,
+                location: store.location,
+                description: store.description,
+                products: store.products,
+            }
+
             return BaseResponse.success(
-                store,
+                storeDto,
                 undefined,
                 'Store created successfully',
                 EHttpStatusCode.CREATED
@@ -85,7 +107,7 @@ export class StoreService {
         }
     }
 
-    public async updateStore(id: string, dto: CreateStoreDto): Promise<BaseResponse<StoreDto | unknown>> {
+    public async updateStore(id: string, dto: CreateStoreDto): Promise<BaseResponse<StoreDto>> {
         try {
             const store = await Store.findById(id);
             if (!store) {
@@ -95,8 +117,17 @@ export class StoreService {
             store.set(dto);
             await store.save();
 
+            const storeDto: StoreDto = {
+                id: (store._id as mongoose.Types.ObjectId).toString(),
+                ownerId: store.ownerId,
+                name: store.name,
+                location: store.location,
+                description: store.description,
+                products: store.products,
+            }
+
             return BaseResponse.success(
-                store,
+                storeDto,
                 undefined,
                 'Store updated successfully',
                 EHttpStatusCode.OK
@@ -109,7 +140,7 @@ export class StoreService {
         }
     }
 
-    public async deleteStore(id: string): Promise<BaseResponse<StoreDto | unknown>> {
+    public async deleteStore(id: string): Promise<BaseResponse<boolean>> {
         try {
             const store = await Store.findById(id);
             if (!store) {
@@ -119,7 +150,7 @@ export class StoreService {
             await store.deleteOne();
 
             return BaseResponse.success(
-                undefined,
+                true,
                 undefined,
                 'Store deleted successfully',
                 EHttpStatusCode.OK

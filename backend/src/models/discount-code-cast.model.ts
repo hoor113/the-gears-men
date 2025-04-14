@@ -7,11 +7,16 @@ export enum EDiscountCodeType {
     ShippingDiscount = 'shippingDiscount'
 }
 
+export enum EDiscountCalculationMethod {
+    Percentage = 'percentage',
+    FixedAmount = 'fixedAmount'
+}
+
 export interface IDiscountCodeCast extends Document {
     code: string;
     type: EDiscountCodeType;
-    discountPercentage: number;
-    discountAmount: number;
+    discountCalculationMethod: EDiscountCalculationMethod;
+    discountQuantity: number;
     expiryDate: Date;
     // add amounts (cast)
     quantity: number;
@@ -25,8 +30,12 @@ const DiscountCodeCast = new Schema<IDiscountCodeCast>(
             enum: Object.values(EDiscountCodeType),
             required: true,
         },
-        discountPercentage: { type: Number, required: true },
-        discountAmount: { type: Number, required: true },
+        discountCalculationMethod: {
+            type: String,
+            enum: Object.values(EDiscountCalculationMethod),
+            required: true,
+        },
+        discountQuantity: { type: Number, required: true },
         expiryDate: { type: Date, required: true },
         quantity: { type: Number, required: true },
     },

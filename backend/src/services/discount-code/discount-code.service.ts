@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import DiscountCode from '@/models/discount-code.model';
-import DiscountCodeCast, { EDiscountCodeType } from '@/models/discount-code-cast.model';
+import DiscountCodeCast, { EDiscountCodeType, EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
 import { BaseResponse } from 'src/common/base-response';
 import { EHttpStatusCode } from 'src/utils/enum';
 import mongoose from 'mongoose';
@@ -10,9 +10,77 @@ import {
     CreateDiscountCodeCastDto,
     ValidateDiscountCodeDto
 } from './dto/discount-code.dto';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
+import { buildQuery } from '@/utils/utils';
 
 @Service()
 export class DiscountCodeService {
+    public async getAllDiscountCodeCasts(dto: BaseGetAllDto): Promise<BaseResponse<DiscountCodeCastDto[]>> {
+        try {
+            // Fetch all discount codes from the database
+            const query = buildQuery(dto);
+            const discountCodes = await DiscountCodeCast.find(query).skip(dto.skipCount).limit(dto.maxResultCount).populate('discountCodeCastId', 'code type quantity discountCalculationMethod discountQuantity expiryDate');
+
+            // Check if any discount codes were found
+            if (!discountCodes || discountCodes.length === 0) {
+                return BaseResponse.error(
+                    'No discount codes found',
+                    EHttpStatusCode.NOT_FOUND
+                );
+            }
+
+            // Map the discount codes to the response format
+            const responseData = discountCodes.map((code) => ({
+                _id: code._id,
+                code: code.code,
+                type: code.type,
+                quantity: code.quantity,
+                discountCalculationMethod: code.discountCalculationMethod,
+                discountQuantity: code.discountQuantity,
+                expiryDate: code.expiryDate
+            }));
+
+            return BaseResponse.success(responseData);
+        } catch (error: any) {
+            return BaseResponse.error(
+                error.message || 'Failed to fetch discount codes',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    public async getDiscountCodeCastById(id: string): Promise<BaseResponse<DiscountCodeCastDto>> {
+        try {
+            // Fetch the discount code by ID from the database
+            const discountCode = await DiscountCodeCast.findById(id);
+
+            // Check if the discount code was found
+            if (!discountCode) {
+                return BaseResponse.error(
+                    `Discount code with ID ${id} not found`,
+                    EHttpStatusCode.NOT_FOUND
+                );
+            }
+
+            // Map the discount code to the response format
+            const responseData = {
+                _id: discountCode._id,
+                code: discountCode.code,
+                type: discountCode.type,
+                quantity: discountCode.quantity,
+                discountCalculationMethod: discountCode.discountCalculationMethod,
+                discountQuantity: discountCode.discountQuantity,
+                expiryDate: discountCode.expiryDate
+            };
+
+            return BaseResponse.success(responseData);
+        } catch (error: any) {
+            return BaseResponse.error(
+                error.message || 'Failed to fetch discount code',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
     /**
      * Creates a new discount code cast
      * @param createDto The data to create the discount code cast
@@ -20,35 +88,26 @@ export class DiscountCodeService {
      */
     public async createDiscountCodeCast(createDto: CreateDiscountCodeCastDto): Promise<BaseResponse<DiscountCodeCastDto>> {
         try {
-            // Ensure either discountPercentage or discountAmount is provided, but not both
-            if ((createDto.discountPercentage && createDto.discountAmount) ||
-                (!createDto.discountPercentage && !createDto.discountAmount)) {
-                return BaseResponse.error(
-                    'A discount code must have either a percentage OR an amount, but not both and not neither',
-                    EHttpStatusCode.BAD_REQUEST
-                );
-            }
-
             // If percentage is provided, set amount to 0 and vice versa
             const discountCodeCastData = {
                 ...createDto,
-                discountPercentage: createDto.discountPercentage || null,
-                discountAmount: createDto.discountAmount || null
+                discountCalculationMethod: createDto.discountCalculationMethod,
+                discountQuantity: createDto.discountQuantity,
             };
 
             // Create the discount code cast
             const discountCodeCast = new DiscountCodeCast(discountCodeCastData);
             await discountCodeCast.save();
 
-            this.createDiscountCodesFromCast(discountCodeCast);
+            // this.createDiscountCodesFromCast(discountCodeCast);
 
             return BaseResponse.success({
                 _id: discountCodeCast._id,
                 code: discountCodeCast.code,
                 type: discountCodeCast.type,
                 quantity: discountCodeCast.quantity,
-                discountPercentage: discountCodeCast.discountPercentage,
-                discountAmount: discountCodeCast.discountAmount,
+                discountCalculationMethod: discountCodeCast.discountCalculationMethod,
+                discountQuantity: discountCodeCast.discountQuantity,
                 expiryDate: discountCodeCast.expiryDate
             });
         } catch (error: any) {
@@ -59,33 +118,53 @@ export class DiscountCodeService {
         }
     }
 
-    private async createDiscountCodesFromCast(cast: DiscountCodeCastDto): Promise<BaseResponse<DiscountCodeDto[]>> {
-        // Generate the specified quantity of discount codes
-        try {
-            const discountCodes: DiscountCodeDto[] = [];
-            for (let i = 0; i < cast.quantity; i++) {
-                discountCodes.push({
-                    code: cast.code,
-                    type: cast.type,
-                    discountPercentage: cast.discountPercentage,
-                    discountAmount: cast.discountAmount,
-                    expiryDate: cast.expiryDate,
-                    isUsed: false
-                });
-            }
 
-            // Save the discount codes
-            await DiscountCode.insertMany(discountCodes);
-            return BaseResponse.success(discountCodes);
-        }
-        catch (error: any) {
+    public async claimDiscountCode(customerId: string, code: string): Promise<BaseResponse<DiscountCodeDto>> {
+        try {
+            // Find the discount code
+            const discountCodeCast = await DiscountCodeCast.findOne({ code: code });
+
+            // Verify the discount code exists
+            if (!discountCodeCast) {
+                return BaseResponse.error(
+                    `Discount code ${code} not found`,
+                    EHttpStatusCode.NOT_FOUND
+                );
+            }
+            
+            if (discountCodeCast.quantity <= 0) {
+                return BaseResponse.error(
+                    `Discount code ${code} has no remaining quantity`, EHttpStatusCode.BAD_REQUEST
+                );
+            }
+            discountCodeCast.quantity -= 1;
+
+            const discountCode = new DiscountCode({
+                code: discountCodeCast.code,
+                customerId: customerId,
+                isUsed: false
+            });
+
+            await discountCode.save();
+            await discountCodeCast.save();
+
+            return BaseResponse.success({
+                id: discountCode._id,
+                code: discountCode.code,
+                type: discountCodeCast.type,
+                discountCalculationMethod: discountCodeCast.discountCalculationMethod,
+                discountQuantity: discountCodeCast.discountQuantity,
+                expiryDate: discountCodeCast.expiryDate,
+                customerId: discountCode.customerId,
+                isUsed: discountCode.isUsed
+            }, undefined, 'Discount code claimed successfully', EHttpStatusCode.CREATED);
+        } catch (error: any) {
             return BaseResponse.error(
-                error.message || 'Failed to create discount code cast',
+                error.message || 'Failed to claim discount code',
                 EHttpStatusCode.INTERNAL_SERVER_ERROR
             );
         }
     }
-
     /**
      * Validates and applies a product discount code
      * @param code The discount code to validate
@@ -93,7 +172,7 @@ export class DiscountCodeService {
      */
     public async validateProductDiscountCode(code: mongoose.Types.ObjectId): Promise<BaseResponse<DiscountCodeDto>> {
         // Find the discount code
-        const discountCode = await DiscountCode.findOne({ _id: code });
+        const discountCode = await DiscountCode.findById({ code });
 
         // Verify the discount code exists
         if (!discountCode) {
@@ -133,10 +212,10 @@ export class DiscountCodeService {
         }
 
         // Determine discount type (percentage or fixed amount)
-        const discountType = discountCodeCast.discountPercentage > 0 ? 'percentage' : 'fixed';
-        const discountValue = discountType === 'percentage' ?
-            discountCodeCast.discountPercentage :
-            discountCodeCast.discountAmount;
+        // const discountType = discountCodeCast.discountPercentage > 0 ? 'percentage' : 'fixed';
+        // const discountValue = discountType === 'percentage' ?
+        //     discountCodeCast.discountPercentage :
+        //     discountCodeCast.discountAmount;
 
         // Mark the discount code as used
         discountCode.isUsed = true;
@@ -144,9 +223,10 @@ export class DiscountCodeService {
 
         return BaseResponse.success({
             code: discountCode.code,
+            customerId: discountCode.customerId,
             type: discountCodeCast.type,
-            discountPercentage: discountCodeCast.discountPercentage,
-            discountAmount: discountCodeCast.discountAmount,
+            discountCalculationMethod: discountCodeCast.discountCalculationMethod,
+            discountQuantity: discountCodeCast.discountQuantity,
             expiryDate: discountCodeCast.expiryDate,
             isUsed: true
         });
@@ -198,21 +278,16 @@ export class DiscountCodeService {
             );
         }
 
-        // Determine discount type (percentage or fixed amount)
-        const discountType = discountCodeCast.discountPercentage > 0 ? 'percentage' : 'fixed';
-        const discountValue = discountType === 'percentage' ?
-            discountCodeCast.discountPercentage :
-            discountCodeCast.discountAmount;
-
         // Mark the shipping discount code as used
         discountCode.isUsed = true;
         await discountCode.save();
 
         return BaseResponse.success({
             code: discountCode.code,
+            customerId: discountCode.customerId,
             type: discountCodeCast.type,
-            discountPercentage: discountCodeCast.discountPercentage,
-            discountAmount: discountCodeCast.discountAmount,
+            discountCalculationMethod: discountCodeCast.discountCalculationMethod,
+            discountQuantity: discountCodeCast.discountQuantity,
             expiryDate: discountCodeCast.expiryDate,
             isUsed: true
         });

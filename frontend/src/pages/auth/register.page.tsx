@@ -50,7 +50,6 @@ const RegisterPage = () => {
   const { enqueueSnackbar } = useSnackbar();
   const {
     register,
-    handleSubmit,
     formState: { errors },
     watch,
     setValue,
@@ -72,7 +71,7 @@ const RegisterPage = () => {
 
   const role = watch('role');
 
-  const { mutate, isLoading: loginLoading } = useMutation({
+  const { isLoading: loginLoading } = useMutation({
     mutationFn: (data: IRegisterInput) => authService.register(data),
     onSuccess: () => {
       appService.hideLoadingModal();
@@ -88,20 +87,20 @@ const RegisterPage = () => {
     },
   });
 
-  const onSubmit = (data: Partial<IRegisterInput>) => {
-    mutate({
-      email: data.email!,
-      userName: data.userName!,
-      fullName: data.fullName!,
-      phoneNumber: data.phoneNumber || '',
-      addresses: data.addresses?.filter(
-        (address): address is string => !!address,
-      ),
-      password: data.password!,
-      role: role,
-    }); // Gán roleId theo tab đã chọn
-    appService.showLoadingModal();
-  };
+  // const onSubmit = (data: Partial<IRegisterInput>) => {
+  //   mutate({
+  //     email: data.email!,
+  //     userName: data.userName!,
+  //     fullName: data.fullName!,
+  //     phoneNumber: data.phoneNumber || '',
+  //     addresses: data.addresses?.filter(
+  //       (address): address is string => !!address,
+  //     ),
+  //     password: data.password!,
+  //     role: role,
+  //   }); // Gán roleId theo tab đã chọn
+  //   appService.showLoadingModal();
+  // };
 
   return (
     <Box
@@ -199,8 +198,9 @@ const RegisterPage = () => {
               ))}
             </Select>
           </Box>
-
-          <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+          
+          //thêm onSubmit sau
+          <Box component="form" >
             <TextField
               fullWidth
               label={t('Tên người dùng')}

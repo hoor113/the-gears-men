@@ -23,7 +23,6 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
 
   const defaultData = useMemo(
     () => ({
-      name: authQuery.data?.name,
       userName: authQuery.data?.userName,
       email: authQuery.data?.email,
     }),

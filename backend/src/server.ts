@@ -8,5 +8,4 @@ const controllers = [AuthController, UserController, FileController];
 
 const app = new App(controllers);
 
-const PORT = parseInt(process.env.PORT as string) ;
-app.listen(PORT);
+app.listen(5000);

@@ -11,8 +11,8 @@ export class OrderCronService {
     private shipmentService: CronShipmentService;
     
     // For testing: 3 minutes instead of 24 hours
-    private readonly CONFIRMATION_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes in milliseconds
-    // private readonly CONFIRMATION_TIMEOUT_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    // private readonly CONFIRMATION_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes in milliseconds
+    private readonly CONFIRMATION_TIMEOUT_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     
     constructor() {
         this.shipmentService = Container.get(CronShipmentService);
@@ -80,8 +80,8 @@ export class OrderCronService {
             await redis.set(
                 `order_confirmation:${orderIdStr}`, 
                 confirmationTime.getTime().toString(),
-                60 * 5 // 5 minutes TTL for testing
-                // 60 * 60 * 25 // 25 hours TTL for production
+                // 60 * 5 // 5 minutes TTL for testing
+                60 * 60 * 48 // 48 hours TTL for production
             );
             
             console.log(`TEST MODE: Order ${orderIdStr} scheduled for confirmation at ${confirmationTime.toISOString()} (in 3 minutes)`);

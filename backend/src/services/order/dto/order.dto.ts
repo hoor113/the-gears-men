@@ -59,12 +59,12 @@ export class CreateOrderItemDto extends EntityDto {
     quantity!: number; // Required
 
     @IsOptional()
-    @IsMongoId({ message: 'Product discount code must be a Mongo ID.' })
-    productDiscountCode?: mongoose.Types.ObjectId; // Optional
+    @IsString({ message: 'Product discount code must be a string.' })
+    productDiscountCode?: string; // Optional
 
     @IsOptional()
-    @IsMongoId({ message: 'Shipping discount code must be a Mongo ID.' })
-    shippingDiscountCode?: mongoose.Types.ObjectId; // Optional
+    @IsString({ message: 'Shipping discount code must be a string.' })
+    shippingDiscountCode?: string; // Optional
 }
 
 export class CreateOrderDto extends EntityDto {

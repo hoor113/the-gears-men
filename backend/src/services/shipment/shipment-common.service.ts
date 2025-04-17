@@ -5,13 +5,14 @@ import { Service } from 'typedi';
 import {
     ShipmentDto,
 } from 'src/services/shipment/dto/shipment.dto';
+import { StringEntityDto } from '@/common/entity-dto';
 
 @Service()
 export class ShipmentCommonService {
-    public async cancelShipment(cancellerId: string, shipmentId: string): Promise<BaseResponse<ShipmentDto>> {
+    public async cancelShipment(cancellerId: string, shipmentId: StringEntityDto): Promise<BaseResponse<ShipmentDto>> {
         try {
             const shipment = await Shipment.findByIdAndUpdate(
-                shipmentId,
+                shipmentId.id,
                 { status: EShipmentStatus.Failed, canceller: cancellerId },
                 { new: true }
             );

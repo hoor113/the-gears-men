@@ -208,7 +208,7 @@ export class ShipmentController {
     @UseBefore(ValidationMiddleware(StringEntityDto))
     public async cancelShipment(
         @Req() req: Request,
-        shipmentId: string,
+        shipmentId: StringEntityDto,
         @Res() res: Response) {
         try {
             const authHeader = (req.headers as any)?.authorization;

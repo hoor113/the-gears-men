@@ -68,7 +68,7 @@ export class CreateDiscountCodeCastDto {
     discountCalculationMethod!: EDiscountCalculationMethod;
 
     @IsNumber({}, {message: 'Discount quantity must be a number.'})
-    @Min(0, {message: 'Discount quantity must be at least 0.'})
+    @Min(1, {message: 'Discount quantity must be at least 0.'})
     discountQuantity!: number;
 
     @IsDate({message: 'Expiry date must be a valid date.'})
@@ -78,15 +78,6 @@ export class CreateDiscountCodeCastDto {
     @IsNumber({}, {message: 'Quantity must be a number.'})
     @Min(1, {message: 'Quantity must be at least 1.'})
     quantity!: number;
-}
-
-// DTO for assigning a discount code to a customer
-export class AssignDiscountCodeDto {
-    @IsMongoId({message: 'Discount code ID must be a valid MongoDB identifier.'})
-    discountCodeId!: mongoose.Types.ObjectId;
-    
-    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
-    customerId!: mongoose.Types.ObjectId;
 }
 
 // DTO for updating a discount code

@@ -60,17 +60,20 @@ export class OrderService {
                 let productDiscountCode: string | null = null;
                 let shippingDiscountCode: string | null = null;
 
+                console.log(item.productDiscountCode, item.shippingDiscountCode);
+
                 // Process product discount code if provided
                 if (item.productDiscountCode) {
                     const result = await this.discountCodeService.validateProductDiscountCode(item.productDiscountCode);
                     if (!result.success) {
                         return result as BaseResponse<DiscountCodeDto>;
                     }
-                    if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.Percentage) {
-                        productPrice -= ((result as any).data?.discountQuantity || 0) * productPrice; // Apply discount amount to price
+                    console.log(result.result?.discountCalculationMethod, result.result?.discountQuantity);
+                    if (result.result?.discountCalculationMethod === EDiscountCalculationMethod.Percentage) {
+                        productPrice -= (result.result?.discountQuantity || 0) * productPrice; // Apply discount amount to price
                     }
-                    else if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.FixedAmount) {
-                        productPrice -= ((result as any).data?.discountQuantity || 0); // Apply discount percentage to price
+                    else if (result.result?.discountCalculationMethod === EDiscountCalculationMethod.FixedAmount) {
+                        productPrice -= (result.result?.discountQuantity || 0); // Apply discount percentage to price
                     }
                 }
 
@@ -80,13 +83,12 @@ export class OrderService {
                     if (!result.success) {
                         return result as BaseResponse<DiscountCodeDto>;
                     }
-                    shippingDiscountCode = (result as any)?.data?.code || null;
 
                     if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.Percentage) {
-                        shippingPrice -= ((result as any).data?.discountQuantity || 0) * shippingPrice; // Apply discount amount to price
+                        shippingPrice -= (result.result?.discountQuantity || 0) * shippingPrice; // Apply discount amount to price
                     }
                     else if ((result as any).data?.discountCalculationMethod === EDiscountCalculationMethod.FixedAmount) {
-                        shippingPrice -= ((result as any).data?.discountQuantity || 0); // Apply discount percentage to price
+                        shippingPrice -= (result.result?.discountQuantity || 0); // Apply discount percentage to price
                     }
                 }
 
@@ -100,6 +102,8 @@ export class OrderService {
                     shippingDiscountCode: item.shippingDiscountCode || null,
                 };
 
+                totalPrice += productPrice + shippingPrice; // Add product price and shipping price to total price
+
                 // Reduce stock quantity
                 product.stock -= item.quantity;
                 await product.save();
@@ -110,6 +114,10 @@ export class OrderService {
                 // Add item to order items
                 orderItems.push(orderItem);
             }
+
+            /*
+                Payment methods: cash or card 
+             */
 
             const order = new Order({
                 customerId,
@@ -145,6 +153,8 @@ export class OrderService {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
+
+    
 
     public async cancelOrder(customerId: string, dto: CancelOrderDto): Promise<BaseResponse<OrderDto | unknown>> {
         try {

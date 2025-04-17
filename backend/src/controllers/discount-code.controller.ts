@@ -16,11 +16,9 @@ import {
 import { AuthMiddleware } from 'src/middlewares/auth.middleware';
 import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
 import {
-    // CreateDiscountCodeDto,
     GetAllDiscountCodesDto,
     UpdateDiscountCodeDto,
     CreateDiscountCodeCastDto,
-    ValidateDiscountCodeDto
 } from 'src/services/discount-code/dto/discount-code.dto';
 import { DiscountCodeService } from 'src/services/discount-code/discount-code.service';
 import { EHttpStatusCode } from 'src/utils/enum';
@@ -37,22 +35,6 @@ export class DiscountCodeController {
     constructor() {
         this.discountCodeService = new DiscountCodeService();
     }
-
-    // @Post('/')
-    // @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
-    // @UseBefore(ValidationMiddleware(CreateDiscountCodeDto))
-    // async createDiscountCode(@Body() dto: CreateDiscountCodeDto, @Res() res: Response) {
-    //     try {
-    //         const response = await this.discountCodeService.createDiscountCode(dto);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
 
     @Get('/GetAll')
     @UseBefore(ValidationMiddleware(GetAllDiscountCodesDto))
@@ -91,6 +73,33 @@ export class DiscountCodeController {
             return res.status(500).json({
                 success: false,
                 message: (error as any)?.message || 'Discount Code Not Found',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
+
+    @Get('/customer')
+    @UseBefore(authorizeRoles([EUserRole.Customer]))
+    async getDiscountCodeCustomer(
+        @Req() req: Request,
+        @Res() res: Response,) {
+        try {
+            const authHeader = (req.headers as any)?.authorization;
+            const token = authHeader?.split(' ')[1];
+            if (!token) {
+                return res
+                    .status(401)
+                    .json(BaseResponse.error('Token missing', 401));
+            }
+            const decoded = verifyToken(token) as JwtPayload;
+            console.log('decoded', decoded);
+            const customerId = decoded.id;
+            const response = await this.discountCodeService.getDiscountCodeCustomer(customerId);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Internal Server Error',
                 statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
             });
         }
@@ -136,32 +145,6 @@ export class DiscountCodeController {
     //     }
     // }
 
-    // @Post('/Validate')
-    // async validateDiscountCode(
-    //     @Body() body: { code: string, storeId: string },
-    //     @Res() res: Response
-    // ) {
-    //     try {
-    //         const { code, storeId } = body;
-    //         if (!code || !storeId) {
-    //             return res.status(400).json({
-    //                 success: false,
-    //                 message: 'Missing code or storeId parameter',
-    //                 statusCode: EHttpStatusCode.BAD_REQUEST,
-    //             });
-    //         }
-
-    //         const response = await this.discountCodeService.validateDiscountCode(code, storeId);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
-
     /**
      * Creates a new discount code cast
      */
@@ -183,9 +166,10 @@ export class DiscountCodeController {
 
     @Post('/claim')
     @UseBefore(authorizeRoles([EUserRole.Customer]))
+    @UseBefore(ValidationMiddleware(StringEntityDto))
     public async claimDiscountCode(
         @Req() req: Request,
-        code: string,
+        @Body() code: StringEntityDto,
         @Res() res: Response) {
         try {
             const authHeader = (req.headers as any)?.authorization;

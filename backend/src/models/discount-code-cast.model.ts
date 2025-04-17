@@ -3,13 +3,13 @@ import mongoose, { Document, Schema } from 'mongoose';
 // add another discount schema
 
 export enum EDiscountCodeType {
-    ProductDiscount = 'productDiscount',
-    ShippingDiscount = 'shippingDiscount'
+    ProductDiscount = 'product',
+    ShippingDiscount = 'shipping'
 }
 
 export enum EDiscountCalculationMethod {
     Percentage = 'percentage',
-    FixedAmount = 'fixedAmount'
+    FixedAmount = 'fixed'
 }
 
 export interface IDiscountCodeCast extends Document {

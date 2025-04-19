@@ -1,28 +1,60 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export enum EShipmentStatus {
+    Pending = 'pending',
+    Confirmed = 'confirmed',
+    Stored = 'stored',
+    Delivered = 'delivered',
+    Failed = 'failed',
+}
+
 export interface IShipment extends Document {
-    orderId: mongoose.Types.ObjectId;
-    status: 'processing' | 'inTransit' | 'delivered' | 'failed';
+    storeId: mongoose.Types.ObjectId;
+    orderItemId: mongoose.Types.ObjectId;
+    status: EShipmentStatus;
     estimatedDelivery: Date;
-    deliveryPersonnel: mongoose.Types.ObjectId;
+    deliveryCompany?: mongoose.Types.ObjectId;
+    deliveryPersonnel?: mongoose.Types.ObjectId;
+    deliveryDate?: Date;
+    canceller?: mongoose.Types.ObjectId;
 }
 
 const Shipment = new Schema<IShipment>(
     {
-        orderId: { type: Schema.Types.ObjectId, ref: 'Order', required: true },
+        storeId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Store',
+            required: true,
+        },
+        orderItemId: { 
+            type: Schema.Types.ObjectId, 
+            ref: 'Order.items._id',
+            required: true 
+        },
         status: {
             type: String,
-            enum: ['processing', 'inTransit', 'delivered', 'failed'],
+            enum: Object.values(EShipmentStatus),
             required: true,
         },
         estimatedDelivery: { type: Date, required: true },
-        deliveryPersonnel: {
+        deliveryCompany: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: true,
+        },
+        deliveryPersonnel: {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        deliveryDate: {
+            type: Date,
+        },
+        canceller: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
         },
     },
     { timestamps: true },
 );
 
 export default mongoose.model<IShipment>('Shipment', Shipment);
+

@@ -17,8 +17,8 @@ export class OrderCronService {
     constructor() {
         this.shipmentService = Container.get(CronShipmentService);
         
-        // Run every minute to check for orders that need confirmation (more frequent for testing)
-        this.orderConfirmationJob = new CronJob('* * * * *', async () => {
+        // Run every hour to check for orders that need confirmation (more frequent for testing)
+        this.orderConfirmationJob = new CronJob('0 * * * *', async () => {
             await this.processOrderConfirmations();
         });
         

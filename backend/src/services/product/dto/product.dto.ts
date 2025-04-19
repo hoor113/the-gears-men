@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsMongoId, IsNumber, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
-import { EntityDto } from 'src/common/entity-dto';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
+import { EntityDto } from '@/common/entity-dto';
 
 export class ProductDto extends EntityDto {
 

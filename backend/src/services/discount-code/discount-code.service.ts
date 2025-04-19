@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
 import DiscountCode from '@/models/discount-code.model';
 import DiscountCodeCast, { EDiscountCodeType, EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
 import mongoose from 'mongoose';
 import {
     DiscountCodeDto,
@@ -11,7 +11,6 @@ import {
 } from './dto/discount-code.dto';
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
 import { buildQuery } from '@/utils/utils';
-import { stdout } from 'node:process';
 import { StringEntityDto } from '@/common/entity-dto';
 
 @Service()

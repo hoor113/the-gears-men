@@ -2,7 +2,7 @@ import { Service, Container } from 'typedi';
 import { CronJob } from 'cron';
 import Order, { EOrderStatus } from '@/models/order.model';
 import mongoose from 'mongoose';
-import redis from 'src/config/redis';
+import redis from '@/config/redis';
 import { CronShipmentService } from '@/services/shipment/shipment-cron.service';
 
 @Service()

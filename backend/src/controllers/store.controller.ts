@@ -12,14 +12,14 @@ import {
     Res,
     UseBefore,
 } from 'routing-controllers';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import { 
     CreateStoreDto, 
     GetStoresDto, 
-} from 'src/services/store/dto/store.dto';
-import { StoreService } from 'src/services/store/store.service';
-import { EHttpStatusCode } from 'src/utils/enum';
+} from '@/services/store/dto/store.dto';
+import { StoreService } from '@/services/store/store.service';
+import { EHttpStatusCode } from '@/utils/enum';
 import { EUserRole } from '@/models/user.model';
 
 @UseBefore(AuthMiddleware)

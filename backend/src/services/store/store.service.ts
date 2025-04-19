@@ -6,9 +6,9 @@ import {
     StoreDto 
 } from '@/services/store/dto/store.dto';
 import mongoose from 'mongoose';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
-import { buildQuery } from 'src/utils/utils';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
+import { buildQuery } from '@/utils/utils';
 import { Service } from 'typedi';
 
 @Service()

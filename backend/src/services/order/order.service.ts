@@ -1,19 +1,19 @@
-import { DELIVERY_VAT } from 'src/constants/delivery-vat'
+import { DELIVERY_VAT } from '@/constants/delivery-vat'
 import Order, { EOrderStatus } from '@/models/order.model';
 import Product from '@/models/product.model';
 import mongoose from 'mongoose';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
 import { Service, Container } from 'typedi';
 import {
     CreateOrderDto,
     CancelOrderDto,
     OrderDto,
     OrderItemDto
-} from 'src/services/order/dto/order.dto';
+} from '@/services/order/dto/order.dto';
 import { OrderCronService } from '@/services/cron/cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
-import { DiscountCodeDto } from 'src/services/discount-code/dto/discount-code.dto';
+import { DiscountCodeDto } from '@/services/discount-code/dto/discount-code.dto';
 import { EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
 
 @Service()

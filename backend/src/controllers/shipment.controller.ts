@@ -14,8 +14,8 @@ import {
     Res,
     UseBefore,
 } from 'routing-controllers';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     GetShipmentFromCustomerDto,
     ConfirmAndSendShipmentToDeliveryCompanyDto,
@@ -23,17 +23,16 @@ import {
     SendShipmentToDeliveryPersonnelDto,
     GetAssignedShipmentsDto,
     ConfirmShipmentDeliveredDto
-} from 'src/services/shipment/dto/shipment.dto';
+} from '@/services/shipment/dto/shipment.dto';
 import { ShipmentStoreOwnerService } from '@/services/shipment/shipment-store-owner.service';
 import { ShipmentDeliveryCompanyService } from '@/services/shipment/shipment-delivery-company.service';
 import { ShipmentDeliveryPersonnelService } from '@/services/shipment/shipment-delivery-personnel.service';
 import { ShipmentCommonService } from '@/services/shipment/shipment-common.service';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { EHttpStatusCode } from '@/utils/enum';
 import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
-import { verifyToken } from 'src/config/jwt';
-
+import { verifyToken } from '@/config/jwt';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/shipments')

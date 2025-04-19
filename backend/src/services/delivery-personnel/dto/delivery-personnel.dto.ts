@@ -1,7 +1,7 @@
 import { UserDto } from '@/services/user/dto/user.dto';
 import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
-import { EntityDto } from 'src/common/entity-dto';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
+import { EntityDto } from '@/common/entity-dto';
 
 export class DeliveryPersonnelDto extends UserDto {
     @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID.' })

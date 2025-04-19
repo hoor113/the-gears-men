@@ -1,4 +1,3 @@
-import { StringEntityDto } from '@/common/entity-dto';
 import { authorizeRoles } from '@/middlewares/role.middleware';
 import { Response } from 'express';
 import {
@@ -13,18 +12,18 @@ import {
     Res,
     UseBefore,
 } from 'routing-controllers';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     CancelOrderDto,
     CreateOrderDto,
-} from 'src/services/order/dto/order.dto';
+} from '@/services/order/dto/order.dto';
 import { OrderService } from '@/services/order/order.service';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { EHttpStatusCode } from '@/utils/enum';
 import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
-import { verifyToken } from 'src/config/jwt';
+import { verifyToken } from '@/config/jwt';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/orders')

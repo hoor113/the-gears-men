@@ -60,8 +60,15 @@ const AppLayout = () => {
   ]);
 
   useEffect(() => {
+    const currentRole = authQuery.data?.role;
+    if (!currentRole) return;
+
+    // Nếu đã nằm trong đúng nhánh thì không cần redirect nữa
+    const shouldRedirect = pathname === '/' || pathname === '/auth/login';
+  
+    if (!shouldRedirect) return;
     console.log(authQuery.data?.role, 'role');
-    switch (authQuery?.data?.role) {
+    switch (currentRole) {
       case EUserRole.Admin:
         navigate('/admin/');
         break;
@@ -81,7 +88,7 @@ const AppLayout = () => {
         navigate('/');
         break;
     }
-  }, [authQuery.data?.role, navigate]);
+  }, [authQuery.data?.role, navigate, pathname]);
 
   useEffect(() => {
     handlePathnameChange();

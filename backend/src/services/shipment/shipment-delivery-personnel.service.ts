@@ -1,13 +1,13 @@
 import Shipment, { EShipmentStatus } from '@/models/shipment.model';
 import mongoose from 'mongoose';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
 import { Service } from 'typedi';
 import {
     ShipmentDto,
     GetAssignedShipmentsDto,
     ConfirmShipmentDeliveredDto
-} from 'src/services/shipment/dto/shipment.dto';
+} from '@/services/shipment/dto/shipment.dto';
 import { buildQuery } from '@/utils/utils';
 
 

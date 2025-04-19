@@ -1,4 +1,4 @@
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
 
 export function buildQuery<T extends BaseGetAllDto>(
     dto: T,

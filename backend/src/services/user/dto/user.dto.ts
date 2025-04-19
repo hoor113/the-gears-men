@@ -7,9 +7,27 @@ import {
     IsString,
     MinLength,
     ValidationArguments,
+    ValidateIf,
+    ValidatorConstraint,
+    ValidatorConstraintInterface,
+    Validate,
 } from 'class-validator';
 import 'reflect-metadata';
 import { BaseGetAllDto, BaseGetOneResult } from '@/common/base-get-all-dto';
+
+@ValidatorConstraint({ name: 'isVehicleLicenseRequired', async: false })
+export class IsVehicleLicenseRequiredConstraint implements ValidatorConstraintInterface {
+    validate(vehicleLicense: string, args: ValidationArguments) {
+        const object = args.object as any;
+        // If role is deliveryPersonnel, vehicleLicenseNumber must be provided
+        return !(object.role === EUserRole.DeliveryPersonnel && !vehicleLicense);
+    }
+
+    defaultMessage(args: ValidationArguments) {
+        return 'Vehicle license number is required for delivery personnel';
+    }
+}
+
 
 export class UserDto extends BaseGetOneResult<string> {
     @IsString({ message: 'Username must be a string.' })
@@ -40,6 +58,7 @@ export class UserDto extends BaseGetOneResult<string> {
 
     @IsOptional()
     @IsString({ message: 'Vehicle license number must be a string.' })
+    @Validate(IsVehicleLicenseRequiredConstraint)
     vehicleLicenseNumber?: string;
 }
 
@@ -75,6 +94,7 @@ export class CreateUserDto {
 
     @IsOptional()
     @IsString({ message: 'Vehicle license number must be a string.' })
+    @Validate(IsVehicleLicenseRequiredConstraint)
     vehicleLicenseNumber?: string;
 }
 
@@ -95,6 +115,7 @@ export class UpdateUserDto extends EntityDto {
 
     @IsOptional()
     @IsString({ message: 'Vehicle license number must be a string.' })
+    @Validate(IsVehicleLicenseRequiredConstraint)
     vehicleLicenseNumber?: string;
 }
 

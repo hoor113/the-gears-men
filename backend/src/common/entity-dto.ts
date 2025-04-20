@@ -8,10 +8,15 @@ export class EntityDto {
 
 export class StringEntityDto {
     @IsString()
-        id!: string;
+    id!: string;
 }
 
 export class NumberEntityDto {
     @IsNumber({}, { message: 'The id must be a number' })
-        id!: number;
+    id!: number;
+}
+
+export interface ITimestamps {
+    createdAt: Date;
+    updatedAt: Date;
 }

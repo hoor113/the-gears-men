@@ -74,6 +74,15 @@ export class RedisInstance {
             return null;
         }
     }
+
+    public async del(key: string): Promise<void> {
+        try {
+            await RedisInstance.CacheClient.del(key);
+            console.log(`✅ Key "${key}" deleted from Redis`);
+        } catch (err) {
+            console.error('❌ Error deleting data from Redis:', err);
+        }
+    }
 }
 
 const redis = RedisInstance.getInstance();

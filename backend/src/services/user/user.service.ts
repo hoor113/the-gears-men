@@ -1,8 +1,8 @@
 import User, { EUserRole } from '@/models/user.model';
 import bcrypt from 'bcrypt';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
-import { buildQuery } from 'src/utils/utils';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
+import { buildQuery } from '@/utils/utils';
 import { Service } from 'typedi';
 import {
     CreateUserDto,
@@ -15,7 +15,7 @@ import {
 export class UserService {
     public async createUser(
         dto: CreateUserDto,
-    ): Promise<BaseResponse<UserDto | unknown>> {
+    ): Promise<BaseResponse<UserDto>> {
         try {
             const {
                 username,
@@ -69,6 +69,8 @@ export class UserService {
                 addresses: newUser.addresses,
                 avatarPicture: newUser.avatarPicture,
                 vehicleLicenseNumber: newUser.vehicleLicenseNumber,
+                createdAt: newUser.createdAt,
+                updatedAt: newUser.updatedAt,
             };
 
             return BaseResponse.success(
@@ -88,7 +90,7 @@ export class UserService {
 
     public async getAllUsers(
         dto: GetAllUsersDto,
-    ): Promise<BaseResponse<UserDto[] | unknown>> {
+    ): Promise<BaseResponse<UserDto[]>> {
         try {
             const searchableFields = ['username', 'fullname', 'email'];
             const query = buildQuery(dto, searchableFields);
@@ -108,6 +110,8 @@ export class UserService {
                 addresses: user.addresses,
                 avatarPicture: user.avatarPicture,
                 vehicleLicenseNumber: user.vehicleLicenseNumber,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
             }));
 
             return BaseResponse.success(userDtos, totalRecords);
@@ -122,14 +126,15 @@ export class UserService {
 
     public async getUserById(
         id: string,
-    ): Promise<BaseResponse<UserDto | unknown>> {
+        role: EUserRole,
+    ): Promise<BaseResponse<UserDto>> {
         try {
             const user = await User.findById(id);
             if (!user) {
                 return BaseResponse.error('User not found');
             }
 
-            if (user.role === EUserRole.Admin) {
+            if (user.role === EUserRole.Admin && role !== EUserRole.Admin) {
                 return BaseResponse.error('You cannot view an admin user');
             }
 
@@ -143,6 +148,8 @@ export class UserService {
                 addresses: user.addresses,
                 avatarPicture: user.avatarPicture,
                 vehicleLicenseNumber: user.vehicleLicenseNumber,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
             };
 
             return BaseResponse.success(userDto);
@@ -170,7 +177,7 @@ export class UserService {
 
             // Chuyển đổi sang UserDto
             const userDto: UserDto = {
-                id: existingUser.id,
+                id: existingUser._id.toString(),
                 username: existingUser.username,
                 fullname: existingUser.fullname,
                 email: existingUser.email,
@@ -179,6 +186,8 @@ export class UserService {
                 addresses: existingUser.addresses,
                 avatarPicture: existingUser.avatarPicture,
                 vehicleLicenseNumber: existingUser.vehicleLicenseNumber,
+                createdAt: existingUser.createdAt,
+                updatedAt: existingUser.updatedAt,
             };
 
             return BaseResponse.success(userDto);
@@ -193,7 +202,7 @@ export class UserService {
 
     public async deleteUser(
         id: string,
-    ): Promise<BaseResponse<boolean | unknown>> {
+    ): Promise<BaseResponse<boolean>> {
         try {
             const deletedUser = await User.findByIdAndDelete(id);
             if (!deletedUser) {
@@ -212,6 +221,43 @@ export class UserService {
         } catch (error) {
             return BaseResponse.error(
                 'Error deleting user',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+                error,
+            );
+        }
+    }
+
+    public async getAllConfiguration(id: string): Promise<BaseResponse<any>> {
+        try {
+            const user = await User.findById(id);
+            if (!user) {
+                return BaseResponse.error('User not found');
+            }
+
+            const allPermissions = Object.values(EUserRole).reduce(
+                (permissions, role) => {
+                    permissions[`Role.${role}`] = role === user.role;
+                    return permissions;
+                },
+                {} as Record<string, boolean>,
+            );
+
+            const grantedPermissions = {
+                [`Role.${user.role}`]: true,
+            };
+
+            const configuration = {
+                role: user.role,
+                auth: {
+                    allPermissions,
+                    grantedPermissions,
+                },
+            };
+
+            return BaseResponse.success(configuration);
+        } catch (error) {
+            return BaseResponse.error(
+                'Error fetching configuration',
                 EHttpStatusCode.INTERNAL_SERVER_ERROR,
                 error,
             );

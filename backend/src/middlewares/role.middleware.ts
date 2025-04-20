@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
-import { BaseResponse } from 'src/common/base-response';
-import { verifyToken } from 'src/config/jwt';
+import { BaseResponse } from '@/common/base-response';
+import { verifyToken } from '@/config/jwt';
 
 export const authorizeRoles = (allowedRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -21,10 +21,16 @@ export const authorizeRoles = (allowedRoles: string[]) => {
 
         try {
             const decoded = verifyToken(token) as JwtPayload;
+            console.log('role', decoded.role);
             if (!allowedRoles.includes(decoded.role)) {
                 return res
                     .status(403)
-                    .json(BaseResponse.error('Access denied', 403));
+                    .json(
+                        BaseResponse.error(
+                            'Access denied: Your role does not have access',
+                            403,
+                        ),
+                    );
             }
             next();
         } catch (error) {
@@ -68,7 +74,7 @@ export const isSelfOrAuthorizedRoles = (allowedRoles: string[]) => {
                         ),
                     );
             }
-
+            console.log('role', decoded.role);
             if (
                 decoded.id === requestUserId ||
                 allowedRoles.includes(decoded.role)
@@ -78,7 +84,12 @@ export const isSelfOrAuthorizedRoles = (allowedRoles: string[]) => {
 
             return res
                 .status(403)
-                .json(BaseResponse.error('Access denied', 403));
+                .json(
+                    BaseResponse.error(
+                        'Access denied: Your role does not have access or this is not you',
+                        403,
+                    ),
+                );
         } catch (error) {
             return res
                 .status(401)

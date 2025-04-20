@@ -9,8 +9,8 @@ import {
     UploadedFile,
     UseBefore,
 } from 'routing-controllers';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
+import { EHttpStatusCode } from '@/utils/enum';
 import Container from 'typedi';
 
 @JsonController('/file')

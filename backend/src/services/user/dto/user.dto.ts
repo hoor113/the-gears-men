@@ -1,3 +1,4 @@
+import { EntityDto } from '@/common/entity-dto';
 import { EUserRole } from '@/models/user.model';
 import 'reflect-metadata';
 import {
@@ -7,96 +8,115 @@ import {
     IsString,
     MinLength,
     ValidationArguments,
+    ValidatorConstraint,
+    ValidatorConstraintInterface,
+    Validate,
 } from 'class-validator';
 import 'reflect-metadata';
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
-import { EntityDto } from 'src/common/entity-dto';
+import { BaseGetAllDto, BaseGetOneResult } from '@/common/base-get-all-dto';
 
-export class UserDto extends EntityDto {
+@ValidatorConstraint({ name: 'isVehicleLicenseRequired', async: false })
+export class IsVehicleLicenseRequiredConstraint implements ValidatorConstraintInterface {
+    validate(vehicleLicense: string, args: ValidationArguments) {
+        const object = args.object as any;
+        // If role is deliveryPersonnel, vehicleLicenseNumber must be provided
+        return !(object.role === EUserRole.DeliveryPersonnel && !vehicleLicense);
+    }
+
+    defaultMessage(args: ValidationArguments) {
+        return 'Vehicle license number is required for delivery personnel';
+    }
+}
+
+
+export class UserDto extends BaseGetOneResult<string> {
     @IsString({ message: 'Username must be a string.' })
-        username!: string;
+    username!: string;
 
     @IsString({ message: 'Full name must be a string.' })
-        fullname!: string;
+    fullname!: string;
 
     @IsEmail({}, { message: 'Invalid email address.' })
-        email!: string;
+    email!: string;
 
     @IsEnum(EUserRole, {
         message: (args: ValidationArguments) =>
             `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
     })
-        role!: EUserRole;
+    role!: EUserRole;
 
     @IsString({ message: 'Phone number must be a string.' })
-        phoneNumber!: string;
+    phoneNumber!: string;
 
     @IsOptional()
     @IsString({ each: true, message: 'Each address must be a string.' })
-        addresses?: string[];
+    addresses?: string[];
 
     @IsOptional()
     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-        avatarPicture?: string;
+    avatarPicture?: string;
 
     @IsOptional()
     @IsString({ message: 'Vehicle license number must be a string.' })
-        vehicleLicenseNumber?: string;
+    @Validate(IsVehicleLicenseRequiredConstraint)
+    vehicleLicenseNumber?: string;
 }
 
 export class CreateUserDto {
     @IsString({ message: 'Username must be a string.' })
-        username!: string;
+    username!: string;
 
     @IsString({ message: 'Full name must be a string.' })
-        fullname!: string;
+    fullname!: string;
 
     @IsEmail({}, { message: 'Invalid email address.' })
-        email!: string;
+    email!: string;
 
     @IsString({ message: 'Password must be a string.' })
     @MinLength(6, { message: 'Password must be at least 6 characters long.' })
-        password!: string;
+    password!: string;
 
     @IsEnum(EUserRole, {
         message: (args: ValidationArguments) =>
             `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
     })
-        role!: EUserRole;
+    role!: EUserRole;
 
     @IsString({ message: 'Phone number must be a string.' })
-        phoneNumber!: string;
+    phoneNumber!: string;
 
     @IsString({ each: true, message: 'Each address must be a string.' })
-        addresses?: string[];
+    addresses?: string[];
 
     @IsOptional()
     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-        avatarPicture?: string;
+    avatarPicture?: string;
 
     @IsOptional()
     @IsString({ message: 'Vehicle license number must be a string.' })
-        vehicleLicenseNumber?: string;
+    @Validate(IsVehicleLicenseRequiredConstraint)
+    vehicleLicenseNumber?: string;
 }
 
 export class UpdateUserDto extends EntityDto {
     @IsOptional()
     @IsString()
-        fullname?: string;
+    fullname?: string;
 
     @IsString({ message: 'Phone number must be a string.' })
-        phoneNumber!: string;
+    phoneNumber!: string;
 
     @IsString({ each: true, message: 'Each address must be a string.' })
-        addresses!: string[];
+    addresses!: string[];
 
     @IsOptional()
     @IsString({ message: 'Avatar picture must be a valid URL string.' })
-        avatarPicture?: string;
+    avatarPicture?: string;
 
     @IsOptional()
     @IsString({ message: 'Vehicle license number must be a string.' })
-        vehicleLicenseNumber?: string;
+    @Validate(IsVehicleLicenseRequiredConstraint)
+    vehicleLicenseNumber?: string;
 }
 
 export class GetAllUsersDto extends BaseGetAllDto {
@@ -105,9 +125,9 @@ export class GetAllUsersDto extends BaseGetAllDto {
         message: (args: ValidationArguments) =>
             `${args.value} is not a valid role. Accepted roles are: ${Object.values(EUserRole).join(', ')}`,
     })
-        role?: EUserRole;
+    role?: EUserRole;
 
     @IsOptional()
     @IsEmail({}, { message: 'Invalid email address.' })
-        email?: string;
+    email?: string;
 }

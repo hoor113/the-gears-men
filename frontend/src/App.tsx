@@ -1,57 +1,22 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
+import { GlobalScrollbar } from 'mac-scrollbar';
+import { RouterProvider } from 'react-router-dom';
 
-// function App() {
-//   const [count, setCount] = useState(0)
+import BaseLayout from './components/base-layout';
+import ThemeRegistry from './components/theme-registry/theme-registry';
+import { router } from './configs/router.config';
+import ReactQueryProvider from './react-query/provider';
 
-//   return (
-//     <>
-//       <div>
-//         <a href="https://vite.dev" target="_blank">
-//           <img src={viteLogo} className="logo" alt="Vite logo" />
-//         </a>
-//         <a href="https://react.dev" target="_blank">
-//           <img src={reactLogo} className="logo react" alt="React logo" />
-//         </a>
-//       </div>
-//       <h1>Vite + React</h1>
-//       <div className="card">
-//         <button onClick={() => setCount((count) => count + 1)}>
-//           count is {count}
-//         </button>
-//         <p>
-//           Edit <code>src/App.tsx</code> and save to test HMR
-//         </p>
-//       </div>
-//       <p className="read-the-docs">
-//         Click on the Vite and React logos to learn more
-//       </p>
-//     </>
-//   )
-// }
-
-// export default App
-
-import { useEffect, useState } from "react";
-import axios from "axios";
-
-function App() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    axios.get("/api")
-      .then(res => setMessage(res.data))
-      .catch(err => console.error("Error fetching API:", err));
-  }, []);
-
+const App = () => {
   return (
-    <div>
-      <h1>Welcome to My MERN App</h1>
-      <p>Message from Backend: {message}</p>
-    </div>
+    <ReactQueryProvider>
+      <ThemeRegistry>
+        <BaseLayout>
+          <RouterProvider router={router} />
+        </BaseLayout>
+        <GlobalScrollbar />
+      </ThemeRegistry>
+    </ReactQueryProvider>
   );
-}
+};
 
 export default App;

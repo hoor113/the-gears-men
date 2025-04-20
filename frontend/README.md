@@ -1,54 +1,105 @@
-# React + TypeScript + Vite
+# Library Management System  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hệ thống quản lý thư viện giúp đơn giản hóa việc quản lý sách, độc giả, và các giao dịch mượn/trả sách.  
 
-Currently, two official plugins are available:
+## Mục lục  
+1. [Giới thiệu](#giới-thiệu)  
+2. [Tính năng chính](#tính-năng-chính)  
+3. [Cấu trúc dự án](#cấu-trúc-dự-án)  
+4. [Cài đặt](#cài-đặt)  
+5. [Hướng dẫn sử dụng](#hướng-dẫn-sử-dụng)  
+6. [Tài liệu tham khảo](#tài-liệu-tham-khảo)  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Giới thiệu  
+Dự án **Library Management System** được phát triển nhằm hỗ trợ quản lý sách và độc giả hiệu quả hơn thông qua giao diện hiện đại và hệ thống backend mạnh mẽ.  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Frontend được xây dựng bằng **ReactJS**.  
+Backend được phát triển với **Java Spring Boot**.  
+Cơ sở dữ liệu sử dụng **PostgreSQL** để lưu trữ thông tin.  
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Tính năng chính  
+- Quản lý sách (thêm, sửa, xóa, tìm kiếm sách).  
+- Quản lý độc giả và thông tin cá nhân.  
+- Theo dõi lịch sử mượn/trả sách.  
+- Thống kê sách đang mượn, sách quá hạn.  
+- Quản lý tài khoản (Admin/Staff/User).  
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Cấu trúc dự án  
+Dự án được chia thành hai phần chính:  
+1. **Frontend**  
+   - Repository: [Library Management Frontend](https://github.com/hnguyen04/library-management-frontend)  
+   - Công nghệ: ReactJS  
+
+2. **Backend**  
+   - Repository: [Library Management Backend](https://github.com/hnguyen04/library-management-backend)  
+   - Công nghệ: Java Spring Boot  
+   - Cơ sở dữ liệu: PostgreSQL  
+
+---
+
+## Cài đặt  
+### Yêu cầu hệ thống:  
+- **Node.js** (v18 trở lên)  
+- **Java JDK** (17 trở lên)  
+- **PostgreSQL** (15 trở lên)  
+
+### Cài đặt Frontend:  
+1. Clone repository:
+   ```bash
+   git clone https://github.com/hnguyen04/library-management-frontend.git
+   cd library-management-frontend
+
+2. Cài đặt các gói phụ thuộc:
+   ```bash
+   yarn install
+   ```
+3. Tạo file `.env.local` và thêm đường dẫn backend (ví dụ):
+   ```bash
+   VITE_API_ENDPOINT=http://localhost:8080"
+   ```
+4. Chạy ứng dụng:
+   ```bash
+   yarn run dev
+   ```
+Ứng dụng sẽ chạy tại: http://localhost:5173/
+
+   ```bash
+   yarn install
+3. Chạy ứng dụng:
+   ```bash
+   yarn run dev
+Ứng dụng sẽ chạy tại: http://localhost:5173/
+
+### Cài đặt Backend:
+1. Clone repository:
+   ```bash
+   git clone https://github.com/hnguyen04/library-management-backend.git
+   cd library-management-backend
+2. Chạy ứng dụng (recommend chạy trên IntelliJ IDEA)
+  - Mở IntelliJ, chọn File > Open.
+  - Dẫn đến thư mục dự án library-management-backend và mở.
+  - Trong IntelliJ, tìm file LibraryBackendManagementApplication.java trong thư mục src/main/java.
+  - Nhấn chuột phải và chọn Run 'LibraryBackendManagementApplication'.
+  - Backend sẽ chạy tại: http://localhost:8080.
+
+## Hướng dẫn sử dụng  
+1. Mở trình duyệt và truy cập [http://localhost:5173](http://localhost:5173).  
+2. Đăng nhập bằng tài khoản mẫu:  
+   - **Admin:**  
+     - **Username:** `admin`  
+     - **Password:** `admin`  
+3. Sử dụng các chức năng chính của hệ thống:  
+   - **Quản lý sách:** Thêm, chỉnh sửa, xóa sách.
+   - **Theo dõi độc giả:** Xem danh sách độc giả và lịch sử mượn sách.  
+   - **Quản lý tài khoản:** Tạo và quản lý tài khoản nhân viên.
+  
+## Tài liệu tham khảo  
+- [ReactJS Documentation](https://reactjs.org/docs/getting-started.html)  
+- [Spring Boot Reference Guide](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)  
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)  

@@ -1,14 +1,14 @@
 import User, { EUserRole } from '@/models/user.model';
 import bcrypt from 'bcrypt';
 import { JwtPayload } from 'jsonwebtoken';
-import { BaseResponse } from 'src/common/base-response';
+import { BaseResponse } from '@/common/base-response';
 import {
     generateRefreshToken,
     generateToken,
     verifyRefreshToken,
-} from 'src/config/jwt';
-import redis from 'src/config/redis';
-import { EHttpStatusCode } from 'src/utils/enum';
+} from '@/config/jwt';
+import redis from '@/config/redis';
+import { EHttpStatusCode } from '@/utils/enum';
 import { Service } from 'typedi';
 import {
     LoginDto,
@@ -57,6 +57,7 @@ export class AuthService {
             await newUser.save();
 
             const result: RegisterResult = {
+                id: newUser._id.toString(),
                 username: newUser.username,
                 fullname: newUser.fullname,
                 email: newUser.email,
@@ -65,6 +66,8 @@ export class AuthService {
                 addresses: newUser.addresses,
                 avatarPicture: newUser.avatarPicture,
                 vehicleLicenseNumber: newUser.vehicleLicenseNumber,
+                createdAt: newUser.createdAt,
+                updatedAt: newUser.updatedAt,
             };
 
             return BaseResponse.success(
@@ -96,6 +99,7 @@ export class AuthService {
             await user.save();
 
             const result: LoginResult = {
+                authenticated: true,
                 userId: user._id.toString(),
                 username: user.username,
                 email: user.email,

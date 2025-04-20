@@ -2,10 +2,21 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 // add another discount schema
 
+export enum EDiscountCodeType {
+    ProductDiscount = 'product',
+    ShippingDiscount = 'shipping'
+}
+
+export enum EDiscountCalculationMethod {
+    Percentage = 'percentage',
+    FixedAmount = 'fixed'
+}
+
 export interface IDiscountCodeCast extends Document {
     code: string;
-    type: 'productDiscount' | 'shippingDiscount';
-    discountAmount: number;
+    type: EDiscountCodeType;
+    discountCalculationMethod: EDiscountCalculationMethod;
+    discountQuantity: number;
     expiryDate: Date;
     // add amounts (cast)
     quantity: number;
@@ -16,10 +27,15 @@ const DiscountCodeCast = new Schema<IDiscountCodeCast>(
         code: { type: String, required: true, unique: true },
         type: {
             type: String,
-            enum: ['productDiscount', 'shippingDiscount'],
+            enum: Object.values(EDiscountCodeType),
             required: true,
         },
-        discountAmount: { type: Number, required: true },
+        discountCalculationMethod: {
+            type: String,
+            enum: Object.values(EDiscountCalculationMethod),
+            required: true,
+        },
+        discountQuantity: { type: Number, required: true },
         expiryDate: { type: Date, required: true },
         quantity: { type: Number, required: true },
     },

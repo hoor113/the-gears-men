@@ -1,3 +1,4 @@
+import { ITimestamps } from '@/common/entity-dto';
 import mongoose, { Document, Schema } from 'mongoose';
 
 export enum EUserRole {
@@ -8,7 +9,7 @@ export enum EUserRole {
     Admin = 'admin',
 }
 
-export interface IUser extends Document<string> {
+export interface IUser extends Document<string>, ITimestamps {
     username: string;
     fullname: string;
     email: string;
@@ -17,8 +18,8 @@ export interface IUser extends Document<string> {
     phoneNumber: string;
     addresses: string[];
     avatarPicture?: string;
-    // storeId?: string; // Only for store owners
     vehicleLicenseNumber?: string; // Only for delivery personnel
+    discountCodes?: mongoose.Types.ObjectId[]; // Only for Customer
     refreshToken?: string;
 }
 
@@ -32,8 +33,13 @@ export const User = new Schema<IUser>(
         phoneNumber: { type: String, required: true },
         addresses: [{ type: String, required: true }],
         avatarPicture: { type: String },
-        // storeId: { type: Schema.Types.ObjectId, ref: "Store" }, // Only for store owners
         vehicleLicenseNumber: { type: String }, // Only for delivery personnel
+        discountCodes: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'DiscountCode',
+            },
+        ],
         refreshToken: { type: String },
     },
     { timestamps: true },

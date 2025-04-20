@@ -9,6 +9,7 @@ import {
     Post,
     Put,
     QueryParams,
+    Param,
     Res,
     UseBefore,
 } from 'routing-controllers';
@@ -32,8 +33,8 @@ export class ProductController {
         this.productService = new ProductService();
     }
 
-    @Post('/')
-    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
+    @Post('/Create')
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
     @UseBefore(ValidationMiddleware(AddProductDto))
     async addProduct(@Body() dto: AddProductDto, @Res() res: Response) {
         try {
@@ -48,7 +49,7 @@ export class ProductController {
         }
     }
 
-    @Get('/')
+    @Get('/GetAll')
     @UseBefore(ValidationMiddleware(GetProductsDto))
     async getProducts(
         @QueryParams() dto: GetProductsDto,
@@ -66,30 +67,29 @@ export class ProductController {
         }
     }
 
-    // @Get('/detail')
-    // async getProductById(
-    //     @QueryParams() query: StringEntityDto,
-    //     @Res() res: Response,
-    // ) {
-    //     const id = query.id;
-    //     if (!id) {
-    //         return res
-    //             .status(400)
-    //             .json({ success: false, message: 'Missing id parameter' });
-    //     }
-    //     try {
-    //         const response = await this.productService.getProductById(id);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Product Not Found',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
+    @Get('/GetById/:id')
+    async getProductById(
+        @Param('id') id: string,
+        @Res() res: Response,
+    ) {
+        if (!id) {
+            return res
+                .status(400)
+                .json({ success: false, message: 'Missing id parameter' });
+        }
+        try {
+            const response = await this.productService.getProductById(id);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Product Not Found',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
 
-    @Put('/')
+    @Put('/Update')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     @UseBefore(ValidationMiddleware(UpdateProductDto))
     async updateProduct(@Body() dto: UpdateProductDto, @Res() res: Response) {
@@ -105,7 +105,7 @@ export class ProductController {
         }
     }
 
-    @Delete('/')
+    @Delete('/Delete')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     async deleteProduct(
         @QueryParams() query: StringEntityDto,

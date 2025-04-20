@@ -31,6 +31,18 @@ export class ProductService {
         }
     }
 
+    public async getProductById(id: string): Promise<BaseResponse<ProductDto | unknown>> {
+        try {
+            const product = await Product.findById(id);
+            return BaseResponse.success(product, 1, 'Item retrieved successfully', EHttpStatusCode.OK);
+        } catch (error) {
+            return BaseResponse.error(
+                (error as Error)?.message || 'Internal Server Error',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     public async addProduct(dto: AddProductDto): Promise<BaseResponse<ProductDto | unknown>> {
         try {
             const {

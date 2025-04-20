@@ -36,6 +36,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import HomePage from "./Pages/home-page/HomePage";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -47,10 +48,7 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <h1>Welcome to My MERN App</h1>
-      <p>Message from Backend: {message}</p>
-    </div>
+    <HomePage/>
   );
 }
 

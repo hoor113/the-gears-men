@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
 import mongoose from 'mongoose';
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
-import { EntityDto } from 'src/common/entity-dto';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
+import { EntityDto } from '@/common/entity-dto';
 
 export class StoreDto extends EntityDto {
     @IsMongoId({ message: 'Store owner ID must be a valid MongoDB ID.' })

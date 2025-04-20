@@ -1,9 +1,7 @@
 import mongoose from 'mongoose';
 import { IsOptional, IsString, IsMongoId, IsArray, IsNumber, IsEnum, ValidateNested, ValidationArguments } from 'class-validator';
 import { Type } from 'class-transformer';
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
-import { EntityDto } from 'src/common/entity-dto';
-import { mongo } from 'mongoose';
+import { EntityDto } from '@/common/entity-dto';
 
 export class OrderItemDto extends EntityDto {
     @IsString({ message: 'Product ID must be a string.' })

@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 import { IsMongoId, IsString, IsOptional, IsEnum, IsDate } from 'class-validator';
-import { Type } from 'class-transformer';
-import { EntityDto } from 'src/common/entity-dto';
-import { EShipmentStatus } from 'src/models/shipment.model';
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
+import { EntityDto } from '@/common/entity-dto';
+import { EShipmentStatus } from '@/models/shipment.model';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
 
 export class ShipmentDto extends EntityDto {
     @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })

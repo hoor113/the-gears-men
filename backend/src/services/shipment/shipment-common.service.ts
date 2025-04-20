@@ -1,10 +1,10 @@
 import Shipment, { EShipmentStatus } from '@/models/shipment.model';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
 import { Service } from 'typedi';
 import {
     ShipmentDto,
-} from 'src/services/shipment/dto/shipment.dto';
+} from '@/services/shipment/dto/shipment.dto';
 import { StringEntityDto } from '@/common/entity-dto';
 
 @Service()

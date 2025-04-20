@@ -13,15 +13,15 @@ import {
     Res,
     UseBefore,
 } from 'routing-controllers';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     AddProductDto, 
     GetProductsDto,
     UpdateProductDto,
-} from 'src/services/product/dto/product.dto';
-import { ProductService } from 'src/services/product/product.service';
-import { EHttpStatusCode } from 'src/utils/enum';
+} from '@/services/product/dto/product.dto';
+import { ProductService } from '@/services/product/product.service';
+import { EHttpStatusCode } from '@/utils/enum';
 import { EUserRole } from '@/models/user.model';
 
 @UseBefore(AuthMiddleware)

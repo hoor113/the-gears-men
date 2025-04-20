@@ -2,9 +2,9 @@ import User, { EUserRole } from '@/models/user.model';
 import Product from '@/models/product.model';
 import Store from '@/models/store.model';
 import mongoose from 'mongoose';
-import { BaseResponse } from 'src/common/base-response';
-import { EHttpStatusCode } from 'src/utils/enum';
-import { buildQuery } from 'src/utils/utils';
+import { BaseResponse } from '@/common/base-response';
+import { EHttpStatusCode } from '@/utils/enum';
+import { buildQuery } from '@/utils/utils';
 import { Service } from 'typedi';
 import {
     AddProductDto,

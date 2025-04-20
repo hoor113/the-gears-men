@@ -13,19 +13,19 @@ import {
     UseBefore,
     Req
 } from 'routing-controllers';
-import { AuthMiddleware } from 'src/middlewares/auth.middleware';
-import { ValidationMiddleware } from 'src/middlewares/validation.middleware';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     GetAllDiscountCodesDto,
     UpdateDiscountCodeDto,
     CreateDiscountCodeCastDto,
-} from 'src/services/discount-code/dto/discount-code.dto';
-import { DiscountCodeService } from 'src/services/discount-code/discount-code.service';
-import { EHttpStatusCode } from 'src/utils/enum';
+} from '@/services/discount-code/dto/discount-code.dto';
+import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
+import { EHttpStatusCode } from '@/utils/enum';
 import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
-import { verifyToken } from 'src/config/jwt';
+import { verifyToken } from '@/config/jwt';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/discount-codes')

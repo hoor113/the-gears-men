@@ -17,8 +17,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import mongoose from 'mongoose';
-import { BaseGetAllDto } from 'src/common/base-get-all-dto';
-import { EDiscountCodeType, EDiscountCalculationMethod } from 'src/models/discount-code-cast.model';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
+import { EDiscountCodeType, EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
 
 
 export class BaseDiscountCodeDto {

@@ -58,12 +58,12 @@ export abstract class BaseCrudService {
   ): Promise<{ data: T }> {
     const res = await httpService.request<TBaseResponse<{ data: T }>>({
       method: 'GET',
-      url: `${this.basePath}${path}`,
-      params: { id },
+      url: `${this.basePath}${path}/${id}`,
     });
-
+  
     return res.result;
   }
+  
 
   public async getAllInfinity<T>(
     params?: any,

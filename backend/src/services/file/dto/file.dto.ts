@@ -19,6 +19,6 @@ export class UploadManyResponseDto {
     urls!: string[];
 
     @IsString()
-    publicId!: string;
+    publicIds!: string[];
 }
 

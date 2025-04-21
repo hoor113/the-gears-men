@@ -20,7 +20,7 @@ export class ProductService {
     // Update price to range
     public async getProducts(dto: GetProductsDto): Promise<BaseResponse<ProductDto | unknown>> {
         try {
-            const searchableFields = ['name', 'price', 'category'];
+            const searchableFields = ['name'];
             const query = buildQuery(dto, searchableFields);
             const items = await Product.find(query);
             const totalProducts = await Product.countDocuments({ role: EUserRole.Customer });

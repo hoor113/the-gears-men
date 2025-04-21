@@ -1,7 +1,8 @@
-import { IsOptional, IsString, IsMongoId, IsNumber, IsArray, ValidateNested } from 'class-validator';
+import { IsOptional, IsString, IsMongoId, IsNumber, IsArray, ValidateNested, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
 import { EntityDto } from '@/common/entity-dto';
+import { EProductCategory } from '@/models/product.model';
 
 export class ProductDto extends EntityDto {
 
@@ -22,8 +23,8 @@ export class GetProductsDto extends BaseGetAllDto {
     price?: number;
 
     @IsOptional()
-    @IsString({ message: 'Category must be a string.' })
-    category?: string;
+    @IsEnum(EProductCategory, { message: 'Category must be a valid enum value.' })
+    category?: EProductCategory;
 }
 
 export class AddProductDto extends EntityDto {
@@ -42,8 +43,8 @@ export class AddProductDto extends EntityDto {
     @IsNumber({}, { message: 'Stock must be a number.' })
     stock!: number; // Required
 
-    @IsString({ message: 'Category must be a string.' })
-    category!: string; // Required
+    @IsEnum(EProductCategory, { message: 'Category must be a valid enum value.' })
+    category!: EProductCategory;
 
     @IsOptional()
     @IsArray({ message: 'Image URLs must be an array.' })
@@ -73,8 +74,8 @@ export class UpdateProductDto extends EntityDto {
     stock?: number;
 
     @IsOptional()
-    @IsString({ message: 'Category must be a string.' })
-    category?: string;
+    @IsEnum(EProductCategory, { message: 'Category must be a valid enum value.' })
+    category?: EProductCategory;
 
     @IsOptional()
     @IsArray({ message: 'Image URLs must be an array.' })

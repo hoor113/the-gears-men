@@ -7,6 +7,7 @@ import {
     QueryParams,
     Res,
     UploadedFile,
+    UploadedFiles,
     UseBefore,
 } from 'routing-controllers';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
@@ -45,6 +46,25 @@ export class FileController {
     ) {
         try {
             const response = await this.fileService.uploadFile(file, query);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Internal Server Error',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
+
+    @Post('/uploadManyImage')
+    @UseBefore(ValidationMiddleware(UploadRequestDto))
+    async uploadManyImage(
+        @QueryParams() query: UploadRequestDto,
+        @UploadedFiles('file') files: Express.Multer.File[],
+        @Res() res: Response,
+    ) {
+        try {
+            const response = await this.fileService.uploadManyImages(files, query);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

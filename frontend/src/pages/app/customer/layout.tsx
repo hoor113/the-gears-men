@@ -5,6 +5,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 
 import useAuth from '@/hooks/use-auth';
 import { EUserRole } from '@/services/auth/auth.model';
+import CustomerTopNav from './_components/customer-top-nav';
 
 const StyledWrapper = styled(Box)({
   display: 'flex',
@@ -24,6 +25,7 @@ const CustomerLayout = () => {
 
   return authQuery.isSuccess ? (
     <StyledWrapper>
+      <CustomerTopNav />
       <Outlet />
     </StyledWrapper>
   ) : (

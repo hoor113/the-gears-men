@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { TopNav } from '../_components/top-nav';
 import productsService from './_services/product.service';
 import { EProductCategory } from './_services/product.model';
 const CustomerPage = () => {

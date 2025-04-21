@@ -80,16 +80,6 @@ export class CreateDiscountCodeCastDto {
     quantity!: number;
 }
 
-// DTO for updating a discount code
-export class UpdateDiscountCodeDto {
-    @IsOptional()
-    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
-    customerId?: mongoose.Types.ObjectId;
-
-    @IsOptional()
-    @IsBoolean({message: 'isUsed must be a boolean value.'})
-    isUsed?: boolean;
-}
 
 // DTO for validating a general discount code
 export class ValidateDiscountCodeDto {

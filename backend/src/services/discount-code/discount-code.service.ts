@@ -111,6 +111,42 @@ export class DiscountCodeService {
             );
         }
     }
+
+    // public async updateDiscountCodeCast(dto: StringEntityDto): Promise<BaseResponse<DiscountCodeCastDto>> {
+    //     try {
+    //         // Fetch the discount code by ID from the database
+    //         const discountCode = await DiscountCodeCast.findById(dto.id);
+    //     } catch (error: any) {
+    //         return BaseResponse.error(
+    //             error.message || 'Failed to fetch discount code',
+    //             EHttpStatusCode.INTERNAL_SERVER_ERROR
+    //         );
+    //     }
+    // } 
+
+    public async deleteDiscountCodeCast(dto: StringEntityDto): Promise<BaseResponse<boolean>> {
+        try {
+            // Delete the discount code by ID from the database
+            const discountCodeCast = await DiscountCodeCast.findByIdAndDelete(dto.id);
+
+            // Check if the discount code was found
+            if (!discountCodeCast) {
+                return BaseResponse.error(
+                    `Discount code with ID ${dto.id} not found`,
+                    EHttpStatusCode.NOT_FOUND
+                );
+            }
+
+            return BaseResponse.success(true, undefined, 'Discount code deleted successfully');
+        } catch (error: any) {
+            return BaseResponse.error(
+                error.message || 'Failed to delete discount code',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+
     /**
      * Creates a new discount code cast
      * @param createDto The data to create the discount code cast

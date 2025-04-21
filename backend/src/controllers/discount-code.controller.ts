@@ -17,7 +17,6 @@ import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     GetAllDiscountCodesDto,
-    UpdateDiscountCodeDto,
     CreateDiscountCodeCastDto,
 } from '@/services/discount-code/dto/discount-code.dto';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
@@ -78,7 +77,7 @@ export class DiscountCodeController {
         }
     }
 
-    @Get('/customer')
+    @Get('/customer/')
     @UseBefore(authorizeRoles([EUserRole.Customer]))
     async getDiscountCodeCustomer(
         @Req() req: Request,
@@ -106,11 +105,10 @@ export class DiscountCodeController {
     }
 
     // @Put('/Update')
-    // @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
-    // @UseBefore(ValidationMiddleware(UpdateDiscountCodeDto))
-    // async updateDiscountCode(@Body() dto: UpdateDiscountCodeDto, @Res() res: Response) {
+    // @UseBefore(authorizeRoles([EUserRole.Admin]))
+    // async updateDiscountCodeCast(@Body() dto: StringEntityDto, @Res() res: Response) {
     //     try {
-    //         const response = await this.discountCodeService.updateDiscountCode(dto);
+    //         const response = await this.discountCodeService.updateDiscountCodeCast(dto);
     //         return res.status(response.statusCode).json(response);
     //     } catch (error) {
     //         return res.status(500).json({
@@ -121,34 +119,28 @@ export class DiscountCodeController {
     //     }
     // }
 
-    // @Delete('/Delete')
-    // @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
-    // async deleteDiscountCode(
-    //     @QueryParams() query: StringEntityDto,
-    //     @Res() res: Response,
-    // ) {
-    //     const id = query.id;
-    //     if (!id) {
-    //         return res
-    //             .status(400)
-    //             .json({ success: false, message: 'Missing id parameter' });
-    //     }
-    //     try {
-    //         const response = await this.discountCodeService.deleteDiscountCode(id);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
+    @Delete('/Delete')
+    @UseBefore(authorizeRoles([EUserRole.Admin]))
+    async deleteDiscountCodeCast(
+        @Body() dto: StringEntityDto,
+        @Res() res: Response,
+    ) {
+        try {
+            const response = await this.discountCodeService.deleteDiscountCodeCast(dto);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Internal Server Error',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
 
     /**
      * Creates a new discount code cast
      */
-    @Post('/cast')
+    @Post('/Create')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
     @UseBefore(ValidationMiddleware(CreateDiscountCodeCastDto))
     async createDiscountCodeCast(@Body() dto: CreateDiscountCodeCastDto, @Res() res: Response) {

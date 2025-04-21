@@ -13,7 +13,49 @@ import { Service } from 'typedi';
 
 @Service()
 export class StoreService {
-    public async getUserStores(userId: string): Promise<BaseResponse<StoreDto[]>> {
+    public async createStore(dto: CreateStoreDto): Promise<BaseResponse<StoreDto>> {
+        try {
+            const {
+                ownerId,
+                name,
+                location,
+                description
+            } = dto;
+
+            const store = new Store({
+                ownerId,
+                name,
+                location,
+                description,
+                products: [] // Initialize with empty products array
+            });
+
+            await store.save();
+
+            const storeDto: StoreDto = {
+                id: (store._id as mongoose.Types.ObjectId).toString(),
+                ownerId: store.ownerId,
+                name: store.name,
+                location: store.location,
+                description: store.description,
+                products: store.products,
+            }
+
+            return BaseResponse.success(
+                storeDto,
+                undefined,
+                'Store created successfully',
+                EHttpStatusCode.CREATED
+            );
+        } catch (error) {
+            return BaseResponse.error(
+                (error as Error)?.message || 'Internal Server Error',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    public async getMyStore(userId: string): Promise<BaseResponse<StoreDto[]>> {
         try {
             const userObjectId = new mongoose.Types.ObjectId(userId);
 
@@ -65,24 +107,12 @@ export class StoreService {
         }
     }
 
-    public async createStore(dto: CreateStoreDto): Promise<BaseResponse<StoreDto>> {
+    public async getStoreById(id: string): Promise<BaseResponse<StoreDto>> {
         try {
-            const {
-                ownerId,
-                name,
-                location,
-                description
-            } = dto;
-
-            const store = new Store({
-                ownerId,
-                name,
-                location,
-                description,
-                products: [] // Initialize with empty products array
-            });
-
-            await store.save();
+            const store = await Store.findById(id);
+            if (!store) {
+                return BaseResponse.error('Store not found', EHttpStatusCode.NOT_FOUND);
+            }
 
             const storeDto: StoreDto = {
                 id: (store._id as mongoose.Types.ObjectId).toString(),
@@ -96,8 +126,8 @@ export class StoreService {
             return BaseResponse.success(
                 storeDto,
                 undefined,
-                'Store created successfully',
-                EHttpStatusCode.CREATED
+                'Store retrieved successfully',
+                EHttpStatusCode.OK
             );
         } catch (error) {
             return BaseResponse.error(
@@ -106,6 +136,8 @@ export class StoreService {
             );
         }
     }
+
+
 
     public async updateStore(id: string, dto: CreateStoreDto): Promise<BaseResponse<StoreDto>> {
         try {

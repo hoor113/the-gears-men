@@ -4,7 +4,11 @@ import Store from '@/models/store.model';
 import mongoose from 'mongoose';
 import { BaseResponse } from '@/common/base-response';
 import { EHttpStatusCode } from '@/utils/enum';
-import { buildQuery } from '@/utils/utils';
+import { 
+    buildQuery,
+    EExtraConditionType,
+    IExtraCondition
+} from '@/utils/utils';
 import { Service } from 'typedi';
 import {
     AddProductDto,
@@ -12,19 +16,45 @@ import {
     ProductDto,
     UpdateProductDto
 } from '@/services/product/dto/product.dto';
+// import { EExtraConditionType } from '@/utils/utils';
 
 
 @Service()
 export class ProductService {
 
     // Update price to range
-    public async getProducts(dto: GetProductsDto): Promise<BaseResponse<ProductDto | unknown>> {
+    public async getProducts(dto: GetProductsDto): Promise<BaseResponse<ProductDto[]>> {
         try {
             const searchableFields = ['name'];
-            const query = buildQuery(dto, searchableFields);
-            const items = await Product.find(query);
-            const totalProducts = await Product.countDocuments({ role: EUserRole.Customer });
-            return BaseResponse.success(items, totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
+            const extraCondition: IExtraCondition[] = [
+                // {
+                //     field: 'category',
+                //     type: EExtraConditionType.NotEquals,
+                //     valueField: 'category'
+                // },
+                {
+                    field: 'price',
+                    type: EExtraConditionType.InRange,
+                    fromField: 'minPrice',
+                    toField: 'maxPrice'
+                }
+            ];
+            const query = buildQuery(dto, searchableFields, extraCondition);
+            // const query = buildQuery(dto, searchableFields);
+            const items = await Product.find(query)
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount);
+            const totalProducts = await Product.countDocuments(query);
+            return BaseResponse.success(items.map((item) => ({
+                id: item._id as string,
+                storeId: item.storeId.toString(),
+                name: item.name,
+                description: item.description,
+                price: item.price,
+                stock: item.stock,
+                category: item.category,
+                images: item.images,
+            })), totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
         }
         catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
@@ -43,7 +73,7 @@ export class ProductService {
         }
     }
 
-    public async addProduct(dto: AddProductDto): Promise<BaseResponse<ProductDto | unknown>> {
+    public async addProduct(dto: AddProductDto): Promise<BaseResponse<ProductDto[] | unknown>> {
         try {
             const {
                 storeId,

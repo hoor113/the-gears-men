@@ -5,7 +5,23 @@ import { EntityDto } from '@/common/entity-dto';
 import { EProductCategory } from '@/models/product.model';
 
 export class ProductDto extends EntityDto {
+    @IsString({ message: 'Store ID must be a string.' })
+    storeId!: string; // Required
 
+    @IsString({ message: 'Product name must be a string.' })
+    name!: string; // Required
+
+    @IsString({ message: 'Description must be a string.' })
+    description!: string; // Required
+
+    @IsNumber({}, { message: 'Price must be a number.' })
+    price!: number; // Required
+
+    @IsNumber({}, { message: 'Stock must be a number.' })
+    stock!: number; // Required
+
+    @IsEnum(EProductCategory, { message: 'Category must be a valid enum value.' })
+    category!: EProductCategory;
 }
 
 class ImageDto extends EntityDto {
@@ -13,18 +29,23 @@ class ImageDto extends EntityDto {
     imageUrl!: string; // Required
 }
 
+
 export class GetProductsDto extends BaseGetAllDto {
     @IsOptional()
     @IsString({ message: 'Product name must be a string.' })
-    name?: string;
-
-    @IsOptional()
-    @IsNumber({}, { message: 'Price must be a number.' })
-    price?: number;
+    keyword?: string;
 
     @IsOptional()
     @IsEnum(EProductCategory, { message: 'Category must be a valid enum value.' })
     category?: EProductCategory;
+
+    @IsOptional()
+    @IsNumber({}, { message: 'Minimum price must be a number.' })
+    minPrice?: number;
+
+    @IsOptional()
+    @IsNumber({}, { message: 'Maximum price must be a number.' })
+    maxPrice?: number;
 }
 
 export class AddProductDto extends EntityDto {

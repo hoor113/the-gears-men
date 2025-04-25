@@ -46,21 +46,27 @@
             display: flex;
         }
 
-        &:hover .detail{
-            display: block;
+        &:hover .button-overlay{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .detail {
+        .detail, .more {
+            background-color: rgb(219, 212, 212);
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .button-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 5px;
-            background-color: rgb(219, 212, 212);
-            border-radius: 8px;
             z-index: 101;
             cursor: pointer;
             display: none;
+            text-align: center;
         }
     }
 

@@ -4,17 +4,20 @@ import { Box } from "@mui/material";
 import "slick-carousel/slick/slick.scss";
 import "slick-carousel/slick/slick-theme.scss";
 import "./block-products.scss"
+import { fake_products } from "./test_product";
+import { EProductCategory, Product } from "../_services/product.model";
 
 type BlockProductsProps = {
     title: string;
+    products: Product[]
   };
 
-const BlockProducts = ({title}: BlockProductsProps) => {
+const BlockProducts = ({title, products}: BlockProductsProps) => {
     const settings = {
         dots: false,
         infinite: true,
         speed: 500,
-        slidesToShow: 5,  // Hiện 4 sản phẩm mỗi lần
+        slidesToShow: 4,  // Hiện 4 sản phẩm mỗi lần
         slidesToScroll: 1,
         responsive: [
             {
@@ -32,15 +35,17 @@ const BlockProducts = ({title}: BlockProductsProps) => {
         ],
     };
 
+    
+
     return (
         <div className="block">
             <div className="block-name">{title}</div>
             <div className="products">
                 <Box sx={{ px: 2 }}>
                     <Slider {...settings}>
-                        {[...Array(10)].map((_, index) => (
-                            <Box key={index} px={1}>
-                                <ProductItem />
+                        {products.map((item, index) => (
+                            <Box key={item.id} px={1}>
+                                <ProductItem product={item}/>
                             </Box>
                         ))}
                     </Slider>

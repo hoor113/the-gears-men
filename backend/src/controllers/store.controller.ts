@@ -26,6 +26,7 @@ import { EUserRole } from '@/models/user.model';
 import { verifyToken } from '@/config/jwt';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/stores')
@@ -89,18 +90,11 @@ export class StoreController {
     }
 
     @Get('/GetMyStore')
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
+    @UseBefore(TokenDecoderMiddleware)
     async getMyStore(@Req() req: Request, @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const ownerId = decoded.id;
+            const ownerId = (req as any)?.userId;
             const response = await this.storeService.getMyStore(ownerId);
             return res.status(response.statusCode).json(response);
         } catch (error) {

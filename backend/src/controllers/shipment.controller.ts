@@ -35,6 +35,7 @@ import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from '@/config/jwt';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/shipments')
@@ -58,22 +59,14 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     @Get('/store/')
     @UseBefore(ValidationMiddleware(GetShipmentFromCustomerDto))
+    @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromCustomer(
         @Req() req: any,
         @Body() dto: GetShipmentFromCustomerDto,
         @Res() res: Response,
     ) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const ownerId = decoded.id;
+            const ownerId = (req as any)?.userId;
             const response = await this.shipmentStoreOwnerService.getShipmentsFromCustomer(ownerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -109,22 +102,14 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.DeliveryCompany]))
     @Get('/company/')
     @UseBefore(ValidationMiddleware(GetShipmentFromStoreDto))
+    @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromStore(
         @Req() req: Request,
         @Body() dto: GetShipmentFromStoreDto,
         @Res() res: Response,
     ) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const companyId = decoded.id;
+            const companyId = (req as any).userId;
             const response = await this.shipmentDeliveryCompanyService.getShipmentFromStore(companyId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -166,16 +151,7 @@ export class ShipmentController {
         @Res() res: Response,
     ) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const personnelId = decoded.id;
+            const personnelId = (req as any).userId;
             const response = await this.shipmentDeliveryPersonnelService.getAssignedShipments(personnelId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -209,21 +185,13 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.DeliveryCompany, EUserRole.DeliveryPersonnel, EUserRole.Admin]))
     @Post('/cancel')
     @UseBefore(ValidationMiddleware(StringEntityDto))
+    @UseBefore(TokenDecoderMiddleware)
     public async cancelShipment(
         @Req() req: Request,
         shipmentId: StringEntityDto,
         @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const cancellerId = decoded.id;
+            const cancellerId = (req as any).userId;
             const response = await this.shipmentCommonService.cancelShipment(cancellerId, shipmentId);
             return res.status(response.statusCode).json(response);
         } catch (error) {

@@ -27,6 +27,7 @@ import {
 import { UserService } from '@/services/user/user.service';
 import { EHttpStatusCode } from '@/utils/enum';
 import Container from 'typedi';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/users')
@@ -121,19 +122,11 @@ export class UserController {
     }
 
     @Get('/MyInfo')
+    @UseBefore(TokenDecoderMiddleware)
     async myInfo(@Req() req: Request, @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const userId = decoded.id;
-            const role = decoded.role;
+            const userId = (req as any).userId;
+            const role = (req as any).role;
             const response = await this.userService.getUserById(userId, role);
             return res.status(response.statusCode).json(response);
         } catch (error) {

@@ -25,6 +25,7 @@ import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from '@/config/jwt';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/discount-codes')
@@ -78,21 +79,10 @@ export class DiscountCodeController {
     }
 
     @Get('/customer/')
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
-    async getDiscountCodeCustomer(
-        @Req() req: Request,
-        @Res() res: Response,) {
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
+    async getDiscountCodeCustomer(@Req() req: Request, @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const customerId = decoded.id;
+            const customerId = (req as any).userId;
             const response = await this.discountCodeService.getDiscountCodeCustomer(customerId);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -157,23 +147,14 @@ export class DiscountCodeController {
     }
 
     @Post('/claim')
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
     @UseBefore(ValidationMiddleware(StringEntityDto))
     public async claimDiscountCode(
         @Req() req: Request,
         @Body() code: StringEntityDto,
         @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const customerId = decoded.id;
+            const customerId = (req as any).userId;
             const response = await this.discountCodeService.claimDiscountCode(customerId, code);
             return res.status(response.statusCode).json(response);
         } catch (error) {

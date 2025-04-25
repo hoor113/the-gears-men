@@ -25,6 +25,7 @@ import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from '@/config/jwt';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/orders')
@@ -52,21 +53,12 @@ export class OrderController {
     // }
 
     // Customer endpoints
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
     @Post('/create')
     @UseBefore(ValidationMiddleware(CreateOrderDto))
-    async createOrder(@Req() req: Request,  @Body() dto: CreateOrderDto, @Res() res: Response) {
+    async createOrder(@Req() req: Request, @Body() dto: CreateOrderDto, @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const customerId = decoded.id;
+            const customerId = (req as any).userId;
             const response = await this.orderService.createOrder(customerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -79,20 +71,11 @@ export class OrderController {
     }
 
     @Post('/cancel')
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
     @UseBefore(ValidationMiddleware(CancelOrderDto))
-    async cancelOrder(@Req() req: Request , @Body() dto: CancelOrderDto, @Res() res: Response) {
+    async cancelOrder(@Req() req: Request, @Body() dto: CancelOrderDto, @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const customerId = decoded.id;
+            const customerId = (req as any).userId;
             const response = await this.orderService.cancelOrder(customerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {

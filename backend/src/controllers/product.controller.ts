@@ -18,6 +18,7 @@ import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     AddProductDto, 
     GetProductsDto,
+    GetProductsByCategoryDto,
     UpdateProductDto,
 } from '@/services/product/dto/product.dto';
 import { ProductService } from '@/services/product/product.service';
@@ -79,6 +80,24 @@ export class ProductController {
         }
         try {
             const response = await this.productService.getProductById(id);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Product Not Found',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
+
+    @Get('/GetByCategory/:category')
+    @UseBefore(ValidationMiddleware(GetProductsByCategoryDto))
+    async getProductByCategory(
+        @QueryParams() dto: GetProductsByCategoryDto,
+        @Res() res: Response,
+    ) {
+        try {
+            const response = await this.productService.getProductsByCategory(dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

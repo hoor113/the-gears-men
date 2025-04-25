@@ -8,6 +8,7 @@ import {
     Post,
     Put,
     QueryParams,
+    Param,
     Req,
     Res,
     UseBefore,
@@ -33,6 +34,22 @@ export class OrderController {
     constructor() {
         this.orderService = new OrderService();
     }
+
+    // public async getOrderById(
+    //     @Param('id') query: string,
+    //     @Res() res: Response,
+    // ) {
+    //     try {
+    //         const response = await this.orderService.getOrderById(query);
+    //         return res.status(response.statusCode).json(response);
+    //     } catch (error) {
+    //         return res.status(500).json({
+    //             success: false,
+    //             message: (error as any)?.message || 'Internal Server Error',
+    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+    //         });
+    //     }
+    // }
 
     // Customer endpoints
     @UseBefore(authorizeRoles([EUserRole.Customer]))

@@ -48,6 +48,11 @@ export class GetProductsDto extends BaseGetAllDto {
     maxPrice?: number;
 }
 
+export class GetProductsByCategoryDto extends BaseGetAllDto {
+    @IsEnum(EProductCategory, { message: 'Category must be a valid enum value.' })
+    category!: EProductCategory;
+}
+
 export class AddProductDto extends EntityDto {
     @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
     storeId!: string; // Required

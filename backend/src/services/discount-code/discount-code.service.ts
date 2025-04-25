@@ -12,6 +12,7 @@ import {
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
 import { buildQuery } from '@/utils/utils';
 import { StringEntityDto } from '@/common/entity-dto';
+import redis from '@/config/redis';
 
 @Service()
 export class DiscountCodeService {
@@ -190,7 +191,20 @@ export class DiscountCodeService {
 
     public async claimDiscountCode(customerId: string, code: StringEntityDto): Promise<BaseResponse<DiscountCodeDto>> {
         try {
-            // Find the discount code
+            if (!customerId) {
+                return BaseResponse.error(
+                    'Customer ID is required',
+                    EHttpStatusCode.BAD_REQUEST
+                );
+            }
+
+            if (await redis.get(`discount-code-cooldown:${code.id}`) == customerId) {
+                return BaseResponse.error(
+                    `You have already claimed this discount code. Please wait for 48 hours before claiming again.`,
+                    EHttpStatusCode.BAD_REQUEST);
+                }
+
+            // Find the discount code            
             const discountCodeCast = await DiscountCodeCast.findOne({ code: code.id });
 
             // Verify the discount code exists
@@ -216,6 +230,8 @@ export class DiscountCodeService {
 
             await discountCode.save();
             await discountCodeCast.save();
+
+            redis.set(`discount-code-cooldown:${code.id}`, customerId.toString(), 60 * 60 * 24 * 2); // Set expiration to 48 hours
 
             return BaseResponse.success({
                 id: discountCode._id,

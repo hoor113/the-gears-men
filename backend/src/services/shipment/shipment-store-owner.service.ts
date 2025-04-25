@@ -33,21 +33,6 @@ export class ShipmentStoreOwnerService {
                     path: 'storeId',
                     select: 'name email phoneNumber address'
                 })
-                // .populate({
-                //     path: 'orderId',
-                //     select: 'shippingAddress createdAt'
-                // })
-                // .populate({
-                //     path: 'orderId',
-                //     populate: {
-                //         path: 'customerId',
-                //         select: 'email phoneNumber'
-                //     }
-                // })
-                // .populate({
-                //     path: 'orderItemId',
-                //     model: 'Order.items'
-                // })
                 .limit(dto.maxResultCount)
                 .skip(dto.skipCount)
                 .sort({ createdAt: -1 });

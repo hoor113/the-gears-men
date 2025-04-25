@@ -14,8 +14,6 @@ export interface IOrderItem {
     _id: mongoose.Types.ObjectId;
     productId: mongoose.Types.ObjectId;
     quantity: number;
-    // shippingCompanyId?: mongoose.Types.ObjectId;
-    // deliveryPersonnel?: mongoose.Types.ObjectId;
     shippingDiscountCode?: mongoose.Types.ObjectId;
     productDiscountCode?: mongoose.Types.ObjectId;
     price: number;

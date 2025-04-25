@@ -15,8 +15,6 @@ import { buildQuery } from '@/utils/utils';
 export class ShipmentDeliveryPersonnelService {
     public async getAssignedShipments(personnelId: string, dto: GetAssignedShipmentsDto): Promise<BaseResponse<ShipmentDto | unknown>> {
         try {
-            // const { deliveryPersonnelId } = dto;
-
             const query = buildQuery(dto);
             query.deliveryPersonnel = new mongoose.Types.ObjectId(personnelId);
             query.status = EShipmentStatus.Stored; // Set status to stored
@@ -58,13 +56,6 @@ export class ShipmentDeliveryPersonnelService {
                 { new: true }
             );
 
-            // Check if the shipment is assigned to this delivery personnel
-            // const shipment = await Shipment.findOne({
-            //     id: shipmentId,
-            //     // deliveryPersonnel: new mongoose.Types.ObjectId(deliveryPersonnelId),
-            //     shipmentStatus: EShipmentStatus.Stored
-            // });
-
             if (!shipment) {
                 return BaseResponse.error(
                     'Shipment not found',
@@ -72,9 +63,6 @@ export class ShipmentDeliveryPersonnelService {
                 );
             }
 
-            // Update shipment status to delivered
-            // shipment.status = EShipmentStatus.Delivered;
-            // shipment.deliveryDate = new Date();
 
             await shipment.save();
 

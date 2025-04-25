@@ -12,6 +12,7 @@ import {
 import { Service } from 'typedi';
 import {
     AddProductDto,
+    GetProductsByCategoryDto,
     GetProductsDto,
     ProductDto,
     UpdateProductDto
@@ -71,6 +72,32 @@ export class ProductService {
                 EHttpStatusCode.INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    public async getProductsByCategory(dto: GetProductsByCategoryDto): Promise<BaseResponse<ProductDto[]>> {
+        try {
+            const query = buildQuery(dto);
+            const items = await Product.find(query)
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount);
+            const totalProducts = await Product.countDocuments(query);
+            return BaseResponse.success(items.map((item) => ({
+                id: item._id as string,
+                storeId: item.storeId.toString(),
+                name: item.name,
+                description: item.description,
+                price: item.price,
+                stock: item.stock,
+                category: item.category,
+                images: item.images,
+            })), totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
+        } catch (error) {
+            return BaseResponse.error(
+                (error as Error)?.message || 'Internal Server Error',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
+        }
+
     }
 
     public async addProduct(dto: AddProductDto): Promise<BaseResponse<ProductDto[] | unknown>> {

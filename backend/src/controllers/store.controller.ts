@@ -52,7 +52,7 @@ export class StoreController {
         }
     }
 
-    @Get('/Get')
+    @Get('/GetAll')
     @UseBefore(ValidationMiddleware(GetStoresDto))
     async getStores(@QueryParams() dto: GetStoresDto, @Res() res: Response) {
         try {

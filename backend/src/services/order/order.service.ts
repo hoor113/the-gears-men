@@ -57,8 +57,6 @@ export class OrderService {
 
                 let productPrice: number = product.price * item.quantity;
                 let shippingPrice: number = productPrice * DELIVERY_VAT;
-                let productDiscountCode: string | null = null;
-                let shippingDiscountCode: string | null = null;
 
                 console.log(item.productDiscountCode, item.shippingDiscountCode);
 

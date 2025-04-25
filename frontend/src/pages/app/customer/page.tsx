@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import productsService from './_services/product.service';
 import { EProductCategory } from './_services/product.model';
+
+import { Container } from "@mui/material"
+import BlockProducts from './_components/block-products';
 const CustomerPage = () => {
 
     const { data: getAllProducts } = useQuery({
@@ -21,7 +24,9 @@ const CustomerPage = () => {
     console.log('getAllAccessories', getAllAccessories);
     return (
         <>
-        Home Page            
+            <Container maxWidth={"lg"}>
+                <BlockProducts title={"Danh mục 1"}/>
+            </Container>
         </>
     );
 };

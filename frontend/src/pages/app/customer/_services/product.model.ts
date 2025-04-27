@@ -14,3 +14,14 @@ export enum EProductCategory {
     Gaming = 'Gaming',
     Others = 'Others',
 }
+
+export interface Product {
+    storeId: string;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    category: EProductCategory;
+    images: string[];
+    id: string;
+  }

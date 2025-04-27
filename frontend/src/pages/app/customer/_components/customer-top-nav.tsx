@@ -8,6 +8,7 @@ import productsService from '@/pages/app/customer/_services/product.service'; //
 import useDebounce from '@/hooks/use-debounce';// custom hook debounce
 import usePopover from '@/hooks/use-popover';
 import AccountPopover from '../../_components/account-popover';
+import './custom-top-nav.scss'
 
 
 const AvatarStyled = styled(Avatar)(({ theme }) => ({
@@ -50,7 +51,7 @@ export default function CustomerTopNav() {
             <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded-sm" />
                 <span className="font-bold text-base md:text-lg">
-                    <span className="text-yellow-400">The Gears Men</span>
+                    <span className="text-yellow-400 top-nav-group-name">The Gears Men</span>
                 </span>
             </div>
 
@@ -95,7 +96,7 @@ export default function CustomerTopNav() {
 
             {/* Giỏ hàng */}
             <div>
-                <div className="border border-white rounded px-2 py-1 flex items-center gap-1 text-sm">
+                <div className="border border-white rounded px-2 py-1 flex items-center gap-1 text-sm top-nav-cart">
                     <i className="fas fa-lock" />
                     <span>Giỏ hàng</span>
                     <span className="bg-yellow-400 text-[#e4572e] rounded-full text-xs px-2 py-0.5 font-bold">

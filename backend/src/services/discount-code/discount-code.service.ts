@@ -200,7 +200,7 @@ export class DiscountCodeService {
 
             if (await redis.get(`discount-code-cooldown:${code.id}`) == customerId) {
                 return BaseResponse.error(
-                    `You have already claimed this discount code. Please wait for 48 hours before claiming again.`,
+                    `You have already claimed this discount code. Please wait for 36 hours before claiming again.`,
                     EHttpStatusCode.BAD_REQUEST);
             }
 
@@ -268,9 +268,18 @@ export class DiscountCodeService {
                     EHttpStatusCode.NOT_FOUND
                 );
             }
-
+            
+            // Check if the code is already used
+            if (discountCode.isUsed) {
+                return BaseResponse.error(
+                    `Product discount code ${code} has already been used`,
+                    EHttpStatusCode.BAD_REQUEST
+                );
+            }
+            
             const discount = await redis.get(`discount-code-value:${discountCode.code}`);
             if (discount) {
+                console.log('Discount code found in Redis:', discount);
                 const discountCodeRedis = JSON.parse(discount);
                 discountCode.isUsed = true;
                 await discountCode.save();
@@ -304,13 +313,6 @@ export class DiscountCodeService {
                 );
             }
 
-            // Check if the code is already used
-            if (discountCode.isUsed) {
-                return BaseResponse.error(
-                    `Product discount code ${code} has already been used`,
-                    EHttpStatusCode.BAD_REQUEST
-                );
-            }
 
             // Check if the code is expired
             if (new Date() > discountCodeCast.expiryDate) {

@@ -11,8 +11,6 @@ import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { Container } from 'typedi';
 import { OrderCronService } from '@/services/cron/cron.service';
-
-import connectDB from './config/database';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 
 dotenv.config();
@@ -22,16 +20,11 @@ export class App {
 
     constructor(controllers: Function[]) {
         this.app = express();
-        this.connectDatabase();
         this.setupMiddlewares();
         this.setupControllers(controllers);
-        // this.initializeAuthentication();
-        this.initializeSwagger(controllers);
+        this.setupSwagger(controllers);
         this.initializeServices();
-    }
-
-    private async connectDatabase() {
-        await connectDB();
+        this.setupHealthCheck(); // 👈 thêm health check
     }
 
     private setupMiddlewares() {
@@ -46,13 +39,13 @@ export class App {
     private setupControllers(controllers: Function[]) {
         useExpressServer(this.app, {
             controllers,
-            defaultErrorHandler: false, // Tắt error handler mặc định của routing-controllers
+            defaultErrorHandler: false,
         });
 
-        console.log('Registered controllers:', controllers);
+        console.log('✅ Registered controllers:', controllers);
     }
 
-    private initializeSwagger(controllers: Function[]) {
+    private setupSwagger(controllers: Function[]) {
         const schemas = validationMetadatasToSchemas({
             refPointerPrefix: '#/components/schemas/',
         });
@@ -92,6 +85,12 @@ export class App {
         // Initialize the OrderCronService singleton
         Container.get(OrderCronService);
         console.log('🕒 Cron service initialized successfully');
+    }
+
+    private setupHealthCheck() {
+        this.app.get('/health', (_, res) => {
+            res.status(200).send('OK');
+        });
     }
 
     public initializeAuthentication() {

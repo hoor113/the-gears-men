@@ -42,8 +42,8 @@ export class BaseDiscountCodeDto {
 
 // DTO for discount code response
 export class DiscountCodeDto extends BaseDiscountCodeDto {
-    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
-    customerId!: mongoose.Types.ObjectId;
+    // @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
+    // customerId!: mongoose.Types.ObjectId;
 
     @IsBoolean({message: 'isUsed must be a boolean value.'})
     isUsed!: boolean;

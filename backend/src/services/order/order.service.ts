@@ -58,7 +58,7 @@ export class OrderService {
                 let productPrice: number = product.price * item.quantity;
                 let shippingPrice: number = productPrice * DELIVERY_VAT;
 
-                console.log(item.productDiscountCode, item.shippingDiscountCode);
+                // console.log(item.productDiscountCode, item.shippingDiscountCode);
 
                 // Process product discount code if provided
                 if (item.productDiscountCode) {

@@ -202,7 +202,7 @@ export class DiscountCodeService {
                 return BaseResponse.error(
                     `You have already claimed this discount code. Please wait for 48 hours before claiming again.`,
                     EHttpStatusCode.BAD_REQUEST);
-                }
+            }
 
             // Find the discount code            
             const discountCodeCast = await DiscountCodeCast.findOne({ code: code.id });
@@ -231,7 +231,7 @@ export class DiscountCodeService {
             await discountCode.save();
             await discountCodeCast.save();
 
-            redis.set(`discount-code-cooldown:${code.id}`, customerId.toString(), 60 * 60 * 24 * 2); // Set expiration to 48 hours
+            redis.set(`discount-code-cooldown:${code.id}`, customerId.toString(), 60 * 60 * 36); // Set expiration to 36 hours
 
             return BaseResponse.success({
                 id: discountCode._id,
@@ -269,6 +269,28 @@ export class DiscountCodeService {
                 );
             }
 
+            const discount = await redis.get(`discount-code-value:${discountCode.code}`);
+            if (discount) {
+                const discountCodeRedis = JSON.parse(discount);
+                discountCode.isUsed = true;
+                await discountCode.save();
+                if (new Date() > discountCodeRedis.expiryDate) {
+                    return BaseResponse.error(
+                        `Product discount code ${code} has expired`,
+                        EHttpStatusCode.BAD_REQUEST
+                    );
+                }
+                return BaseResponse.success({
+                    code,
+                    // customerId: discountCode.customerId,
+                    type: discountCodeRedis.type,
+                    discountCalculationMethod: discountCodeRedis.discountCalculationMethod,
+                    discountQuantity: discountCodeRedis.discountQuantity,
+                    expiryDate: discountCodeRedis.expiryDate,
+                    isUsed: true
+                });
+            }
+
             // Find the discount code cast to verify type and other details
             const discountCodeCast = await DiscountCodeCast.findOne({
                 code: discountCode.code
@@ -298,19 +320,21 @@ export class DiscountCodeService {
                 );
             }
 
-            // Determine discount type (percentage or fixed amount)
-            // const discountType = discountCodeCast.discountPercentage > 0 ? 'percentage' : 'fixed';
-            // const discountValue = discountType === 'percentage' ?
-            //     discountCodeCast.discountPercentage :
-            //     discountCodeCast.discountAmount;
-
             // Mark the discount code as used
             discountCode.isUsed = true;
             await discountCode.save();
 
+            // Store the discount code in Redis with a 36-hour expiration
+            redis.set(`discount-code-value:${discountCode.code}`, JSON.stringify({
+                type: discountCodeCast.type,
+                discountCalculationMethod: discountCodeCast.discountCalculationMethod,
+                discountQuantity: discountCodeCast.discountQuantity,
+                expiryDate: discountCodeCast.expiryDate
+            }), 60 * 60 * 24);
+
             return BaseResponse.success({
                 code: discountCode.code,
-                customerId: discountCode.customerId,
+                // customerId: discountCode.customerId,
                 type: discountCodeCast.type,
                 discountCalculationMethod: discountCodeCast.discountCalculationMethod,
                 discountQuantity: discountCodeCast.discountQuantity,

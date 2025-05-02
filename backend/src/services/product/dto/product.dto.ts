@@ -17,6 +17,10 @@ export class ProductDto extends EntityDto {
     @IsNumber({}, { message: 'Price must be a number.' })
     price!: number; // Required
 
+    @IsOptional()
+    @IsNumber({}, { message: 'Price after discount must be a number.' })
+    priceAfterDiscount?: number; // Optional
+
     @IsNumber({}, { message: 'Stock must be a number.' })
     stock!: number; // Required
 

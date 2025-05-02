@@ -11,7 +11,7 @@ import {
     OrderDto,
     OrderItemDto
 } from '@/services/order/dto/order.dto';
-import { OrderCronService } from '@/services/cron/cron.service';
+import { OrderCronService } from '@/services/order/order-cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
 import { DiscountCodeDto } from '@/services/discount-code/dto/discount-code.dto';
 import { EDiscountCalculationMethod } from '@/models/discount-code-cast.model';

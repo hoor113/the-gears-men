@@ -9,7 +9,7 @@ import {
     EExtraConditionType,
     IExtraCondition
 } from '@/utils/utils';
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
 import {
     AddProductDto,
     GetProductsByCategoryDto,
@@ -17,12 +17,15 @@ import {
     ProductDto,
     UpdateProductDto
 } from '@/services/product/dto/product.dto';
+import { ProductDiscountCronService } from '@/services/product/product-discoun-cron.service';
+import redis from '@/config/redis';
+import { DAILY_DISCOUNT_PERCENTAGE } from '@/constants/daily-discount-percentage';
+
 // import { EExtraConditionType } from '@/utils/utils';
 
 
 @Service()
 export class ProductService {
-
     // Update price to range
     public async getProducts(dto: GetProductsDto): Promise<BaseResponse<ProductDto[]>> {
         try {
@@ -41,17 +44,22 @@ export class ProductService {
                 }
             ];
             const query = buildQuery(dto, searchableFields, extraCondition);
-            // const query = buildQuery(dto, searchableFields);
             const items = await Product.find(query)
                 .skip(dto.skipCount)
                 .limit(dto.maxResultCount);
             const totalProducts = await Product.countDocuments(query);
+            // RETRIEVE DISCOUNT FROM REDIS
+            const discountedList = await redis.getList('daily_discount');
+            console.log('Discounted List:', discountedList);
             return BaseResponse.success(items.map((item) => ({
                 id: item._id as string,
                 storeId: item.storeId.toString(),
                 name: item.name,
                 description: item.description,
-                price: item.price,
+                price: item.price,  
+                // priceAfterDiscount: (discountedList.includes(item._id as string) ?
+                //     item.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(item._id as string)] / 100 : undefined),
+                priceAfterDiscount: 100000,
                 stock: item.stock,
                 category: item.category,
                 images: item.images,
@@ -65,7 +73,24 @@ export class ProductService {
     public async getProductById(id: string): Promise<BaseResponse<ProductDto | unknown>> {
         try {
             const product = await Product.findById(id);
-            return BaseResponse.success(product, 1, 'Item retrieved successfully', EHttpStatusCode.OK);
+            
+            // RETRIEVE DISCOUNT FROM REDIS
+            const discountedList = await redis.getList('daily_discount');
+            
+            const productWithDiscount = product ? {
+                id: product._id as string,
+                storeId: product.storeId.toString(),
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                priceAfterDiscount: (discountedList.includes(product._id as string) ?
+                    product.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(product._id as string)] / 100 : undefined),
+                stock: product.stock,
+                category: product.category,
+                images: product.images,
+            } : null;
+            
+            return BaseResponse.success(productWithDiscount, 1, 'Item retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error(
                 (error as Error)?.message || 'Internal Server Error',
@@ -81,12 +106,18 @@ export class ProductService {
                 .skip(dto.skipCount)
                 .limit(dto.maxResultCount);
             const totalProducts = await Product.countDocuments(query);
+            
+            // RETRIEVE DISCOUNT FROM REDIS
+            const discountedList = await redis.getList('daily_discount');
+            
             return BaseResponse.success(items.map((item) => ({
                 id: item._id as string,
                 storeId: item.storeId.toString(),
                 name: item.name,
                 description: item.description,
                 price: item.price,
+                priceAfterDiscount: (discountedList.includes(item._id as string) ?
+                    item.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(item._id as string)] / 100 : undefined),
                 stock: item.stock,
                 category: item.category,
                 images: item.images,
@@ -97,7 +128,6 @@ export class ProductService {
                 EHttpStatusCode.INTERNAL_SERVER_ERROR
             );
         }
-
     }
 
     public async addProduct(dto: AddProductDto): Promise<BaseResponse<ProductDto[] | unknown>> {

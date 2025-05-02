@@ -10,8 +10,9 @@ import { getMetadataArgsStorage, useExpressServer } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { Container } from 'typedi';
-import { OrderCronService } from '@/services/cron/cron.service';
+import { OrderCronService } from '@/services/order/order-cron.service';
 import { AuthMiddleware } from './middlewares/auth.middleware';
+import { ProductDiscountCronService } from './services/product/product-discoun-cron.service';
 
 dotenv.config();
 
@@ -84,6 +85,7 @@ export class App {
     private initializeServices() {
         // Initialize the OrderCronService singleton
         Container.get(OrderCronService);
+        Container.get(ProductDiscountCronService);
         console.log('🕒 Cron service initialized successfully');
     }
 

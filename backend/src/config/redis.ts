@@ -83,6 +83,38 @@ export class RedisInstance {
             console.error('❌ Error deleting data from Redis:', err);
         }
     }
+
+    public async push(key: string, val: string): Promise<void> {
+        try {
+            await RedisInstance.CacheClient.rPush(key, val);
+        } catch (err) {
+            console.error('❌ Error pushing data to Redis:', err);
+        }
+    }
+
+    public async pop(key: string): Promise<string | void> {
+        try {
+            const value = await RedisInstance.CacheClient.lPop(key);
+            if (value) {
+                console.log(`✅ Popped value "${value}" from key "${key}"`);
+                return value;
+            } else {
+                console.log(`🔺 No value found for key "${key}"`);
+            }
+        } catch (err) {
+            console.error('❌ Error popping data from Redis:', err);
+        }
+    }
+
+    public async getList(key: string): Promise<string[]> {
+        try {
+            const list = await RedisInstance.CacheClient.lRange(key, 0, -1);
+            return list;
+        } catch (err) {
+            console.error('❌ Error getting list from Redis:', err);
+            return [];
+        }
+    }
 }
 
 const redis = RedisInstance.getInstance();

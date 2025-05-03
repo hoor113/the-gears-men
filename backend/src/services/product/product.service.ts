@@ -51,15 +51,19 @@ export class ProductService {
             // RETRIEVE DISCOUNT FROM REDIS
             const discountedList = await redis.getList('daily_discount');
             console.log('Discounted List:', discountedList);
+            // for (let item in items) {
+            //     console.log('Item:', items[item]);
+            //     console.log('Item ID:', (items[item]._id as string).toString());
+            //     console.log('Discounted List:', discountedList.includes(items[item]._id as string));
+            // }
             return BaseResponse.success(items.map((item) => ({
                 id: item._id as string,
                 storeId: item.storeId.toString(),
                 name: item.name,
                 description: item.description,
                 price: item.price,  
-                // priceAfterDiscount: (discountedList.includes(item._id as string) ?
-                //     item.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(item._id as string)] / 100 : undefined),
-                priceAfterDiscount: 100000,
+                priceAfterDiscount: (discountedList.includes((item._id as string).toString()) ?
+                    item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((item._id as string).toString())]) / 100 : undefined),
                 stock: item.stock,
                 category: item.category,
                 images: item.images,
@@ -84,7 +88,7 @@ export class ProductService {
                 description: product.description,
                 price: product.price,
                 priceAfterDiscount: (discountedList.includes(product._id as string) ?
-                    product.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(product._id as string)] / 100 : undefined),
+                    product.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(product._id as string)]) / 100 : undefined),
                 stock: product.stock,
                 category: product.category,
                 images: product.images,
@@ -109,6 +113,11 @@ export class ProductService {
             
             // RETRIEVE DISCOUNT FROM REDIS
             const discountedList = await redis.getList('daily_discount');
+            for (let item in items) {
+                console.log('Item:', items[item]);
+                console.log('Item ID:', items[item]._id as string);
+                console.log('Discounted List:', discountedList.includes(items[item]._id as string));
+            }
             
             return BaseResponse.success(items.map((item) => ({
                 id: item._id as string,
@@ -116,8 +125,8 @@ export class ProductService {
                 name: item.name,
                 description: item.description,
                 price: item.price,
-                priceAfterDiscount: (discountedList.includes(item._id as string) ?
-                    item.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(item._id as string)] / 100 : undefined),
+                priceAfterDiscount: (discountedList.includes((item._id as string).toString()) ?
+                    item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((item._id as string).toString())]) / 100 : undefined),
                 stock: item.stock,
                 category: item.category,
                 images: item.images,

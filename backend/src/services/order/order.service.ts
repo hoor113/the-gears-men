@@ -15,6 +15,8 @@ import { OrderCronService } from '@/services/order/order-cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
 import { DiscountCodeDto } from '@/services/discount-code/dto/discount-code.dto';
 import { EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
+import redis from '@/config/redis';
+import { DAILY_DISCOUNT_PERCENTAGE } from '@/constants/daily-discount-percentage';
 
 @Service()
 export class OrderService {
@@ -54,7 +56,14 @@ export class OrderService {
                         EHttpStatusCode.BAD_REQUEST
                     );
                 }
-
+                // Apply daily discount if available
+                const discountedList = await redis.getList('daily_discount');
+                console.log('Discounted List:', discountedList);
+                if (discountedList && discountedList.includes((product._id as string).toString())) {
+                    console.log('Product is in the discounted list:', product.name);
+                    // Apply discount logic here
+                    product.price -= (product.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((product._id as string).toString())]) / 100; // Apply discount percentage to price
+                }
                 let productPrice: number = product.price * item.quantity;
                 let shippingPrice: number = productPrice * DELIVERY_VAT;
 
@@ -152,7 +161,7 @@ export class OrderService {
         }
     }
 
-    
+
 
     public async cancelOrder(customerId: string, dto: CancelOrderDto): Promise<BaseResponse<OrderDto | unknown>> {
         try {
@@ -184,7 +193,7 @@ export class OrderService {
                 order.orderStatus = EOrderStatus.Cancelled;
                 await order.save();
             }
-            
+
             this.orderCronService.cancelOrderConfirmation(orderId); // Cancel confirmation job
 
             const orderDto: OrderDto = {

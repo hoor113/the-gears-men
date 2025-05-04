@@ -10,9 +10,9 @@ import { EProductCategory, Product } from "../_services/product.model";
 type BlockProductsProps = {
     title: string;
     products: Product[]
-  };
+};
 
-const BlockProducts = ({title, products}: BlockProductsProps) => {
+const BlockProducts = ({ title, products }: BlockProductsProps) => {
     const settings = {
         dots: false,
         infinite: true,
@@ -35,7 +35,7 @@ const BlockProducts = ({title, products}: BlockProductsProps) => {
         ],
     };
 
-    
+
 
     return (
         <div className="block">
@@ -45,7 +45,7 @@ const BlockProducts = ({title, products}: BlockProductsProps) => {
                     <Slider {...settings}>
                         {products.map((item, index) => (
                             <Box key={item.id} px={1}>
-                                <ProductItem product={item}/>
+                                <ProductItem product={item} />
                             </Box>
                         ))}
                     </Slider>

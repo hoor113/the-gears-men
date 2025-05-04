@@ -51,6 +51,9 @@ const BlockProducts = ({ title, products }: BlockProductsProps) => {
                     </Slider>
                 </Box>
             </div>
+            <div className="view-all">
+                <button>Xem tất cả</button>
+            </div>
         </div>
     );
 };

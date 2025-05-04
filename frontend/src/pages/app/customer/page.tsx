@@ -55,14 +55,22 @@ const CustomerPage = () => {
   );
 
 
+  // const { data: discountedProducts } = useQuery({
+  //   queryKey: ['products/getAll'],
+  //   queryFn: () =>
+  //     productsService.getAll({
+  //       maxResultCount: 1000,
+  //     }),
+  //   select: (products) =>
+  //     (products || []).filter((product) => product.priceAfterDiscount !== undefined),
+  // });
+
+  // console.log(discountedProducts);
+
   const { data: discountedProducts } = useQuery({
-    queryKey: ['products/getAll'],
+    queryKey: ['products/GetDailyDiscount'],
     queryFn: () =>
-      productsService.getAll({
-        maxResultCount: 1000,
-      }),
-    select: (products) =>
-      (products || []).filter((product) => product.priceAfterDiscount !== undefined),
+      productsService.getDailyDiscount()
   });
 
   console.log(discountedProducts);

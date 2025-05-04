@@ -1,6 +1,6 @@
 import React from 'react';
 import NiceModal from '@ebay/nice-modal-react';
-import ProductModal from './product-model'; // Đảm bảo rằng bạn import đúng đường dẫn của ProductModal
+import ProductModal from './product-modal'; // Đảm bảo rằng bạn import đúng đường dẫn của ProductModal
 import { EProductCategory, Product } from '../_services/product.model';
 import './product-item.scss'
 

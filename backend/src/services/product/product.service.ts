@@ -103,34 +103,30 @@ export class ProductService {
         }
     }
 
-    public async getProductsByCategory(dto: GetProductsByCategoryDto): Promise<BaseResponse<ProductDto[]>> {
+    public async getDailyDiscount(): Promise<BaseResponse<ProductDto[]>> {
         try {
-            const query = buildQuery(dto);
-            const items = await Product.find(query)
-                .skip(dto.skipCount)
-                .limit(dto.maxResultCount);
-            const totalProducts = await Product.countDocuments(query);
-            
-            // RETRIEVE DISCOUNT FROM REDIS
             const discountedList = await redis.getList('daily_discount');
-            for (let item in items) {
-                console.log('Item:', items[item]);
-                console.log('Item ID:', items[item]._id as string);
-                console.log('Discounted List:', discountedList.includes(items[item]._id as string));
+            if (!discountedList) {
+                return BaseResponse.error(
+                    'No daily discount available',
+                    EHttpStatusCode.NOT_FOUND
+                );
             }
-            
-            return BaseResponse.success(items.map((item) => ({
+
+            const products = await Product.find({ _id: { $in: discountedList } });
+            const productDtos = products.map((item) => ({
                 id: item._id as string,
                 storeId: item.storeId.toString(),
                 name: item.name,
                 description: item.description,
                 price: item.price,
-                priceAfterDiscount: (discountedList.includes((item._id as string).toString()) ?
-                    item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((item._id as string).toString())]) / 100 : undefined),
+                priceAfterDiscount: (item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((item._id as string).toString())]) / 100),
                 stock: item.stock,
                 category: item.category,
                 images: item.images,
-            })), totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
+            }));
+
+            return BaseResponse.success(productDtos, undefined, 'Items retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error(
                 (error as Error)?.message || 'Internal Server Error',
@@ -138,6 +134,42 @@ export class ProductService {
             );
         }
     }
+
+    // public async getProductsByCategory(dto: GetProductsByCategoryDto): Promise<BaseResponse<ProductDto[]>> {
+    //     try {
+    //         const query = buildQuery(dto);
+    //         const items = await Product.find(query)
+    //             .skip(dto.skipCount)
+    //             .limit(dto.maxResultCount);
+    //         const totalProducts = await Product.countDocuments(query);
+            
+    //         // RETRIEVE DISCOUNT FROM REDIS
+    //         const discountedList = await redis.getList('daily_discount');
+    //         for (let item in items) {
+    //             console.log('Item:', items[item]);
+    //             console.log('Item ID:', items[item]._id as string);
+    //             console.log('Discounted List:', discountedList.includes(items[item]._id as string));
+    //         }
+            
+    //         return BaseResponse.success(items.map((item) => ({
+    //             id: item._id as string,
+    //             storeId: item.storeId.toString(),
+    //             name: item.name,
+    //             description: item.description,
+    //             price: item.price,
+    //             priceAfterDiscount: (discountedList.includes((item._id as string).toString()) ?
+    //                 item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((item._id as string).toString())]) / 100 : undefined),
+    //             stock: item.stock,
+    //             category: item.category,
+    //             images: item.images,
+    //         })), totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
+    //     } catch (error) {
+    //         return BaseResponse.error(
+    //             (error as Error)?.message || 'Internal Server Error',
+    //             EHttpStatusCode.INTERNAL_SERVER_ERROR
+    //         );
+    //     }
+    // }
 
     public async addProduct(dto: AddProductDto): Promise<BaseResponse<ProductDto[] | unknown>> {
         try {

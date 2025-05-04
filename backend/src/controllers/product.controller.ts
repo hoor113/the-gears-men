@@ -94,23 +94,39 @@ export class ProductController {
         }
     }
 
-    @Get('/GetByCategory/:category')
-    @UseBefore(ValidationMiddleware(GetProductsByCategoryDto))
-    async getProductByCategory(
-        @QueryParams() dto: GetProductsByCategoryDto,
-        @Res() res: Response,
-    ) {
+    @Get('/GetDailyDiscount')
+    @UseBefore(ValidationMiddleware(GetProductsDto))
+    async getDailyDiscount(@Res() res: Response) {
         try {
-            const response = await this.productService.getProductsByCategory(dto);
+            const response = await this.productService.getDailyDiscount();
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({
                 success: false,
-                message: (error as any)?.message || 'Product Not Found',
+                message: (error as any)?.message || 'Internal Server Error',
                 statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
             });
         }
     }
+
+
+    // @Get('/GetByCategory/:category')
+    // @UseBefore(ValidationMiddleware(GetProductsByCategoryDto))
+    // async getProductByCategory(
+    //     @QueryParams() dto: GetProductsByCategoryDto,
+    //     @Res() res: Response,
+    // ) {
+    //     try {
+    //         const response = await this.productService.getProductsByCategory(dto);
+    //         return res.status(response.statusCode).json(response);
+    //     } catch (error) {
+    //         return res.status(500).json({
+    //             success: false,
+    //             message: (error as any)?.message || 'Product Not Found',
+    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+    //         });
+    //     }
+    // }
 
     @Put('/Update')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]), TokenDecoderMiddleware)

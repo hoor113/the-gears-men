@@ -20,7 +20,8 @@ export class DiscountCodeService {
         try {
             // Fetch all discount codes from the database
             const query = buildQuery(dto);
-            const discountCodes = await DiscountCodeCast.find(query).skip(dto.skipCount).limit(dto.maxResultCount).populate('discountCodeCastId', 'code type quantity discountCalculationMethod discountQuantity expiryDate');
+            const discountCodes = await DiscountCodeCast.find(query).skip(dto.skipCount).limit(dto.maxResultCount);
+                // .populate('discountCodeCastId', 'code type quantity discountCalculationMethod discountQuantity expiryDate');
 
             // Check if any discount codes were found
             if (!discountCodes || discountCodes.length === 0) {

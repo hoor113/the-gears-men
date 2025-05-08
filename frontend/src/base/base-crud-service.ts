@@ -62,19 +62,7 @@ export abstract class BaseCrudService {
     });
   
     return res.result;
-  }
-
-  public async getDailyDiscount<T>(
-    path = '/GetDailyDiscount',
-  ): Promise<{ data: T }> {
-    const res = await httpService.request<TBaseResponse<{ data: T }>>({
-      method: 'GET',
-      url: `${this.basePath}${path}`,
-    });
-  
-    return res.result;
-  }
-  
+  }  
 
   public async getAllInfinity<T>(
     params?: any,

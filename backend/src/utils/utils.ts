@@ -32,9 +32,17 @@ export function buildQuery<T extends BaseGetAllDto>(
         }));
     }
 
+    const excludedFields = new Set<string>();
+    extraCondition?.forEach((cond) => {
+        if (cond.valueField) excludedFields.add(cond.valueField);
+        if (cond.fromField) excludedFields.add(cond.fromField);
+        if (cond.toField) excludedFields.add(cond.toField);
+    });
+
     Object.entries(dto).forEach(([key, value]) => {
         if (
             !['keyword', 'skipCount', 'maxResultCount'].includes(key) &&
+            !excludedFields.has(key) &&
             value !== undefined
         ) {
             query[key] = value;
@@ -46,14 +54,23 @@ export function buildQuery<T extends BaseGetAllDto>(
 
         switch (type) {
             case EExtraConditionType.InRange: {
-                const from = condition.fromField ? (dto as Record<string, any>)[condition.fromField] : undefined;
-                const to = condition.toField ? (dto as Record<string, any>)[condition.toField] : undefined;
-                if (from !== undefined || to !== undefined) {
-                    query[field] = {
-                        ...(from !== undefined ? { $gte: from } : {}),
-                        ...(to !== undefined ? { $lte: to } : {}),
-                    };
-                }
+                const dtoRecord = dto as Record<string, any>;
+            
+                const fromValue = condition.fromField ? dtoRecord[condition.fromField] : undefined;
+                const toValue = condition.toField ? dtoRecord[condition.toField] : undefined;
+            
+                const hasFrom = fromValue !== undefined && fromValue !== null;
+                const hasTo = toValue !== undefined && toValue !== null;
+            
+                if (!hasFrom && !hasTo) break; // bỏ qua nếu không có cả hai
+            
+                const from = hasFrom ? fromValue : 0;
+                const to = hasTo ? toValue : Number.MAX_SAFE_INTEGER;
+                query[field] = {
+                    $gte: from,
+                    $lte: to,
+                };
+            
                 break;
             }
 
@@ -106,6 +123,6 @@ export function buildQuery<T extends BaseGetAllDto>(
             }
         }
     });
-
+    console.log('query', query);
     return query;
 }

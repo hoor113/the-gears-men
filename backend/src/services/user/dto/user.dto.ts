@@ -10,9 +10,12 @@ import {
     ValidatorConstraint,
     ValidatorConstraintInterface,
     Validate,
+    IsArray,
+    IsMongoId,
 } from 'class-validator';
 import 'reflect-metadata';
 import { BaseGetAllDto, BaseGetOneResult } from '@/common/base-get-all-dto';
+import mongoose from 'mongoose';
 
 @ValidatorConstraint({ name: 'isVehicleLicenseRequired', async: false })
 export class IsVehicleLicenseRequiredConstraint implements ValidatorConstraintInterface {
@@ -54,6 +57,11 @@ export class UserDto extends BaseGetOneResult<string> {
     @IsOptional()
     @IsString({ message: 'Avatar picture must be a valid URL string.' })
     avatarPicture?: string;
+
+    @IsOptional()
+    @IsArray({ message: 'Discount codes must be an array of MongoDB ObjectIds.' })
+    @IsMongoId({ each: true, message: 'Each discount code must be a valid MongoDB ObjectId.' })
+    discountCodes?: mongoose.Types.ObjectId[];
 
     @IsOptional()
     @IsString({ message: 'Vehicle license number must be a string.' })

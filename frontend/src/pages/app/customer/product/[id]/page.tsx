@@ -9,11 +9,11 @@ const SingleProductPage = () => {
         queryKey: ['products/getOne', id],
         queryFn: () => productsService.getOne(id as string),
         enabled: !!id,
-    });
+    }) as any;
 
     console.log('product', product);
 
-    if (!product) return <div>Đang tải sản phẩm...</div>;
+    // if (!product) return <div>Đang tải sản phẩm...</div>;
 
     return (
         <div className="flex flex-col lg:flex-row items-start gap-8 p-8">
@@ -21,8 +21,8 @@ const SingleProductPage = () => {
             <div className="flex flex-col items-center">
                 <div className="border-4 border-yellow-400 p-2 relative">
                     <img
-                        src={product.image || "/placeholder.png"} //thya product.image bằng lưu trong backend   
-                        alt={product.name} //thay product.name bằng tên sản phẩm trong backend
+                        src={product?.image || "/placeholder.png"} //thya product.image bằng lưu trong backend   
+                        alt={product?.name} //thay product.name bằng tên sản phẩm trong backend
                         className="w-80 h-60 object-contain"
                     />
                     <span className="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 text-sm font-bold rounded">
@@ -32,7 +32,7 @@ const SingleProductPage = () => {
 
                 {/* Hình ảnh nhỏ */}
                 <div className="flex gap-4 mt-4">
-                    {product.images?.map((img: string, index: number) => (
+                    {product?.images?.map((img: string, index: number) => (
                         <img
                             key={index}
                             src={img}
@@ -48,8 +48,8 @@ const SingleProductPage = () => {
                 <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
                 <p className="mb-2">
                     <span className="font-semibold">Tình trạng: </span>
-                    <span className={product.stock > 0 ? "text-green-600" : "text-red-600"}>
-                        {product.stock > 0 ? "Còn hàng" : "Hết hàng"}
+                    <span className={product?.stock > 0 ? "text-green-600" : "text-red-600"}>
+                        {product?.stock > 0 ? "Còn hàng" : "Hết hàng"}
                     </span>
                 </p>
 

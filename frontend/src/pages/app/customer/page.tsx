@@ -61,8 +61,11 @@ const CustomerPage = () => {
     return (
         <>
             <Container maxWidth={"lg"}>
-                {queryResults.map((item, index) => (
-                    <BlockProducts title={`Danh mục ${item?(item.data?(item.data.category):("")):("")}`} products={item?(item.data?(item.data.products):([])):([])}/>
+                {queryResults.map((item) => (
+                    <BlockProducts 
+                        title={`Danh mục ${item?.data?.category || ""}`} 
+                        products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []} 
+                    />
                 ))}
             </Container>
         </>

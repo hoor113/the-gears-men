@@ -123,6 +123,5 @@ export function buildQuery<T extends BaseGetAllDto>(
             }
         }
     });
-    console.log('query', query);
     return query;
 }

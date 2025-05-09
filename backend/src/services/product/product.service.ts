@@ -4,7 +4,7 @@ import Store from '@/models/store.model';
 import mongoose from 'mongoose';
 import { BaseResponse } from '@/common/base-response';
 import { EHttpStatusCode } from '@/utils/enum';
-import { 
+import {
     buildQuery,
     EExtraConditionType,
     IExtraCondition
@@ -27,7 +27,7 @@ import { DAILY_DISCOUNT_PERCENTAGE } from '@/constants/daily-discount-percentage
 @Service()
 export class ProductService {
     // Update price to range
-    public async getProducts(dto: GetProductsDto): Promise<BaseResponse<ProductDto[]>> {
+    public async getProducts(dto: GetProductsDto): Promise<BaseResponse<ProductDto[] | unknown>> {
         try {
             const searchableFields = ['name'];
             const extraCondition: IExtraCondition[] = [
@@ -49,25 +49,28 @@ export class ProductService {
                 .limit(dto.maxResultCount);
             const totalProducts = await Product.countDocuments(query);
             // RETRIEVE DISCOUNT FROM REDIS
-            const discountedList = await redis.getList('daily_discount');
-            console.log('Discounted List:', discountedList);
-            // for (let item in items) {
-            //     console.log('Item:', items[item]);
-            //     console.log('Item ID:', (items[item]._id as string).toString());
-            //     console.log('Discounted List:', discountedList.includes(items[item]._id as string));
-            // }
-            return BaseResponse.success(items.map((item) => ({
-                id: item._id as string,
-                storeId: item.storeId.toString(),
-                name: item.name,
-                description: item.description,
-                price: item.price,  
-                priceAfterDiscount: (discountedList.includes((item._id as string).toString()) ?
-                    item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((item._id as string).toString())]) / 100 : undefined),
-                stock: item.stock,
-                category: item.category,
-                images: item.images,
-            })), totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
+            const discountedList: string[] = await redis.getList('daily_discount') || [];
+
+            return BaseResponse.success(items.map((item) => {
+                const itemId = (item._id as string).toString();
+                const indexInDiscount = discountedList.indexOf(itemId);
+                const priceAfterDiscount =
+                    indexInDiscount !== -1 && DAILY_DISCOUNT_PERCENTAGE[indexInDiscount] !== undefined
+                        ? item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[indexInDiscount]) / 100
+                        : null;
+
+                return {
+                    id: itemId,
+                    storeId: item.storeId.toString(),
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    priceAfterDiscount,
+                    stock: item.stock,
+                    category: item.category,
+                    images: item.images,
+                };
+            }), totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
         }
         catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
@@ -77,23 +80,23 @@ export class ProductService {
     public async getProductById(id: string): Promise<BaseResponse<ProductDto | unknown>> {
         try {
             const product = await Product.findById(id);
-            
+
             // RETRIEVE DISCOUNT FROM REDIS
-            const discountedList = await redis.getList('daily_discount');
-            
+            const discountedList: string[] = await redis.getList('daily_discount') || [];
+
             const productWithDiscount = product ? {
                 id: product._id as string,
                 storeId: product.storeId.toString(),
                 name: product.name,
                 description: product.description,
                 price: product.price,
-                priceAfterDiscount: (discountedList.includes(product._id as string) ?
-                    product.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(product._id as string)]) / 100 : undefined),
+                priceAfterDiscount: discountedList.includes(product._id as string) ?
+                    product.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(product._id as string)]) / 100 : null,
                 stock: product.stock,
                 category: product.category,
                 images: product.images,
             } : null;
-            
+
             return BaseResponse.success(productWithDiscount, 1, 'Item retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error(
@@ -126,7 +129,7 @@ export class ProductService {
                 images: item.images,
             }));
 
-            return BaseResponse.success(productDtos, undefined, 'Items retrieved successfully', EHttpStatusCode.OK);
+            return BaseResponse.success(productDtos, productDtos.length, 'Items retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error(
                 (error as Error)?.message || 'Internal Server Error',
@@ -142,7 +145,7 @@ export class ProductService {
     //             .skip(dto.skipCount)
     //             .limit(dto.maxResultCount);
     //         const totalProducts = await Product.countDocuments(query);
-            
+
     //         // RETRIEVE DISCOUNT FROM REDIS
     //         const discountedList = await redis.getList('daily_discount');
     //         for (let item in items) {
@@ -150,7 +153,7 @@ export class ProductService {
     //             console.log('Item ID:', items[item]._id as string);
     //             console.log('Discounted List:', discountedList.includes(items[item]._id as string));
     //         }
-            
+
     //         return BaseResponse.success(items.map((item) => ({
     //             id: item._id as string,
     //             storeId: item.storeId.toString(),

@@ -78,7 +78,7 @@ export class DiscountCodeController {
         }
     }
 
-    @Get('/customer/')
+    @Get('/customer')
     @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
     async getDiscountCodeCustomer(@Req() req: Request, @Res() res: Response) {
         try {

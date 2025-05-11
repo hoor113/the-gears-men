@@ -56,6 +56,12 @@ export class DiscountCodeCastDto extends BaseDiscountCodeDto {
     quantity!: number;
 }
 
+export class GetDiscountCodeCustomerDto extends BaseGetAllDto {    
+    @IsBoolean({message: 'isUsed must be a boolean value.'})
+    @IsOptional()
+    isUsed?: boolean;
+}
+
 // DTO for creating a new discount code cast
 export class CreateDiscountCodeCastDto {
     @IsString({message: 'Code must be a string.'})

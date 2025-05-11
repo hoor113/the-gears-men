@@ -3,16 +3,18 @@ import DiscountCode from '@/models/discount-code.model';
 import DiscountCodeCast, { EDiscountCodeType, EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
 import { BaseResponse } from '@/common/base-response';
 import { EHttpStatusCode } from '@/utils/enum';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import {
     DiscountCodeDto,
     DiscountCodeCastDto,
+    GetDiscountCodeCustomerDto,
     CreateDiscountCodeCastDto,
 } from './dto/discount-code.dto';
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
-import { buildQuery } from '@/utils/utils';
+import { buildQuery, EExtraConditionType, IExtraCondition } from '@/utils/utils';
 import { StringEntityDto } from '@/common/entity-dto';
 import redis from '@/config/redis';
+import User from '@/models/user.model';
 
 @Service()
 export class DiscountCodeService {
@@ -84,31 +86,39 @@ export class DiscountCodeService {
         }
     }
 
-    public async getDiscountCodeCustomer(id: string): Promise<BaseResponse<DiscountCodeDto | any>> {
+    public async getDiscountCodeCustomer(customerId: string, dto: GetDiscountCodeCustomerDto): Promise<BaseResponse<DiscountCodeDto[] | any>> {
         try {
-            // Fetch the discount code by ID from the database
-            const discountCode = await DiscountCode.findById(id);
+            // Find customer by ID and populate the discountCodes field
+            const customer = await User.findOne({ _id: customerId })
+                .populate({
+                    path: 'discountCodes',
+                    select: '_id code customerId isUsed'
+                });
 
-            // Check if the discount code was found
-            if (!discountCode) {
+            if (!customer || !customer.discountCodes || customer.discountCodes.length === 0) {
                 return BaseResponse.error(
-                    `Discount code with ID ${id} not found`,
+                    'No discount codes found for this customer',
                     EHttpStatusCode.NOT_FOUND
                 );
             }
 
-            // Map the discount code to the response format
-            const responseData = {
+            // Map the populated discount codes to the response format
+            let discountCodes = customer.discountCodes.map((discountCode: any) => ({
                 id: discountCode._id,
                 code: discountCode.code,
                 customerId: discountCode.customerId,
                 isUsed: discountCode.isUsed,
-            };
+            }));
 
-            return BaseResponse.success(responseData);
+            // Filter the discount codes based on isUsed if provided in the DTO
+            if (dto.isUsed !== undefined) {
+                discountCodes = discountCodes.filter(code => code.isUsed === dto.isUsed);
+            }
+
+            return BaseResponse.success(discountCodes);
         } catch (error: any) {
             return BaseResponse.error(
-                error.message || 'Failed to fetch discount code',
+                error.message || 'Failed to fetch discount codes',
                 EHttpStatusCode.INTERNAL_SERVER_ERROR
             );
         }
@@ -229,8 +239,12 @@ export class DiscountCodeService {
                 isUsed: false
             });
 
+            const customer = await User.findById(customerId);
+            customer?.discountCodes?.push(discountCode._id as mongoose.Types.ObjectId);
+
             await discountCode.save();
             await discountCodeCast.save();
+            await customer?.save();
 
             redis.set(`discount-code-cooldown:${code.id}`, customerId.toString(), 60 * 60 * 36); // Set expiration to 36 hours
 

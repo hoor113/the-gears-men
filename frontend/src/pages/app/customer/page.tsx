@@ -74,19 +74,23 @@ const CustomerPage = () => {
   });
 
   console.log(discountedProducts);
-  
-
 
   return (
     <>
       <Container maxWidth={"lg"}>
-        <BlockProducts key={"index"} title={`Giá sốc hôm nay`} products={discountedProducts||[]} />
-        {queryResults.map((item, index) => (
-          <BlockProducts key={index} title={`Danh mục ${item ? (item.data ? (item.data.category) : ("")) : ("")}`} products={item ? (item.data ? (item.data.products) : ([])) : ([])} />
+        <BlockProducts path="sale" key={"index"} title={`Giá sốc hôm nay`} products={Array.isArray(discountedProducts) ? discountedProducts as Product[] : []} />
+        {queryResults.map((item, idx) => (
+          <BlockProducts
+            path={categories[idx].key}
+            title={`Danh mục ${item?.data?.category || ""}`}
+            products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []}
+          />
         ))}
+        
       </Container>
     </>
   );
+
 };
 
 export default CustomerPage;

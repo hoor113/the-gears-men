@@ -32,6 +32,8 @@ import './custom-top-nav.scss';
 import { RemoveCircle } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
+import { categoriesObject } from '../_services/product.model';
+
 const AvatarStyled = styled(Avatar)(({ theme }) => ({
     border: `1px solid ${alpha(theme.palette.primary.main, 0.6)}`,
     flexShrink: 0,
@@ -43,21 +45,6 @@ const AvatarStyled = styled(Avatar)(({ theme }) => ({
     },
 }));
 
-const categoriesObject = [
-    { key: 'phone', title: 'Điện thoại' },
-    { key: 'laptop', title: 'Laptop' },
-    { key: 'pc', title: 'PC' },
-    { key: 'tablet', title: 'Máy tính bảng' },
-    { key: 'accessories', title: 'Phụ kiện' },
-    { key: 'wearable', title: 'Thiết bị đeo' },
-    { key: 'tv', title: 'TV' },
-    { key: 'audio', title: 'Âm thanh' },
-    { key: 'camera', title: 'Máy ảnh' },
-    { key: 'smartHome', title: 'Nhà thông minh' },
-    { key: 'homeAppliance', title: 'Đồ gia dụng' },
-    { key: 'gaming', title: 'Gaming' },
-    { key: 'others', title: 'Khác' }
-];
 
 export default function CustomerTopNav() {
     const navigate = useNavigate();
@@ -132,7 +119,7 @@ export default function CustomerTopNav() {
                 <IconButton onClick={toggleDrawer(true)} sx={{ color: 'white' }}>
                     <MenuIcon />
                 </IconButton>
-                
+
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded-sm" />
                 <span className="font-bold text-base md:text-lg">
                     <span className="text-yellow-400 top-nav-group-name">The Gears Men</span>

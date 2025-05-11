@@ -11,13 +11,15 @@ import {
     QueryParams,
     Res,
     UseBefore,
-    Req
+    Req,
+    Param
 } from 'routing-controllers';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     GetAllDiscountCodesDto,
     CreateDiscountCodeCastDto,
+    GetDiscountCodeCustomerDto,
 } from '@/services/discount-code/dto/discount-code.dto';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
 import { EHttpStatusCode } from '@/utils/enum';
@@ -79,11 +81,16 @@ export class DiscountCodeController {
     }
 
     @Get('/customer/')
+    @UseBefore(ValidationMiddleware(GetDiscountCodeCustomerDto))
     @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
-    async getDiscountCodeCustomer(@Req() req: Request, @Res() res: Response) {
+    async getDiscountCodeCustomer(
+        @Req() req: Request, 
+        @QueryParams() dto: GetDiscountCodeCustomerDto, 
+        @Res() res: Response
+    ) {
         try {
             const customerId = (req as any).userId;
-            const response = await this.discountCodeService.getDiscountCodeCustomer(customerId);
+            const response = await this.discountCodeService.getDiscountCodeCustomer(customerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

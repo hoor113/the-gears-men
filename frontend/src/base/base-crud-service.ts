@@ -62,8 +62,7 @@ export abstract class BaseCrudService {
     });
   
     return res.result;
-  }
-  
+  }  
 
   public async getAllInfinity<T>(
     params?: any,

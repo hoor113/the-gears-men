@@ -69,6 +69,7 @@ export class UserService {
                 addresses: newUser.addresses,
                 avatarPicture: newUser.avatarPicture,
                 vehicleLicenseNumber: newUser.vehicleLicenseNumber,
+                discountCodes: (newUser.role === EUserRole.Customer)? [] : undefined,
                 createdAt: newUser.createdAt,
                 updatedAt: newUser.updatedAt,
             };

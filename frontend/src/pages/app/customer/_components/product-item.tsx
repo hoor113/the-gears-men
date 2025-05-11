@@ -5,15 +5,24 @@ import { Product } from '../_services/product.model';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { IconButton, Typography, Box } from '@mui/material';
+import { useCart } from '../cart/context/cart.context';
 
 type ProductProps = {
     product: Product;
 };
 
 const ProductItem: React.FC<ProductProps> = ({ product }) => {
-
+    const [_, cartDispatch] = useCart();
     const handleAddToCart = () => {
-        NiceModal.show(ProductModal, { product });
+        NiceModal.show(ProductModal, { 
+            product: product ,
+            addToCart: (product: Product, quantity: number) => {
+                cartDispatch({
+                    type: 'ADD_ITEM',
+                    payload: { ...product, quantity },
+                });
+            },
+        });
     };
 
     const mainImage =

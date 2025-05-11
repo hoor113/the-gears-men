@@ -20,6 +20,7 @@ import LoginPage from '@/pages/auth/login.page';
 import RegisterPage from '@/pages/auth/register.page';
 import NotFoundPage from '@/pages/not-found.page';
 import SingleProductPage from '@/pages/app/customer/product/[id]/page';
+import CartPage from '@/pages/app/customer/cart/page';
 
 export const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
             path: 'product/:id',
             element: <SingleProductPage />,
           },
+          {
+            path: 'cart',
+            element: <CartPage />,
+          }
         ],
       },
       {

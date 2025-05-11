@@ -16,9 +16,10 @@ import 'swiper/css';
 
 type ProductModalProps = {
   product: Product;
+  addToCart: (product: Product, quantity: number) => void;
 };
 
-const ProductModal = NiceModal.create(({ product }: ProductModalProps) => {
+const ProductModal = NiceModal.create(({ product, addToCart }: ProductModalProps) => {
   const modal = useModal();
   const hasImages = product.images?.length > 0;
   const [selectedImage, setSelectedImage] = useState<string>(
@@ -27,8 +28,8 @@ const ProductModal = NiceModal.create(({ product }: ProductModalProps) => {
   const [quantity, setQuantity] = useState<number>(1);
 
   const handleAddToCart = () => {
-    console.log('Product ID:', product.id);
-    console.log('Quantity:', quantity);
+    addToCart(product, quantity);
+    modal.hide();
   };
 
   return (

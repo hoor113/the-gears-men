@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { AbpContext } from '@/services/abp/abp.context';
-import React, { useContext, useState } from 'react';
+import { useState } from 'react';
 import voucherService from './_services/voucher.service';
 import { Container } from '@mui/material';
 import Item from './_components/item';
@@ -11,7 +10,6 @@ const tabs = [
 ];
 
 const VoucherPage = () => {
-  const [abpState] = useContext(AbpContext);
   const [activeTab, setActiveTab] = useState('all');
 
   // let id = '';
@@ -23,13 +21,13 @@ const VoucherPage = () => {
     queryKey: ['discount-codes', 'GetAll'],
     queryFn: () => voucherService.getAll(),
     enabled: activeTab === 'all', 
-  });
+  }) as any;
 
   const { data: myVouchers } = useQuery({
     queryKey: ['discount-codes', 'customer'],
     queryFn: () => voucherService.getDiscountCodesOfCustomer(),
     enabled: activeTab === 'mine',
-  });
+  }) as any;
 
   // console.log(myVouchers);
   // console.log(allVouchers);
@@ -61,7 +59,7 @@ const VoucherPage = () => {
         {activeTab === 'all' && (
           <div>
             <h2 className="text-3xl font-extrabold mb-4 text-gray-800">Tất cả Voucher</h2>
-            {allVouchers?.map(item => (
+            {allVouchers?.items?.map((item: any) => (
               <Item isMyVoucher={true} voucherCode={item.code} key={item.id}/>
             ))}
           </div>
@@ -69,7 +67,7 @@ const VoucherPage = () => {
         {activeTab === 'mine' && (
           <div>
             <h2 className="text-3xl font-extrabold mb-4 text-gray-800">Voucher của tôi</h2>
-            {myVouchers?.map(item => (
+            {myVouchers?.items?.map((item: any) => (
               <Item isMyVoucher={true} voucherCode={item.code} key={item.id}/>
             ))}
           </div>

@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface ItemProps {
   isMyVoucher?: boolean;
   voucherCode?: string;

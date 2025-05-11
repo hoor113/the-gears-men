@@ -33,4 +33,22 @@
             padding: 20px 0;
         }
     }
+
+    .view-all {
+        text-align: center;
+        button {
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 6px;
+            color: rgb(219, 88, 12);    
+            background-color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover{
+            color: #fff;    
+            background-color: rgb(219, 88, 12);
+        }
+    }
 }

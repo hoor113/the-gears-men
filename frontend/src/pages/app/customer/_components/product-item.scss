@@ -86,6 +86,25 @@
     }
 
 
-    
+    .content-discount {
+        width: 100%;
+        padding: 30px 15px;
+        .name{
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .price {
+            font-weight: 500;
+            color: red;
+            text-decoration: line-through;
+        }
+
+        .discount-price {
+            font-weight: 700;
+            font-size: 23px;
+            color: red;
+        }
+    }
 
 }

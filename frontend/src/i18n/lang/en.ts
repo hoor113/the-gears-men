@@ -368,6 +368,7 @@ export const en = {
   'Danh sách sản phẩm': 'Order Items',
   'Danh sách voucher': 'Order Vouchers',
   'Tên sản phẩm': "Item's Name",
+  'Lịch sử đơn hàng': 'Order History',
   Giảm: 'Discount',
   'Giảm tối đa': 'Max Discount',
   'Đơn tối thiểu': 'Min Order',
@@ -477,4 +478,6 @@ export const en = {
   'Nhập lại mật khẩu mới': 'Re-enter password',
   'Tên người dùng': 'Username',
   'Đăng ký': 'Register Account',
+  'Đã giao hang': 'Delivered',
+  'Bạn chưa có đơn hang nào': 'You have no orders',
 };

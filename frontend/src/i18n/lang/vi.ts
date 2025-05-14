@@ -1326,6 +1326,7 @@ export const initial = {
   'Danh sách sản phẩm': '',
   'Danh sách voucher': '',
   'Tên sản phẩm': '',
+  'Lịch sử đơn hàng': '',
   Giảm: '',
   'Giảm tối đa': '',
   'Đơn tối thiểu': '',
@@ -1430,6 +1431,8 @@ export const initial = {
   'Tổng số sách mượn trả': '',
   'Thống kê yêu cầu': '',
   'Đã có tài khoản': '',
+  'Đã giao hàng': '',
+  'Bạn chưa có đơn hàng nào': '',
 };
 
 type TObj = typeof initial;

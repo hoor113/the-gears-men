@@ -228,4 +228,13 @@ export class OrderService {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public async getAllOrderByCustomer(customerId: string): Promise<BaseResponse<OrderDto[] | unknown>> {
+        try {
+            const orders = await Order.find({ customerId }).populate('items.shipmentId');
+            return BaseResponse.success(orders, undefined, 'Orders retrieved successfully', EHttpStatusCode.OK);
+        } catch (error) {
+            return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

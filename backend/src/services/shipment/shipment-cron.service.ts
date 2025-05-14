@@ -52,6 +52,12 @@ export class CronShipmentService {
                     deliveryPersonnel: shipment.deliveryPersonnel
                 });
                 console.log(`Created shipment for order item ${item._id} in order ${orderId}`);
+
+                let orderItem = order.items.find((i) => i._id.toString() === item._id.toString());
+                if (orderItem) {
+                    orderItem.shipmentId = shipment._id as mongoose.Types.ObjectId;
+                    await order.save();
+                }
             }
 
             console.log(`Successfully created ${order.items.length} shipments for order ${orderId}`);

@@ -86,4 +86,22 @@ export class OrderController {
             });
         }
     }
+
+    @Get('/history')
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
+    // @UseBefore(ValidationMiddleware(GetOrderHistoryDto))
+    async getAllOrderByCustomer(
+        @Req() req: Request, @Res() res: Response) {
+        try {
+            const customerId = (req as any).userId;
+            const response = await this.orderService.getAllOrderByCustomer(customerId);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Internal Server Error',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
 }

@@ -12,6 +12,7 @@ export enum EPaymentMethod {
 
 export interface IOrderItem {
     _id: mongoose.Types.ObjectId;
+    shipmentId?: mongoose.Types.ObjectId;
     productId: mongoose.Types.ObjectId;
     quantity: number;
     shippingDiscountCode?: mongoose.Types.ObjectId;
@@ -42,6 +43,10 @@ const Order = new Schema<IOrder>(
                 _id: { 
                     type: Schema.Types.ObjectId, 
                     default: () => new mongoose.Types.ObjectId() 
+                },
+                shipmentId: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'Shipment',
                 },
                 productId: {
                     type: Schema.Types.ObjectId,

@@ -1,4 +1,4 @@
-import { DELIVERY_VAT } from '@/constants/delivery-vat'
+import { DELIVERY_VAT } from '@/constants/delivery-vat';
 import Order, { EOrderStatus } from '@/models/order.model';
 import Product from '@/models/product.model';
 import mongoose from 'mongoose';

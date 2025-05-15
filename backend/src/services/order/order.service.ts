@@ -9,7 +9,8 @@ import {
     CreateOrderDto,
     CancelOrderDto,
     OrderDto,
-    OrderItemDto
+    OrderItemDto,
+    GetAllOrderByCustomerDto
 } from '@/services/order/dto/order.dto';
 import { OrderCronService } from '@/services/order/order-cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
@@ -229,9 +230,16 @@ export class OrderService {
         }
     }
 
-    public async getAllOrderByCustomer(customerId: string): Promise<BaseResponse<OrderDto[] | unknown>> {
+    public async getAllOrderByCustomer(customerId: string, dto: GetAllOrderByCustomerDto): Promise<BaseResponse<OrderDto[] | unknown>> {
         try {
-            const orders = await Order.find({ customerId }).populate('items.shipmentId');
+            const orders = await Order.find({ customerId })
+                .populate('items.shipmentId')
+                .populate('items.productId')
+                .populate('items.productDiscountCode')
+                .populate('items.shippingDiscountCode')
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount)
+                .sort({ createdAt: -1 });
             return BaseResponse.success(orders, undefined, 'Orders retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);

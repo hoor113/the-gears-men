@@ -10,48 +10,28 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import useTranslation from '@/hooks/use-translation';
-import orderHistoryService, { IOrderHistoryItem } from './_services/history.services';
-import OrderItem from './_components/item';
-import { useNavigate } from 'react-router-dom';
-import { EOrderStatus } from '@/services/order/order.model';
+import orderHistoryService from './_services/history.services';
+import OrderItem from './_components/order-item';
 
 export default function OrderHistoryPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(5);
 
   // Query for order history
   const { data, isLoading } = useQuery({
     queryKey: ['orders/history', page],
-    queryFn: () => {
-      // For demo purposes, use mock data
-      // In production, uncomment this line:
-      // return orderHistoryService.getOrderHistory(page, rowsPerPage);
-      
-      // Mock data for example
-      return Promise.resolve({
-        items: [
-          { id: '1', date: '2023-05-08T10:30:00', status: EOrderStatus.Confirmed, total: 250000, items: 3 },
-          { id: '2', date: '2023-05-01T15:20:00', status: EOrderStatus.Confirmed, total: 175000, items: 1 },
-          { id: '3', date: '2023-04-23T09:15:00', status: EOrderStatus.Confirmed, total: 320000, items: 2 },
-          { id: '4', date: '2023-04-15T14:45:00', status: EOrderStatus.Confirmed, total: 430000, items: 4 },
-          { id: '5', date: '2023-03-28T11:10:00', status: EOrderStatus.Confirmed, total: 195000, items: 2 },
-        ],
-        totalPages: 3,
-        totalItems: 25,
-        currentPage: page,
-        pageSize: rowsPerPage
-      });
-    },
+    queryFn: async () => {
+      try {
+        return orderHistoryService.getOrderHistory(page, rowsPerPage);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    }
   });
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
-  };
-
-  const handleOrderClick = (orderId: string) => {
-    navigate(`/customer/order-history/${orderId}`);
   };
 
   return (
@@ -69,21 +49,20 @@ export default function OrderHistoryPage() {
         ) : data?.items && data.items.length > 0 ? (
           <>
             <Box>
-              {data.items.map((order: IOrderHistoryItem) => (
-                <OrderItem 
+              {data.items.map((order) => (
+                <OrderItem
                   key={order.id}
                   order={order}
-                  onClick={() => handleOrderClick(order.id)}
                 />
               ))}
             </Box>
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <Pagination 
-                count={data.totalPages || 1} 
-                page={page} 
-                onChange={handleChangePage} 
-                color="primary" 
+              <Pagination
+                count={data.totalPages || 1}
+                page={page + 1}
+                onChange={handleChangePage}
+                color="primary"
               />
             </Box>
           </>

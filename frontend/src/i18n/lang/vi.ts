@@ -1433,6 +1433,20 @@ export const initial = {
   'Đã có tài khoản': '',
   'Đã giao hàng': '',
   'Bạn chưa có đơn hàng nào': '',
+  'Mã giảm giá sản phẩm': '',
+  'Mã giảm giá vận chuyển': '',
+  'Chi tiết vận chuyển': '',
+  'Đang chờ': '',
+  'Đang vận chuyển': '',
+  'Mã vận chuyển': '',
+  'Không có hình ảnh': '',
+  'Ngày giao hàng dự kiến': '',
+  'Ngày giao hàng': '',
+  'Trạng thái vận chuyển': '',
+  'Đơn hàng này đã bị hủy.': '',
+  'Giao hàng thất bại': '',
+  'Đang giao': '',
+  'Đã giao': '',
 };
 
 type TObj = typeof initial;

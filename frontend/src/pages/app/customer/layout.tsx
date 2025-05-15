@@ -6,6 +6,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
 import { EUserRole } from '@/services/auth/auth.model';
 import CustomerTopNav from './_components/customer-top-nav';
+import CartProvider from './cart/context/cart.context';
 
 const StyledWrapper = styled(Box)({
   display: 'flex',
@@ -16,7 +17,6 @@ const StyledWrapper = styled(Box)({
 const CustomerLayout = () => {
   const navigate = useNavigate();
   const authQuery = useAuth();
-
   useEffect(() => {
     if (authQuery.isSuccess && authQuery.data?.role !== EUserRole.Customer) {
       navigate(`/`);
@@ -24,10 +24,12 @@ const CustomerLayout = () => {
   }, [authQuery.isSuccess, authQuery.data, navigate]);
 
   return authQuery.isSuccess ? (
-    <StyledWrapper>
-      <CustomerTopNav />
-      <Outlet />
-    </StyledWrapper>
+    <CartProvider>
+      <StyledWrapper>
+        <CustomerTopNav />
+        <Outlet />
+      </StyledWrapper>
+    </CartProvider>
   ) : (
     <></>
   );

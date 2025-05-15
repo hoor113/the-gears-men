@@ -1,5 +1,6 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // Thêm icon voucher
 import {
   Divider,
   MenuItem,
@@ -76,6 +77,21 @@ const AccountPopover = (props: TAccountPopover) => {
           <AccountCircleIcon />
         </MenuItemStyled>
         <Divider />
+        
+        {/* Thêm mục Voucher */}
+        <MenuItemStyled 
+          onClick={() => {
+            onClose?.();
+            navigate('/customer/vouchers');
+          }}
+          className="item-voucher"
+        >
+          <span>{t('Danh sách voucher')}</span>
+          <LocalOfferIcon fontSize="small" />
+        </MenuItemStyled>
+        
+        <Divider />
+        
         <MenuItemStyled onClick={() => handleLogout()} className="item-logout">
           <span>{t('Đăng xuất')}</span>
           <LogoutIcon fontSize="small" />
@@ -96,7 +112,9 @@ const MenuItemStyled = styled(MenuItem)`
 
   position: relative;
   width: 100%;
-  &.item-logout > svg {
+  
+  &.item-logout > svg,
+  &.item-voucher > svg {
     position: absolute;
     right: 6px;
     top: 50%;

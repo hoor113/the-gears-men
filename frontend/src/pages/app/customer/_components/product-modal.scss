@@ -52,6 +52,18 @@
                     padding: 15px;
                 }
 
+                .price.dc {
+                    text-decoration: line-through;
+                }
+
+                .discounted-price {
+                    font-size: 28px;
+                    color: red;
+                    font-weight: 700;
+                    background-color: #F1F1F1;
+                    padding: 15px;
+                }
+
                 .quantity {
                     margin-top: 30px;
                     input {

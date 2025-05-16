@@ -1,217 +1,176 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  Chip,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+import { useState } from 'react';
+import { 
+  Box, 
+  Card, 
+  CardContent, 
+  Typography, 
+  Chip, 
   Grid,
-  Divider,
-  Card,
-  CardContent,
-  CardMedia,
-  useTheme
+  styled,
+  Collapse,
+  Button,
+  Divider
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { IOrderHistoryItem } from '../_services/history.service';
-import { EOrderStatus } from '@/services/order/order.model';
-import { EShipmentStatus } from '@/services/shipment/shipment.model';
 import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { EOrderStatus } from '@/services/order/order.model';
 import useTranslation from '@/hooks/use-translation';
+import ShipmentBox from './shipment-box';
+import { EShipmentStatus } from '@/services/shipment/shipment.model';
 
-// Helper function to get order status color and label
-function getOrderStatusInfo(status: EOrderStatus) {
-  const statusMap = {
-    [EOrderStatus.Pending]: { color: 'warning', label: 'Đang xử lý' },
-    [EOrderStatus.Confirmed]: { color: 'success', label: 'Đã xác nhận' },
-    [EOrderStatus.Cancelled]: { color: 'error', label: 'Đã hủy' },
+interface ShipmentItem {
+  id: string;
+  status: EShipmentStatus;
+  estimatedDelivery: string;
+  deliveryDate?: string;
+  product: {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    imageUrl?: string;
   };
-  return statusMap[status] || { color: 'default', label: 'Không xác định' };
-}
-
-// Helper function to get shipment status color and label
-function getShipmentStatusInfo(status: EShipmentStatus) {
-  const statusMap = {
-    [EShipmentStatus.Pending]: { color: 'warning', label: 'Đang xử lý' },
-    [EShipmentStatus.Confirmed]: { color: 'info', label: 'Đã xác nhận' },
-    [EShipmentStatus.Stored]: { color: 'secondary', label: 'Đã lưu kho' },
-    [EShipmentStatus.Delivering]: { color: 'primary', label: 'Đang giao hàng' },
-    [EShipmentStatus.Delivered]: { color: 'success', label: 'Đã giao hàng' },
-    [EShipmentStatus.Failed]: { color: 'error', label: 'Giao hàng thất bại' },
-    [EShipmentStatus.Returned]: { color: 'warning', label: 'Đã trả lại' },
-  };
-  return statusMap[status] || { color: 'default', label: 'Không xác định' };
+  productDiscountCode?: string;
+  shippingDiscountCode?: string;
+  shippingPrice: number;
 }
 
 interface OrderItemProps {
-  order: IOrderHistoryItem;
+  order: {
+    id: string;
+    date: string;
+    status: EOrderStatus;
+    total: number;
+    shipments: ShipmentItem[];
+  };
 }
 
-const OrderItem = ({ order }: OrderItemProps) => {
-  const theme = useTheme();
+const StatusChip = styled(Chip)(({ theme, color }) => ({
+  fontWeight: 600,
+  ...(color === 'success' && {
+    color: theme.palette.success.dark,
+    backgroundColor: theme.palette.success.light,
+  }),
+  ...(color === 'warning' && {
+    color: theme.palette.warning.dark,
+    backgroundColor: theme.palette.warning.light,
+  }),
+  ...(color === 'error' && {
+    color: theme.palette.error.dark,
+    backgroundColor: theme.palette.error.light,
+  }),
+}));
+
+export default function OrderItem({ order }: OrderItemProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const orderStatusInfo = getOrderStatusInfo(order.status);
-
-  const handleChangeExpanded = () => {
-    setExpanded(!expanded);
+  
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND' 
+    }).format(amount);
   };
 
-  const formattedDate = format(new Date(order.date), 'dd/MM/yyyy HH:mm');
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'PPp', { locale: vi });
+  };
+
+  const getStatusInfo = (status: EOrderStatus) => {
+    switch(status) {
+      case EOrderStatus.Pending:
+        return { label: t('Đang xử lý'), color: 'warning' };
+      case EOrderStatus.Confirmed:
+        return { label: t('Đã xác nhận'), color: 'success' };
+      case EOrderStatus.Cancelled:
+        return { label: t('Đã hủy'), color: 'error' };
+      default:
+        return { label: status, color: 'default' };
+    }
+  };
+
+  const statusInfo = getStatusInfo(order.status);
 
   return (
-    <Paper
-      elevation={2}
-      sx={{
-        mb: 3,
-        overflow: 'hidden',
-        border: `1px solid ${theme.palette.divider}`
+    <Card 
+      sx={{ 
+        mb: 2,
+        '&:hover': { boxShadow: 3 } 
       }}
     >
-      <Accordion expanded={expanded} onChange={handleChangeExpanded}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          sx={{
-            p: 2,
-            backgroundColor: theme.palette.background.default,
-          }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={4}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {t('Đơn hàng')} #{order.id.substring(0, 8)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {formattedDate}
-              </Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2">
-                {t('Số lượng')}: {order.items} {order.items > 1 ? t('sản phẩm') : t('sản phẩm')}
-              </Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="subtitle1" fontWeight="bold" color="primary">
-                {order.total.toLocaleString('vi-VN')}₫
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Chip
-                label={t(orderStatusInfo.label)}
-                color={orderStatusInfo.color as any}
-                size="small"
-                sx={{ fontWeight: 'medium' }}
-              />
-            </Grid>
-          </Grid>
-        </AccordionSummary>
-
-        <AccordionDetails sx={{ p: 0 }}>
-          <Divider />
-          <Box sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              {t('Chi tiết đơn hàng')}
+      <CardContent sx={{ pb: 1 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <Typography variant="subtitle2" color="text.secondary">
+              {t('Mã đơn hàng')}
             </Typography>
-
-            {order.shipments.map((shipment, index) => {
-              const shipmentStatusInfo = getShipmentStatusInfo(shipment.status);
-              const estimatedDelivery = format(new Date(shipment.estimatedDelivery), 'dd/MM/yyyy');
-              const deliveryDate = shipment.deliveryDate 
-                ? format(new Date(shipment.deliveryDate), 'dd/MM/yyyy')
-                : null;
-              
-              return (
-                <Card 
-                  key={shipment.id}
-                  variant="outlined"
-                  sx={{ mb: 2, borderRadius: 2 }}
-                >
-                  <CardContent sx={{ p: 2 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={2}>
-                        <CardMedia
-                          component="img"
-                          image={shipment.product.imageUrl || '/assets/images/no-image.png'}
-                          alt={shipment.product.name}
-                          sx={{ 
-                            height: 100, 
-                            objectFit: 'contain',
-                            backgroundColor: 'background.paper',
-                            borderRadius: 1
-                          }}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle1" fontWeight="medium">
-                          {shipment.product.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                          {t('Số lượng')}: {shipment.product.quantity}
-                        </Typography>
-                        {shipment.productDiscountCode && (
-                          <Typography variant="body2" color="text.secondary">
-                            {t('Mã giảm giá sản phẩm')}: {shipment.productDiscountCode}
-                          </Typography>
-                        )}
-                        {shipment.shippingDiscountCode && (
-                          <Typography variant="body2" color="text.secondary">
-                            {t('Mã giảm giá vận chuyển')}: {shipment.shippingDiscountCode}
-                          </Typography>
-                        )}
-                      </Grid>
-
-                      <Grid item xs={12} sm={4}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                          <Chip
-                            label={t(shipmentStatusInfo.label)}
-                            color={shipmentStatusInfo.color as any}
-                            size="small"
-                            sx={{ mb: 1, fontWeight: 'medium' }}
-                          />
-                          
-                          <Typography variant="body2" align="right" sx={{ mt: 1 }}>
-                            {t('Giá sản phẩm')}: <strong>{shipment.product.price.toLocaleString('vi-VN')}₫</strong>
-                          </Typography>
-                          
-                          <Typography variant="body2" align="right">
-                            {t('Phí vận chuyển')}: <strong>{shipment.shippingPrice.toLocaleString('vi-VN')}₫</strong>
-                          </Typography>
-                          
-                          <Typography variant="subtitle1" align="right" color="primary" fontWeight="bold" sx={{ mt: 1 }}>
-                            {((shipment.product.price * shipment.product.quantity) + shipment.shippingPrice).toLocaleString('vi-VN')}₫
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    </Grid>
-
-                    <Divider sx={{ my: 2 }} />
-                    
-                    <Grid container spacing={1}>
-                      <Grid item xs={12} sm={6}>
-                        <Typography variant="body2">
-                          {t('Dự kiến giao hàng')}: <strong>{estimatedDelivery}</strong>
-                        </Typography>
-                      </Grid>
-                      {deliveryDate && (
-                        <Grid item xs={12} sm={6}>
-                          <Typography variant="body2" align="right">
-                            {t('Ngày giao hàng')}: <strong>{deliveryDate}</strong>
-                          </Typography>
-                        </Grid>
-                      )}
-                    </Grid>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </Box>
-        </AccordionDetails>
-      </Accordion>
-    </Paper>
+            <Typography variant="body1" fontWeight={500}>
+              #{order.id}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Typography variant="subtitle2" color="text.secondary">
+              {t('Ngày đặt')}
+            </Typography>
+            <Typography variant="body1">
+              {formatDate(order.date)}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Box display="flex" justifyContent="flex-end" alignItems="center">
+              <Box mr={2}>
+                <Typography variant="subtitle2" color="text.secondary" align="right">
+                  {t('Tổng tiền')}
+                </Typography>
+                <Typography variant="body1" fontWeight={600} color="primary.main">
+                  {formatCurrency(order.total)}
+                </Typography>
+              </Box>
+              <StatusChip 
+                label={statusInfo.label}
+                color={statusInfo.color as any}
+                size="small"
+              />
+            </Box>
+          </Grid>
+        </Grid>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+          <Button 
+            onClick={() => setExpanded(!expanded)}
+            startIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            size="small"
+            color="primary"
+          >
+            {expanded ? t('Thu gọn') : t('Xem chi tiết')}
+          </Button>
+        </Box>
+      </CardContent>
+      
+      <Collapse in={expanded}>
+        <Divider />
+        <Box sx={{ px: 2, pb: 2, pt: 1 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            {t('Chi tiết vận chuyển')} ({order.shipments.length})
+          </Typography>
+          
+          {order.shipments.map((shipment) => (
+            <ShipmentBox
+              key={shipment.id}
+              shipmentId={shipment.id}
+              productInfo={shipment.product}
+              shipmentStatus={shipment.status}
+              estimatedDelivery={shipment.estimatedDelivery}
+              deliveryDate={shipment.deliveryDate}
+              productDiscountCode={shipment.productDiscountCode}
+              shippingDiscountCode={shipment.shippingDiscountCode}
+              shippingPrice={shipment.shippingPrice}
+            />
+          ))}
+        </Box>
+      </Collapse>
+    </Card>
   );
-};
-
-export default OrderItem;
+}

@@ -1,11 +1,12 @@
-import React from 'react';
 import { Box, Typography, Paper, styled } from '@mui/material';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import useTranslation from '@/hooks/use-translation';
+import { EDiscountCodeType } from '@/services/discount-code/discount-code.model';
+
 
 interface DiscountBadgeProps {
   discountCode: string;
-  type: 'product' | 'shipping';
+  type: EDiscountCodeType.ProductDiscount | EDiscountCodeType.ShippingDiscount;
 }
 
 const DiscountContainer = styled(Paper)(({ theme }) => ({

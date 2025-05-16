@@ -1447,6 +1447,7 @@ export const initial = {
   'Giao hàng thất bại': '',
   'Đang giao': '',
   'Đã giao': '',
+  'Dự kiến giao hàng': '',
 };
 
 type TObj = typeof initial;

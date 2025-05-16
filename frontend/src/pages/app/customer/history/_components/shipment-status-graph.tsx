@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Typography, styled, Chip } from '@mui/material';
 import { EShipmentStatus } from '@/services/shipment/shipment.model';
 import useTranslation from '@/hooks/use-translation';
@@ -13,9 +12,10 @@ const StatusContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   width: '100%',
-  maxWidth: '500px', // Make it narrower
+  maxWidth: '450px', // Make it narrower
+  margin: '0 auto', // Center it
   marginTop: theme.spacing(2),
-  marginBottom: theme.spacing(1),
+  marginBottom: theme.spacing(2),
   position: 'relative',
 }));
 
@@ -24,8 +24,8 @@ const StatusNode = styled(Box)<{
   completed: boolean;
   failed: boolean;
 }>(({ theme, active, completed, failed }) => ({
-  width: 16, // Smaller nodes
-  height: 16, // Smaller nodes
+  width: 20, // Smaller nodes
+  height: 20, // Smaller nodes
   borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
@@ -52,7 +52,8 @@ const StatusLine = styled(Box)<{
   failed: boolean;
 }>(({ theme, completed, failed }) => ({
   height: 2,
-  flexGrow: 1,
+  width: '100%', // Use fixed width to make it narrower
+  maxWidth: '120px', // Limit width between nodes
   backgroundColor: failed
     ? theme.palette.error.main
     : completed
@@ -69,7 +70,7 @@ const StatusLabel = styled(Typography)(({ theme }) => ({
   left: '50%',
   transform: 'translateX(-50%)',
   whiteSpace: 'nowrap',
-  width: '80px', // Fixed width
+  width: '70px', // Fixed width for labels
   textAlign: 'center',
 }));
 

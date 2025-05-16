@@ -490,4 +490,5 @@ export const en = {
   'Ngày giao hàng dự kiến': 'Estimated delivery date',
   'Ngày giao hàng': 'Delivery date',
   'Trạng thái vận chuyển': 'Shipment status',
+  'Dự kiên giao hàng': 'Estimated delivery',
 };

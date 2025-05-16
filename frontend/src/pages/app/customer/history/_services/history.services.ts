@@ -121,14 +121,17 @@ class OrderHistoryService extends BaseCrudService {
       method: 'GET',
       url: `${this.basePath}/history`,
       params: {
-        skipCount: page,
+        skipCount: (page - 1 || 0) * pageSize,
         maxResultCount: pageSize,
       }
     });
-
+    // console.log('Order history data:', res);
     // Transform the data from backend format to frontend format
-    const transformedItems = transformOrderData(res.result.items || []);
-    const totalRecords = res.result.totalRecords || 0;
+    const transformedItems = transformOrderData(res.result);
+    const totalRecords = res.resultCount;
+
+    console.log(totalRecords);
+    console.log(Math.ceil(totalRecords / pageSize));
 
     return {
       items: transformedItems,

@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   Box, 
   Typography, 
@@ -8,11 +7,12 @@ import {
   styled 
 } from '@mui/material';
 import ShipmentStatusGraph from './shipment-status-graph';
+import DiscountBadge from './discount-badge';
 import { EShipmentStatus } from '@/services/shipment/shipment.model';
+import { EDiscountCodeType } from '@/services/discount-code/discount-code.model';
 import useTranslation from '@/hooks/use-translation';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 interface ProductInfo {
   id: string;
@@ -42,19 +42,9 @@ const ShipmentPaper = styled(Paper)(({ theme }) => ({
 
 const ProductImage = styled('img')({
   width: '100%',
-  maxHeight: 80,
+  height: 80,
   objectFit: 'contain',
 });
-
-const DiscountBadge = styled(Box)(({ theme }) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  padding: theme.spacing(0.5, 1),
-  backgroundColor: theme.palette.mode === 'light' ? '#f3f8ff' : '#1a365d',
-  borderRadius: theme.shape.borderRadius,
-  margin: theme.spacing(0.5, 0),
-  border: `1px dashed ${theme.palette.primary.main}`,
-}));
 
 export default function ShipmentBox({
   shipmentId,
@@ -82,6 +72,13 @@ export default function ShipmentBox({
 
   return (
     <ShipmentPaper elevation={1}>
+      <Box sx={{ mb: 1 }}>
+        <Typography variant="subtitle2" color="text.secondary">
+          {t('Mã vận chuyển')}: #{shipmentId}
+        </Typography>
+      </Box>
+      <Divider sx={{ my: 1 }} />
+      
       <Grid container spacing={2}>
         {/* Product info */}
         <Grid item xs={12} sm={3}>
@@ -106,21 +103,16 @@ export default function ShipmentBox({
         </Grid>
         
         <Grid item xs={12} sm={9}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Typography variant="subtitle1" fontWeight={500}>
-              {productInfo.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('Mã vận chuyển')}: {shipmentId.substring(0, 8)}
-            </Typography>
-          </Box>
+          <Typography variant="subtitle1" fontWeight={500}>
+            {productInfo.name}
+          </Typography>
           
           <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="body2">
               {t('Số lượng')}: {productInfo.quantity}
             </Typography>
             <Typography variant="body1" fontWeight={600} color="primary.main">
-              {formatCurrency(productInfo.price * productInfo.quantity)}
+              {formatCurrency(productInfo.price)}
             </Typography>
           </Box>
           
@@ -129,68 +121,49 @@ export default function ShipmentBox({
           </Typography>
           
           {/* Display discount codes if available */}
-          <Grid container spacing={1} sx={{ mt: 0.5 }}>
+          <Box sx={{ mt: 1 }}>
             {productDiscountCode && (
-              <Grid item xs={12} sm={6}>
-                <DiscountBadge>
-                  <LocalOfferIcon color="primary" fontSize="small" sx={{ mr: 0.5, fontSize: '1rem', transform: 'rotate(90deg)' }} />
-                  <Box>
-                    <Typography variant="caption" display="block" color="textSecondary">
-                      {t('Mã giảm giá sản phẩm')}:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {productDiscountCode}
-                    </Typography>
-                  </Box>
-                </DiscountBadge>
-              </Grid>
+              <DiscountBadge discountCode={productDiscountCode} type={EDiscountCodeType.ProductDiscount} />
             )}
             {shippingDiscountCode && (
-              <Grid item xs={12} sm={6}>
-                <DiscountBadge>
-                  <LocalOfferIcon color="primary" fontSize="small" sx={{ mr: 0.5, fontSize: '1rem', transform: 'rotate(90deg)' }} />
-                  <Box>
-                    <Typography variant="caption" display="block" color="textSecondary">
-                      {t('Mã giảm giá vận chuyển')}:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {shippingDiscountCode}
-                    </Typography>
-                  </Box>
-                </DiscountBadge>
-              </Grid>
+              <DiscountBadge discountCode={shippingDiscountCode} type={EDiscountCodeType.ShippingDiscount} />
             )}
-          </Grid>
-          
-          <Divider sx={{ my: 1.5 }} />
-          
-          {/* Delivery dates */}
-          <Grid container spacing={2} sx={{ mb: 1.5 }}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                {t('Ngày giao hàng dự kiến')}:
-              </Typography>
-              <Typography variant="body2">
-                {formatDate(estimatedDelivery)}
-              </Typography>
-            </Grid>
-            
-            {deliveryDate && shipmentStatus === EShipmentStatus.Delivered && (
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary">
-                  {t('Ngày giao hàng')}:
-                </Typography>
-                <Typography variant="body2">
-                  {formatDate(deliveryDate)}
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-          
-          {/* Shipment status graph */}
-          <ShipmentStatusGraph status={shipmentStatus} />
+          </Box>
         </Grid>
       </Grid>
+      
+      <Divider sx={{ my: 2 }} />
+      
+      {/* Delivery dates */}
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="body2" color="text.secondary">
+            {t('Ngày giao hàng dự kiến')}:
+          </Typography>
+          <Typography variant="body2">
+            {formatDate(estimatedDelivery)}
+          </Typography>
+        </Grid>
+        
+        {deliveryDate && shipmentStatus === EShipmentStatus.Delivered && (
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body2" color="text.secondary">
+              {t('Ngày giao hàng')}:
+            </Typography>
+            <Typography variant="body2">
+              {formatDate(deliveryDate)}
+            </Typography>
+          </Grid>
+        )}
+      </Grid>
+      
+      {/* Shipment status graph */}
+      <Box sx={{ mt: 3 }}>
+        <Typography variant="subtitle2" gutterBottom>
+          {t('Trạng thái vận chuyển')}
+        </Typography>
+        <ShipmentStatusGraph status={shipmentStatus} />
+      </Box>
     </ShipmentPaper>
   );
 }

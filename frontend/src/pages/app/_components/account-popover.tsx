@@ -97,7 +97,7 @@ const AccountPopover = (props: TAccountPopover) => {
         <Divider />
         <MenuItemStyled
           onClick={() => navigate('/customer/order-history')}
-          className="order-history"
+          className="item-order-history"
         >
           <span>{t('Lịch sử đơn hàng')}</span>
           <HistoryIcon />
@@ -129,6 +129,13 @@ const MenuItemStyled = styled(MenuItem)`
   
   &.item-logout > svg,
   &.item-voucher > svg {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &.item-order-history > svg {
     position: absolute;
     right: 6px;
     top: 50%;

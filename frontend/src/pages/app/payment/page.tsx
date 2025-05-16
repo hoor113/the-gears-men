@@ -4,6 +4,7 @@ import {
     Box,
     Button,
     CardMedia,
+    Divider,
     Grid,
     Paper,
     Stack,
@@ -122,8 +123,11 @@ export default function CheckoutPage() {
             const shippingDiscount =
                 discountCodeMap[item.id]?.shippingDiscount ?? null;
 
-            const originalProductPrice = item.price;
-            const originalShipping = item.price * 0.05;
+            const originalProductPrice =
+                (item.priceAfterDiscount < item.price && item.priceAfterDiscount)
+                    ? item.priceAfterDiscount * item.quantity
+                    : item.price * item.quantity;
+            const originalShipping = originalProductPrice * 0.05;
             const quantity = item.quantity || 1;
 
             const discountedProductPrice = calculateDiscountedPrice(
@@ -177,15 +181,14 @@ export default function CheckoutPage() {
 
             if (returnCode === 1 && orderUrl) {
                 window.open(orderUrl, '_blank'); // 👉 Mở tab mới với đường dẫn thanh toán ZaloPay
-                console.log('ZaloPay order URL:', orderUrl); // 👈 Log đường dẫn thanh toán ZaloPay
+                window.location.href = `/customer`;
+            } else {
+                window.location.href = `/customer/payment/success`;
             }
-
-            // window.location.href = `/customer/payment/success`;
-            console.log('Order success data:', data); // 👈 Log dữ liệu khi tạo đơn hàng thành công
         },
         onError: (err: any) => {
             appService.hideLoadingModal();
-            window.location.href = `/customer/payment/fail`;
+            // window.location.href = `/customer/payment/fail`;
             enqueueSnackbar(err.response.data.message || 'Đã có lỗi xảy ra', {
                 variant: 'error',
             });
@@ -281,225 +284,242 @@ export default function CheckoutPage() {
                 <Grid item xs={12} md={6}>
                     <Paper elevation={1} sx={{ p: 3 }}>
                         <Stack spacing={2}>
-                            {cartItems.map((item) => {
-                                const productDiscount =
-                                    discountCodeMap[item.id]?.productDiscount ?? null;
-                                const shippingDiscount =
-                                    discountCodeMap[item.id]?.shippingDiscount ?? null;
+                            {cartItems.length === 0 ? (
+                                <>
+                                    <Typography variant="h6" color="text.secondary" align="center" sx={{ mt: 4 }}>
+                                        Không có sản phẩm trong giỏ hàng
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" align="center">
+                                        Vui lòng thêm sản phẩm để tiến hành thanh toán.
+                                    </Typography>
 
-                                const originalProductPrice = item.price;
-                                const originalShipping = item.price * 0.05;
-                                const quantity = item.quantity || 1;
+                                    <Divider sx={{ my: 2 }} />
 
-                                const discountedProductPrice = calculateDiscountedPrice(
-                                    originalProductPrice,
-                                    productDiscount,
-                                    quantity,
-                                );
-                                const discountedShipping = calculateShipping(
-                                    originalShipping,
-                                    shippingDiscount,
-                                );
+                                </>
+                            ) : (
+                                cartItems.map((item) => {
+                                    const productDiscount =
+                                        discountCodeMap[item.id]?.productDiscount ?? null;
+                                    const shippingDiscount =
+                                        discountCodeMap[item.id]?.shippingDiscount ?? null;
 
-                                const totalDiscounted =
-                                    discountedProductPrice + discountedShipping;
+                                    const originalProductPrice =
+                                        (item.priceAfterDiscount < item.price && item.priceAfterDiscount)
+                                            ? item.priceAfterDiscount * item.quantity
+                                            : item.price * item.quantity;
+                                    const originalShipping = originalProductPrice * 0.05;
+                                    const quantity = item.quantity || 1;
 
-                                return (
-                                    <Paper key={item.id} variant="outlined" sx={{ p: 2, mb: 2 }}>
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={3}>
-                                                <CardMedia
-                                                    component="img"
-                                                    image={
-                                                        item.images?.[0] || '/assets/images/no-image.png'
-                                                    }
-                                                    alt={item.name}
-                                                    sx={{
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        aspectRatio: '1 / 1', // đảm bảo ảnh vuông
-                                                        objectFit: 'cover',
-                                                        borderRadius: 1,
-                                                    }}
-                                                />
-                                            </Grid>
+                                    const discountedProductPrice = calculateDiscountedPrice(
+                                        originalProductPrice,
+                                        productDiscount,
+                                        quantity,
+                                    );
+                                    const discountedShipping = calculateShipping(
+                                        originalShipping,
+                                        shippingDiscount,
+                                    );
 
-                                            <Grid item xs={9}>
-                                                <Stack spacing={1}>
-                                                    <Typography variant="subtitle1" fontWeight={600}>
-                                                        <Box display="flex" alignItems="center">
-                                                            <Typography
-                                                                component="span"
-                                                                variant="subtitle1"
-                                                                fontWeight={600}
-                                                            >
-                                                                {item.name}
-                                                            </Typography>
-                                                            <Typography
-                                                                component="span"
-                                                                variant="subtitle1"
-                                                                fontWeight={700}
-                                                                color="primary.dark"
-                                                                sx={{ ml: 1 }}
-                                                            >
-                                                                x {item.quantity}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Typography>
+                                    const totalDiscounted =
+                                        discountedProductPrice + discountedShipping;
 
-                                                    {/* Giá sản phẩm */}
-                                                    <Box>
-                                                        <Typography
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            Giá:{' '}
-                                                        </Typography>
-                                                        {discountedProductPrice < originalProductPrice ? (
-                                                            <>
+                                    return (
+                                        <Paper key={item.id} variant="outlined" sx={{ p: 2, mb: 2 }}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={3}>
+                                                    <CardMedia
+                                                        component="img"
+                                                        image={
+                                                            item.images?.[0] || '/assets/images/no-image.png'
+                                                        }
+                                                        alt={item.name}
+                                                        sx={{
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            aspectRatio: '1 / 1',
+                                                            objectFit: 'cover',
+                                                            borderRadius: 1,
+                                                        }}
+                                                    />
+                                                </Grid>
+
+                                                <Grid item xs={9}>
+                                                    <Stack spacing={1}>
+                                                        <Typography variant="subtitle1" fontWeight={600}>
+                                                            <Box display="flex" alignItems="center">
                                                                 <Typography
                                                                     component="span"
-                                                                    variant="body2"
-                                                                    color="success.main"
+                                                                    variant="subtitle1"
+                                                                    fontWeight={600}
                                                                 >
-                                                                    {discountedProductPrice.toLocaleString()}
-                                                                    đ{' '}
+                                                                    {item.name}
                                                                 </Typography>
                                                                 <Typography
                                                                     component="span"
+                                                                    variant="subtitle1"
+                                                                    fontWeight={700}
+                                                                    color="primary.dark"
+                                                                    sx={{ ml: 1 }}
+                                                                >
+                                                                    x {item.quantity}
+                                                                </Typography>
+                                                            </Box>
+                                                        </Typography>
+
+                                                        {/* Giá sản phẩm */}
+                                                        <Box>
+                                                            <Typography
+                                                                component="span"
+                                                                variant="body2"
+                                                                color="text.secondary"
+                                                            >
+                                                                Giá:{' '}
+                                                            </Typography>
+                                                            {discountedProductPrice < originalProductPrice ? (
+                                                                <>
+                                                                    <Typography
+                                                                        component="span"
+                                                                        variant="body2"
+                                                                        color="success.main"
+                                                                    >
+                                                                        {discountedProductPrice.toLocaleString()}
+                                                                        đ{' '}
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        component="span"
+                                                                        variant="body2"
+                                                                        sx={{
+                                                                            textDecoration: 'line-through',
+                                                                            color: 'text.secondary',
+                                                                            ml: 0.5,
+                                                                        }}
+                                                                    >
+                                                                        {originalProductPrice.toLocaleString()}đ
+                                                                    </Typography>
+                                                                </>
+                                                            ) : (
+                                                                <Typography
+                                                                    component="span"
                                                                     variant="body2"
-                                                                    sx={{
-                                                                        textDecoration: 'line-through',
-                                                                        color: 'text.secondary',
-                                                                        ml: 0.5,
-                                                                    }}
+                                                                    color="text.primary"
                                                                 >
                                                                     {originalProductPrice.toLocaleString()}đ
                                                                 </Typography>
-                                                            </>
-                                                        ) : (
+                                                            )}
+                                                        </Box>
+
+                                                        {/* Phí ship */}
+                                                        <Box>
                                                             <Typography
                                                                 component="span"
                                                                 variant="body2"
-                                                                color="text.primary"
+                                                                color="text.secondary"
                                                             >
-                                                                {originalProductPrice.toLocaleString()}đ
+                                                                Phí ship:{' '}
                                                             </Typography>
-                                                        )}
-                                                    </Box>
-
-                                                    {/* Phí ship */}
-                                                    <Box>
-                                                        <Typography
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                        >
-                                                            Phí ship:{' '}
-                                                        </Typography>
-                                                        {discountedShipping < originalShipping ? (
-                                                            <>
+                                                            {discountedShipping < originalShipping ? (
+                                                                <>
+                                                                    <Typography
+                                                                        component="span"
+                                                                        variant="body2"
+                                                                        color="success.main"
+                                                                    >
+                                                                        {discountedShipping.toLocaleString()}đ{' '}
+                                                                    </Typography>
+                                                                    <Typography
+                                                                        component="span"
+                                                                        variant="body2"
+                                                                        sx={{
+                                                                            textDecoration: 'line-through',
+                                                                            color: 'text.secondary',
+                                                                            ml: 0.5,
+                                                                        }}
+                                                                    >
+                                                                        {originalShipping.toLocaleString()}đ
+                                                                    </Typography>
+                                                                </>
+                                                            ) : (
                                                                 <Typography
                                                                     component="span"
                                                                     variant="body2"
-                                                                    color="success.main"
-                                                                >
-                                                                    {discountedShipping.toLocaleString()}đ{' '}
-                                                                </Typography>
-                                                                <Typography
-                                                                    component="span"
-                                                                    variant="body2"
-                                                                    sx={{
-                                                                        textDecoration: 'line-through',
-                                                                        color: 'text.secondary',
-                                                                        ml: 0.5,
-                                                                    }}
+                                                                    color="text.primary"
                                                                 >
                                                                     {originalShipping.toLocaleString()}đ
                                                                 </Typography>
-                                                            </>
-                                                        ) : (
+                                                            )}
+                                                        </Box>
+
+                                                        {discountCodeMap[item.id]?.productDiscount && (
                                                             <Typography
-                                                                component="span"
                                                                 variant="body2"
-                                                                color="text.primary"
+                                                                sx={{ color: 'primary.dark' }}
                                                             >
-                                                                {originalShipping.toLocaleString()}đ
+                                                                Giảm giá sản phẩm:{' '}
+                                                                {discountCodeMap[item.id].productDiscount.code} -
+                                                                giảm{' '}
+                                                                {discountCodeMap[item.id].productDiscount
+                                                                    .discountCalculationMethod === '%'
+                                                                    ? `${discountCodeMap[item.id].productDiscount.quantity}%`
+                                                                    : `${discountCodeMap[item.id].productDiscount.quantity.toLocaleString()}đ`}
                                                             </Typography>
                                                         )}
-                                                    </Box>
 
-                                                    {discountCodeMap[item.id]?.productDiscount && (
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{ color: 'primary.dark' }}
-                                                        >
-                                                            Giảm giá sản phẩm:{' '}
-                                                            {discountCodeMap[item.id].productDiscount.code} -
-                                                            giảm{' '}
-                                                            {discountCodeMap[item.id].productDiscount
-                                                                .discountCalculationMethod === '%'
-                                                                ? `${discountCodeMap[item.id].productDiscount.quantity}%`
-                                                                : `${discountCodeMap[item.id].productDiscount.quantity.toLocaleString()}đ`}
-                                                        </Typography>
-                                                    )}
+                                                        {discountCodeMap[item.id]?.shippingDiscount && (
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{ color: 'primary.dark' }}
+                                                            >
+                                                                Giảm phí ship:{' '}
+                                                                {discountCodeMap[item.id].shippingDiscount.code} -
+                                                                giảm{' '}
+                                                                {discountCodeMap[item.id].shippingDiscount
+                                                                    .discountCalculationMethod === '%'
+                                                                    ? `${discountCodeMap[item.id].shippingDiscount.quantity}%`
+                                                                    : `${discountCodeMap[item.id].shippingDiscount.quantity.toLocaleString()}đ`}
+                                                            </Typography>
+                                                        )}
 
-                                                    {discountCodeMap[item.id]?.shippingDiscount && (
-                                                        <Typography
-                                                            variant="body2"
-                                                            sx={{ color: 'primary.dark' }}
-                                                        >
-                                                            Giảm phí ship:{' '}
-                                                            {discountCodeMap[item.id].shippingDiscount.code} -
-                                                            giảm{' '}
-                                                            {discountCodeMap[item.id].shippingDiscount
-                                                                .discountCalculationMethod === '%'
-                                                                ? `${discountCodeMap[item.id].shippingDiscount.quantity}%`
-                                                                : `${discountCodeMap[item.id].shippingDiscount.quantity.toLocaleString()}đ`}
-                                                        </Typography>
-                                                    )}
+                                                        {/* Tổng tiền cho item */}
+                                                        <Box sx={{ mt: 1 }}>
+                                                            <Typography
+                                                                variant="subtitle1"
+                                                                component="span"
+                                                                sx={{
+                                                                    color: 'primary.main',
+                                                                    fontWeight: 'bold',
+                                                                    fontSize: '1.1rem',
+                                                                }}
+                                                            >
+                                                                Tổng tiền:{' '}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="subtitle1"
+                                                                component="span"
+                                                                sx={{
+                                                                    color: 'primary.main',
+                                                                    fontWeight: 'bold',
+                                                                    fontSize: '1.1rem',
+                                                                    ml: 1,
+                                                                }}
+                                                            >
+                                                                {totalDiscounted.toLocaleString()}đ
+                                                            </Typography>
+                                                        </Box>
 
-                                                    {/* Tổng tiền cho item */}
-                                                    <Box sx={{ mt: 1 }}>
-                                                        <Typography
-                                                            variant="subtitle1"
-                                                            component="span"
-                                                            sx={{
-                                                                color: 'primary.main',
-                                                                fontWeight: 'bold',
-                                                                fontSize: '1.1rem',
-                                                            }}
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            onClick={() => handleOpenVoucherDialog(item)}
                                                         >
-                                                            Tổng tiền:{' '}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="subtitle1"
-                                                            component="span"
-                                                            sx={{
-                                                                color: 'primary.main',
-                                                                fontWeight: 'bold',
-                                                                fontSize: '1.1rem',
-                                                                ml: 1,
-                                                            }}
-                                                        >
-                                                            {totalDiscounted.toLocaleString()}đ
-                                                        </Typography>
-                                                    </Box>
-
-                                                    <Button
-                                                        size="small"
-                                                        variant="outlined"
-                                                        onClick={() => handleOpenVoucherDialog(item)}
-                                                    >
-                                                        Chọn voucher
-                                                    </Button>
-                                                </Stack>
+                                                            Chọn voucher
+                                                        </Button>
+                                                    </Stack>
+                                                </Grid>
                                             </Grid>
-                                        </Grid>
-                                    </Paper>
-                                );
-                            })}
+                                        </Paper>
+                                    );
+                                })
+                            )}
 
                             {/* Hiển thị tổng tiền */}
                             <Stack spacing={1} className="mt-6">

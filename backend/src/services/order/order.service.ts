@@ -132,7 +132,7 @@ export class OrderService {
                 Payment methods: cash or card 
              */
 
-            const orderStatus = paymentMethod === EPaymentMethod.Vnpay ? EOrderStatus.WaitingForPayment : EOrderStatus.Pending;
+            const orderStatus = paymentMethod === EPaymentMethod.Zalopay ? EOrderStatus.WaitingForPayment : EOrderStatus.Pending;
 
             const order = new Order({
                 customerId,
@@ -142,12 +142,6 @@ export class OrderService {
                 shippingAddress,
                 totalPrice
             });
-
-            if (paymentMethod === EPaymentMethod.Zalopay) {
-                const zalopayData = await this.zalopayService.createPaymentData(order);
-
-                return BaseResponse.success({ zalopayData }, undefined, 'VNPay payment initialized', EHttpStatusCode.OK);
-            }
 
             const orderDto: OrderDto = {
                 id: (order._id as mongoose.Types.ObjectId).toString(),
@@ -166,12 +160,18 @@ export class OrderService {
                 shippingAddress: order.shippingAddress,
                 totalPrice: order.totalPrice,
             }
-
             await order.save();
+
+            if (paymentMethod === EPaymentMethod.Zalopay) {
+                const zalopayData = await this.zalopayService.createPaymentData(order);
+
+                return BaseResponse.success({ zalopayData }, undefined, 'VNPay payment initialized', EHttpStatusCode.OK);
+            }
+
             this.orderCronService.scheduleOrderConfirmation(order._id as mongoose.Types.ObjectId); // Schedule confirmation job
             return BaseResponse.success(orderDto, undefined, 'Order created successfully', EHttpStatusCode.OK);
         } catch (error) {
-            return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
+            return BaseResponse.error('in orderservice' + (error as Error)?.message  || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 

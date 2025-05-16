@@ -83,6 +83,7 @@ class AuthService {
     } finally {
       Cookies.remove('refreshToken');
       Cookies.remove('accessToken');
+      localStorage.removeItem('cartState');
       window.location.href = '/auth/login';
     }
   }

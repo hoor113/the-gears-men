@@ -75,7 +75,7 @@ const Order = new Schema<IOrder>(
             enum: Object.values(EOrderStatus),
             default: EOrderStatus.Pending,
         },
-        paymentMethod: { type: String, enum: ['card', 'cash'], required: true },
+        paymentMethod: { type: String, enum: Object.values(EPaymentMethod), required: true },
         shippingAddress: { type: String, required: true },
         totalPrice: { type: Number, required: true },
         createdAt: { type: Date, default: Date.now },

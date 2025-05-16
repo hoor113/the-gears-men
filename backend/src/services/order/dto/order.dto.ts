@@ -38,9 +38,12 @@ export class OrderDto extends EntityDto {
 
     @IsString({ message: 'Order status must be a string.' })
     orderStatus!: string; // Required
-    
-    @IsString({ message: 'Payment method must be a string.' })
-    paymentMethod!: string; // Required
+
+    @IsEnum(EPaymentMethod, {
+        message: (args: ValidationArguments) =>
+            `${args.value} is not a valid payment method. Accepted methods are: card, cash, vnpay'}`,
+    })
+    paymentMethod!: EPaymentMethod; // Required
 
     @IsString({ message: 'Shipping address must be a string.' })
     shippingAddress!: string; // Required

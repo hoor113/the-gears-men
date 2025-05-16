@@ -30,9 +30,7 @@ function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Lưu trạng thái vào localStorage khi state thay đổi
   useEffect(() => {
-    if (state.items.length > 0) {
-      localStorage.setItem('cartState', JSON.stringify(state));
-    }
+    localStorage.setItem('cartState', JSON.stringify(state));
   }, [state]);
 
   return (

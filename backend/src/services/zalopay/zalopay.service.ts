@@ -1,10 +1,11 @@
 import { BaseResponse } from '@/common/base-response';
-import { IOrder } from '@/models/order.model';
+import { EOrderStatus, IOrder } from '@/models/order.model';
 import { EHttpStatusCode } from '@/utils/enum';
 import { Service } from 'typedi';
 import { createHmac } from 'crypto';
 import axios from 'axios';
 import { zalopayConfig } from '@/config/zalopay';
+import Order from '@/models/order.model';
 import moment from 'moment';
 
 @Service()
@@ -12,7 +13,10 @@ export class ZaloPayService {
     public async createPaymentData(orderData: IOrder): Promise<any> {
         try {
             const transID = Math.floor(Math.random() * 1000000);
-            const embed_data = { redirecturl: zalopayConfig.redirect_url };
+            const embed_data = {
+                redirecturl: zalopayConfig.redirect_url,
+                orderId: orderData._id,
+            };
             const items: any[] = [];
 
             const order: any = {
@@ -83,4 +87,37 @@ export class ZaloPayService {
         }
     }
 
+    public async handleCallback(data: any): Promise<any> {
+        try {
+            console.log('data', data);
+
+            // Parse chuỗi JSON trong data.data
+            const callbackData = JSON.parse(data.data); // data.data là string JSON
+            // const dataStr = `${callbackData.app_id}|${callbackData.app_trans_id}|${callbackData.amount}|${callbackData.app_time}|${callbackData.embed_data}|${callbackData.item}`;
+
+            // Optional: Verify MAC (nếu cần)
+            // const mac = createHmac('sha256', zalopayConfig.key2 as string)
+            //     .update(dataStr)
+            //     .digest('hex');
+
+            // if (mac !== data.mac) {
+            //     return BaseResponse.error('Invalid MAC', EHttpStatusCode.UNAUTHORIZED);
+            // }
+
+            const embedData = JSON.parse(callbackData.embed_data); // đã là chuỗi JSON
+            const orderId = embedData.orderId;
+
+            await Order.findByIdAndUpdate(orderId, {
+                orderStatus: EOrderStatus.Confirmed,
+            });
+
+            return BaseResponse.success('Payment successful', EHttpStatusCode.OK);
+
+        } catch (error) {
+            return BaseResponse.error(
+                (error as Error)?.message || 'Internal Server Error',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
 }

@@ -80,7 +80,10 @@ export default function CustomerTopNav() {
   const totalPrice = useMemo(
     () =>
       cartState.items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
+        (sum, item) =>
+          sum +
+          ((item.priceAfterDiscount != null ? item.priceAfterDiscount : item.price) *
+            item.quantity),
         0,
       ),
     [currentCartState.items, cartState.items],
@@ -153,24 +156,23 @@ export default function CustomerTopNav() {
               </IconButton>
             </div>
 
-            {searchResultOpen &&
-              debouncedKeyword &&
-              getAllAccessories?.length > 0 && (
-                <Paper
-                  elevation={4}
-                  sx={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    right: 0,
-                    zIndex: 10,
-                    mt: 1,
-                    maxHeight: 300,
-                    overflowY: 'auto',
-                    borderRadius: 2,
-                  }}
-                >
-                  {getAllAccessories.map((product: any) => {
+            {searchResultOpen && debouncedKeyword && (
+              <Paper
+                elevation={4}
+                sx={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  zIndex: 10,
+                  mt: 1,
+                  maxHeight: 300,
+                  overflowY: 'auto',
+                  borderRadius: 2,
+                }}
+              >
+                {getAllAccessories?.length > 0 ? (
+                  getAllAccessories.map((product: any) => {
                     const hasDiscount = product?.priceAfterDiscount != null;
                     const mainPrice = hasDiscount
                       ? product.priceAfterDiscount
@@ -254,9 +256,18 @@ export default function CustomerTopNav() {
                         </Box>
                       </Box>
                     );
-                  })}
-                </Paper>
-              )}
+                  })
+                ) : (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ p: 2, textAlign: 'center' }}
+                  >
+                    Không có kết quả
+                  </Typography>
+                )}
+              </Paper>
+            )}
           </div>
         </ClickAwayListener>
       </div>
@@ -356,7 +367,11 @@ export default function CustomerTopNav() {
                         </Typography>
                         <Typography variant="body2" mt={0.5}>
                           <span style={{ color: '#e46842', fontWeight: 600 }}>
-                            {item.price.toLocaleString('vi-VN')}₫
+                            {(item.priceAfterDiscount != null
+                              ? item.priceAfterDiscount
+                              : item.price
+                            ).toLocaleString('vi-VN')}
+                            ₫
                           </span>
                           {' x '}
                           <span>{item.quantity}</span>

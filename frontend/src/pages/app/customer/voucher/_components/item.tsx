@@ -1,12 +1,43 @@
+import { useNavigate } from 'react-router-dom';
+import voucherService from '../_services/voucher.service';
+import { useMutation } from '@tanstack/react-query';
+
 interface ItemProps {
   isMyVoucher?: boolean;
-  voucherCode?: string;
+  voucherCode: string;
+  quantity: number
 }
 
-const Item = ({ isMyVoucher = false, voucherCode}: ItemProps) => {
+interface DiscountCode {
+  id: String
+}
 
-  const handleClick = (type: string) => {
+const Item = ({ isMyVoucher = false, voucherCode, quantity }: ItemProps) => {
+
+  const navigate = useNavigate();
+
+  const mutation = useMutation({
+    mutationFn: (data: DiscountCode) => voucherService.claimDiscountCode(data),
+    onSuccess: (data) => {
+      console.log('Claim thành công:', data);
+      // // Ví dụ: navigate sau khi claim thành công
+      // navigate('/');
+    },
+    onError: (error) => {
+      console.error('Lỗi khi claim:', error);
+    },
+  });
+
+
+  const handleClick = (type: string, data: DiscountCode) => {
     console.log(type);
+
+    if (type == "mine") {
+      navigate("/")
+    }
+    else {
+      mutation.mutate(data)
+    }
   }
 
   return (
@@ -17,11 +48,28 @@ const Item = ({ isMyVoucher = false, voucherCode}: ItemProps) => {
           <div>
             <h3 className="text-xl font-semibold text-gray-800">Phiếu giảm giá cho sản phẩm</h3>
             <p className="text-gray-600">Mã: <span className="font-bold">{voucherCode}</span></p>
+            <p className="text-gray-600">Còn lại: <span className="font-bold">{quantity}</span></p>
           </div>
         </div>
-        <button onClick={() => { handleClick(isMyVoucher ? "mine" : "all") }} style={{ cursor: 'pointer' }} className={`mt-4 md:mt-0 px-5 py-2 text-white font-semibold rounded-md transition ${isMyVoucher ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
-          }`}>
-          {isMyVoucher ? 'Sử dụng' : 'Thu thập'}
+        <button
+          onClick={() => {
+            if (quantity > 0) {
+              handleClick(isMyVoucher ? "mine" : "all", { id: voucherCode });
+            }
+          }}
+          style={{
+            cursor: quantity === 0 ? 'not-allowed' : 'pointer',
+            opacity: quantity === 0 ? 0.6 : 1,
+          }}
+          disabled={quantity === 0}
+          className={`mt-4 md:mt-0 px-5 py-2 text-white font-semibold rounded-md transition 
+    ${quantity === 0
+              ? 'bg-gray-400 cursor-not-allowed'
+              : isMyVoucher
+                ? 'bg-green-600 hover:bg-green-700'
+                : 'bg-blue-600 hover:bg-blue-700'}`}
+        >
+          {isMyVoucher ? 'Sử dụng' : quantity?'Thu thập':"Tạm hết"}
         </button>
       </div>
     </div>

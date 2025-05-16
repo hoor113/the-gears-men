@@ -30,7 +30,7 @@ const VoucherPage = () => {
   }) as any;
 
   // console.log(myVouchers);
-  // console.log(allVouchers);
+  console.log(allVouchers);
   
   
 
@@ -59,16 +59,16 @@ const VoucherPage = () => {
         {activeTab === 'all' && (
           <div>
             <h2 className="text-3xl font-extrabold mb-4 text-gray-800">Tất cả Voucher</h2>
-            {allVouchers?.items?.map((item: any) => (
-              <Item isMyVoucher={true} voucherCode={item.code} key={item.id}/>
+            {allVouchers?.map((item: any) => (
+              <Item isMyVoucher={false} voucherCode={item.code} key={item.id} quantity={item.quantity}/>
             ))}
           </div>
         )}
         {activeTab === 'mine' && (
           <div>
             <h2 className="text-3xl font-extrabold mb-4 text-gray-800">Voucher của tôi</h2>
-            {myVouchers?.items?.map((item: any) => (
-              <Item isMyVoucher={true} voucherCode={item.code} key={item.id}/>
+            {myVouchers?.map((item: any) => (
+              <Item isMyVoucher={true} voucherCode={item.code} key={item.id} quantity={1}/>
             ))}
           </div>
         )}

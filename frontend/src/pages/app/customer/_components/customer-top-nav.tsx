@@ -33,14 +33,14 @@ import { RemoveCircle } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 const AvatarStyled = styled(Avatar)(({ theme }) => ({
-    border: `1px solid ${alpha(theme.palette.primary.main, 0.6)}`,
-    flexShrink: 0,
-    height: 45,
-    width: 45,
-    padding: 2,
-    '& > img': {
-        borderRadius: '50%',
-    },
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.6)}`,
+  flexShrink: 0,
+  height: 45,
+  width: 45,
+  padding: 2,
+  '& > img': {
+    borderRadius: '50%',
+  },
 }));
 
 const categoriesObject = [

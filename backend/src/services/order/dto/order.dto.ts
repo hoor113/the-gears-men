@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { IsOptional, IsString, IsMongoId, IsArray, IsNumber, IsEnum, ValidateNested, ValidationArguments } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EntityDto } from '@/common/entity-dto';
+import { EPaymentMethod } from '@/models/order.model';
 
 export class OrderItemDto extends EntityDto {
     @IsString({ message: 'Product ID must be a string.' })
@@ -24,7 +25,6 @@ export class OrderItemDto extends EntityDto {
     @IsNumber({}, { message: 'Shipping price must be a number.' })
     shippingPrice!: number; // Required
 
-    
 }
 
 export class OrderDto extends EntityDto {
@@ -74,11 +74,11 @@ export class CreateOrderDto extends EntityDto {
     @Type(() => CreateOrderItemDto)
     items!: CreateOrderItemDto[]; // Required
 
-    @IsEnum(['card', 'cash'], {
+    @IsEnum(EPaymentMethod, {
         message: (args: ValidationArguments) =>
-            `${args.value} is not a valid payment method. Accepted methods are: card, cash'}`,
+            `${args.value} is not a valid payment method. Accepted methods are: card, cash, vnpay'}`,
     })
-    paymentMethod!: string; // Required
+    paymentMethod!: EPaymentMethod; // Required
 
     @IsString({ message: 'Shipping address must be a string.' })
     shippingAddress!: string; // Required

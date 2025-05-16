@@ -50,12 +50,12 @@ export const info = withAlphas({
 });
 
 export const warning = withAlphas({
-  lightest: '#FFFAEB',
-  light: '#FEF0C7',
-  main: '#F79009',
-  dark: '#B54708',
-  darkest: '#7A2E0E',
-  contrastText: '#FFFFFF',
+  lightest: '#FFFBE6',
+  light: '#FFF0B3',
+  main: '#FFC107', // vàng sáng kiểu cảnh báo
+  dark: '#FF9800',
+  darkest: '#F57C00',
+  contrastText: '#000000', // đổi contrast nếu màu nền quá sáng
 });
 
 export const error = withAlphas({
@@ -68,10 +68,10 @@ export const error = withAlphas({
 });
 
 export const primary = withAlphas({
-  lightest: '#e5edf9',
-  light: '#c5daf2',
-  main: '#1d4e89',
-  dark: '#1b4271',
-  darkest: '#1c395e',
+  lightest: '#FFFAEB', // giống warning.lightest
+  light: '#FEF0C7', // giống warning.light
+  main: '#F79009', // giống warning.main
+  dark: '#B54708', // giống warning.dark
+  darkest: '#7A2E0E', // giống warning.darkest
   contrastText: '#FFFFFF',
 });

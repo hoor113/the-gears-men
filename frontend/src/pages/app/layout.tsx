@@ -65,7 +65,7 @@ const AppLayout = () => {
 
     // Nếu đã nằm trong đúng nhánh thì không cần redirect nữa
     const shouldRedirect = pathname === '/' || pathname === '/auth/login';
-  
+
     if (!shouldRedirect) return;
     console.log(authQuery.data?.role, 'role');
     switch (currentRole) {

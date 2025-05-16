@@ -5,12 +5,20 @@ import AdminPage from '@/pages/app/admin/page';
 import SystemAccountsPage from '@/pages/app/admin/system/accounts/page';
 import CompanyLayout from '@/pages/app/company/layout';
 import CompanyPage from '@/pages/app/company/page';
+import CartPage from '@/pages/app/customer/cart/page';
 import CustomerLayout from '@/pages/app/customer/layout';
 import CustomerPage from '@/pages/app/customer/page';
+import SingleProductPage from '@/pages/app/customer/product/[id]/page';
+import VoucherPage from '@/pages/app/customer/voucher/page';
 import HomePage from '@/pages/app/index.page';
 import AppLayout from '@/pages/app/layout';
 import OwnerLayout from '@/pages/app/owner/layout';
 import OwnerPage from '@/pages/app/owner/page';
+import SuccessPage from '@/pages/app/payment/_services/success/index.page';
+import SuccessLayout from '@/pages/app/payment/_services/success/layout';
+import FailPage from '@/pages/app/payment/fail/index.page';
+import FailLayout from '@/pages/app/payment/fail/layout';
+import CheckoutPage from '@/pages/app/payment/page';
 import PersonnelLayout from '@/pages/app/personnel/layout';
 import PersonnelPage from '@/pages/app/personnel/page';
 import ChangePasswordPage from '@/pages/app/settings/change-password/index.page';
@@ -19,9 +27,6 @@ import AuthLayout from '@/pages/auth/layout';
 import LoginPage from '@/pages/auth/login.page';
 import RegisterPage from '@/pages/auth/register.page';
 import NotFoundPage from '@/pages/not-found.page';
-import SingleProductPage from '@/pages/app/customer/product/[id]/page';
-import VoucherPage from '@/pages/app/customer/voucher/page';
-import CartPage from '@/pages/app/customer/cart/page';
 
 export const router = createBrowserRouter([
   {
@@ -62,7 +67,36 @@ export const router = createBrowserRouter([
           {
             path: 'cart',
             element: <CartPage />,
-          }
+          },
+          {
+            path: 'payment',
+            children: [
+              {
+                index: true,
+                element: <CheckoutPage />,
+              },
+              {
+                path: 'success',
+                element: <SuccessLayout />,
+                children: [
+                  {
+                    index: true,
+                    element: <SuccessPage />,
+                  },
+                ],
+              },
+              {
+                path: 'fail',
+                element: <FailLayout />,
+                children: [
+                  {
+                    index: true,
+                    element: <FailPage />,
+                  },
+                ],
+              },
+            ],
+          },
         ],
       },
       {

@@ -165,7 +165,6 @@ const RegisterPage = () => {
               }}
             />
           </Stack>
-
           {/* Select để chọn role */}
           <Box sx={{ marginBottom: 2 }}>
             <Typography variant="subtitle1" gutterBottom>
@@ -198,9 +197,8 @@ const RegisterPage = () => {
               ))}
             </Select>
           </Box>
-          
           //thêm onSubmit sau
-          <Box component="form" >
+          <Box component="form">
             <TextField
               fullWidth
               label={t('Tên người dùng')}

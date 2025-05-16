@@ -22,6 +22,7 @@ import NotFoundPage from '@/pages/not-found.page';
 import SingleProductPage from '@/pages/app/customer/product/[id]/page';
 import VoucherPage from '@/pages/app/customer/voucher/page';
 import CartPage from '@/pages/app/customer/cart/page';
+import AboutUs from '@/pages/app/customer/_components/aboutus';
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
           {
             path: 'cart',
             element: <CartPage />,
+          },
+          {
+            path: 'aboutus',
+            element: <AboutUs/>
           }
         ],
       },

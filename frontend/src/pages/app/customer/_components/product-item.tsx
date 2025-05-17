@@ -7,13 +7,15 @@ import React from 'react';
 import { Product } from '../_services/product.model';
 import { useCart } from '../cart/context/cart.context';
 import ProductModal from './product-modal';
+import { useNavigate } from 'react-router-dom';
 
 type ProductProps = {
   product: Product;
 };
 
 const ProductItem: React.FC<ProductProps> = ({ product }) => {
-  const [_, cartDispatch] = useCart();
+  const [_, cartDispatch] = useCart(); 
+  const navigate = useNavigate();
 
   const handleAddToCart = () => {
     NiceModal.show(ProductModal, {
@@ -28,10 +30,7 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
   };
 
   const handleViewDetail = () => {
-    NiceModal.show(ProductModal, {
-      product: product,
-      // Cho phép xem chi tiết mà không cần thêm vào giỏ luôn
-    });
+    navigate(`/customer/product/${product.id}`);
   };
 
   const mainImage =
@@ -51,7 +50,7 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
     : 0;
 
   const formatCurrency = (value: number) =>
-    value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    value?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
   const stockText =
     product.stock > 0 ? `Còn lại ${product.stock} sản phẩm` : 'Hết hàng';

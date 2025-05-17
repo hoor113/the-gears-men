@@ -20,8 +20,8 @@ import * as yup from 'yup';
 import BaseFormInput from '@/base/base-form-input';
 import appService from '@/services/app/app.service';
 
-import { useCart } from '../customer/cart/context/cart.context';
-import voucherService from '../customer/voucher/_services/voucher.service';
+import { useCart } from '../cart/context/cart.context';
+import voucherService from '../voucher/_services/voucher.service';
 import VoucherDialog from './_components/voucher_dialog';
 import { EPaymentMethod } from './_services/order.model';
 import orderService from './_services/order.service';

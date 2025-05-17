@@ -31,11 +31,6 @@ export class ProductService {
         try {
             const searchableFields = ['name'];
             const extraCondition: IExtraCondition[] = [
-                // {
-                //     field: 'category',
-                //     type: EExtraConditionType.NotEquals,
-                //     valueField: 'category'
-                // },
                 {
                     field: 'price',
                     type: EExtraConditionType.InRange,
@@ -43,25 +38,32 @@ export class ProductService {
                     toField: 'maxPrice'
                 }
             ];
+
             const query = buildQuery(dto, searchableFields, extraCondition);
+
+            // Query Product và populate trường storeId, chỉ lấy field 'name' của Store
             const items = await Product.find(query)
                 .skip(dto.skipCount)
-                .limit(dto.maxResultCount);
+                .limit(dto.maxResultCount)
+                .populate('storeId', 'name');
+
             const totalProducts = await Product.countDocuments(query);
-            // RETRIEVE DISCOUNT FROM REDIS
+
             const discountedList: string[] = await redis.getList('daily_discount') || [];
 
-            return BaseResponse.success(items.map((item) => {
-                const itemId = (item._id as string).toString();
+            // Map kết quả
+            const result: ProductDto[] = items.map(item => {
+                const itemId = (item._id as mongoose.Types.ObjectId | string).toString();
                 const indexInDiscount = discountedList.indexOf(itemId);
                 const priceAfterDiscount =
                     indexInDiscount !== -1 && DAILY_DISCOUNT_PERCENTAGE[indexInDiscount] !== undefined
                         ? item.price * (100 - DAILY_DISCOUNT_PERCENTAGE[indexInDiscount]) / 100
-                        : null;
+                        : undefined;
 
                 return {
                     id: itemId,
-                    storeId: item.storeId.toString(),
+                    storeId: item.storeId?._id?.toString(),
+                    storeName: item.storeId ? (item.storeId as any).name : undefined,
                     name: item.name,
                     description: item.description,
                     price: item.price,
@@ -70,16 +72,21 @@ export class ProductService {
                     category: item.category,
                     images: item.images,
                 };
-            }), totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
-        }
-        catch (error) {
-            return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
+            });
+
+            return BaseResponse.success(result, totalProducts, 'Items retrieved successfully', EHttpStatusCode.OK);
+        } catch (error) {
+            return BaseResponse.error(
+                (error as Error)?.message || 'Internal Server Error',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
     public async getProductById(id: string): Promise<BaseResponse<ProductDto | unknown>> {
         try {
             const product = await Product.findById(id);
+            const store = product ? await Store.findById(product.storeId) : null;
 
             // RETRIEVE DISCOUNT FROM REDIS
             const discountedList: string[] = await redis.getList('daily_discount') || [];
@@ -87,6 +94,7 @@ export class ProductService {
             const productWithDiscount = product ? {
                 id: product._id as string,
                 storeId: product.storeId.toString(),
+                storeName: store ? store.name : undefined,
                 name: product.name,
                 description: product.description,
                 price: product.price,
@@ -185,6 +193,7 @@ export class ProductService {
                 category,
                 imageUrl
             } = dto;
+            console.log(dto);
 
             // Create the product
             const product = new Product({

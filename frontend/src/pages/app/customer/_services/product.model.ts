@@ -87,6 +87,7 @@ export const categoriesObject = [
 
 export interface Product {
   storeId: string;
+  storeName: string;
   name: string;
   description: string;
   price: number;

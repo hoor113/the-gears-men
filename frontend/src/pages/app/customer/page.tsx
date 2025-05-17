@@ -11,32 +11,85 @@ import SaleBanner from './_components/sale-banner';
 interface Category {
   key: string;
   title: string;
-  category: EProductCategory,
+  category: EProductCategory;
   products: Product[];
 }
 
 
 const CustomerPage = () => {
-
   const categories: Category[] = useMemo(
     () => [
-      { key: 'phone', title: 'Điện thoại', category: EProductCategory.Phone, products: [] },
-      { key: 'laptop', title: 'Laptop', category: EProductCategory.Laptop, products: [] },
+      {
+        key: 'phone',
+        title: 'Điện thoại',
+        category: EProductCategory.Phone,
+        products: [],
+      },
+      {
+        key: 'laptop',
+        title: 'Laptop',
+        category: EProductCategory.Laptop,
+        products: [],
+      },
       { key: 'pc', title: 'PC', category: EProductCategory.PC, products: [] },
-      { key: 'tablet', title: 'Máy tính bảng', category: EProductCategory.Tablet, products: [] },
-      { key: 'accessories', title: 'Phụ kiện', category: EProductCategory.Accessories, products: [] },
-      { key: 'wearable', title: 'Thiết bị đeo', category: EProductCategory.Wearable, products: [] },
+      {
+        key: 'tablet',
+        title: 'Máy tính bảng',
+        category: EProductCategory.Tablet,
+        products: [],
+      },
+      {
+        key: 'accessories',
+        title: 'Phụ kiện',
+        category: EProductCategory.Accessories,
+        products: [],
+      },
+      {
+        key: 'wearable',
+        title: 'Thiết bị đeo',
+        category: EProductCategory.Wearable,
+        products: [],
+      },
       { key: 'tv', title: 'TV', category: EProductCategory.TV, products: [] },
-      { key: 'audio', title: 'Âm thanh', category: EProductCategory.Audio, products: [] },
-      { key: 'camera', title: 'Máy ảnh', category: EProductCategory.Camera, products: [] },
-      { key: 'smartHome', title: 'Nhà thông minh', category: EProductCategory.SmartHome, products: [] },
-      { key: 'homeAppliance', title: 'Đồ gia dụng', category: EProductCategory.HomeAppliance, products: [] },
-      { key: 'gaming', title: 'Gaming', category: EProductCategory.Gaming, products: [] },
-      { key: 'others', title: 'Khác', category: EProductCategory.Others, products: [] },
+      {
+        key: 'audio',
+        title: 'Âm thanh',
+        category: EProductCategory.Audio,
+        products: [],
+      },
+      {
+        key: 'camera',
+        title: 'Máy ảnh',
+        category: EProductCategory.Camera,
+        products: [],
+      },
+      {
+        key: 'smartHome',
+        title: 'Nhà thông minh',
+        category: EProductCategory.SmartHome,
+        products: [],
+      },
+      {
+        key: 'homeAppliance',
+        title: 'Đồ gia dụng',
+        category: EProductCategory.HomeAppliance,
+        products: [],
+      },
+      {
+        key: 'gaming',
+        title: 'Gaming',
+        category: EProductCategory.Gaming,
+        products: [],
+      },
+      {
+        key: 'others',
+        title: 'Khác',
+        category: EProductCategory.Others,
+        products: [],
+      },
     ],
-    []
+    [],
   );
-
 
   const queries = categories.map((category) => ({
     queryKey: [`products/getAll/${category.key}`],
@@ -54,9 +107,8 @@ const CustomerPage = () => {
         ...categories[index],
         products: data || [],
       }),
-    })
+    }),
   );
-
 
   // const { data: discountedProducts } = useQuery({
   //   queryKey: ['products/getAll'],
@@ -72,8 +124,7 @@ const CustomerPage = () => {
 
   const { data: discountedProducts } = useQuery({
     queryKey: ['products/GetDailyDiscount'],
-    queryFn: () =>
-      productsService.getDailyDiscount()
+    queryFn: () => productsService.getDailyDiscount(),
   });
 
   console.log(discountedProducts);
@@ -162,12 +213,9 @@ const CustomerPage = () => {
       </Box>
     </>
   );
-
-
 };
 
 export default CustomerPage;
-
 
 // const { data: getAllProducts } = useQuery({
 //     queryKey: ['products/getAll'],

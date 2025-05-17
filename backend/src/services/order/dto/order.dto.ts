@@ -3,6 +3,7 @@ import { IsOptional, IsString, IsMongoId, IsArray, IsNumber, IsEnum, ValidateNes
 import { Type } from 'class-transformer';
 import { EntityDto } from '@/common/entity-dto';
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
+import { EPaymentMethod } from '@/models/order.model';
 
 export class OrderItemDto extends EntityDto {
     @IsString({ message: 'Product ID must be a string.' })
@@ -25,7 +26,6 @@ export class OrderItemDto extends EntityDto {
     @IsNumber({}, { message: 'Shipping price must be a number.' })
     shippingPrice!: number; // Required
 
-    
 }
 
 export class OrderDto extends EntityDto {
@@ -39,9 +39,12 @@ export class OrderDto extends EntityDto {
 
     @IsString({ message: 'Order status must be a string.' })
     orderStatus!: string; // Required
-    
-    @IsString({ message: 'Payment method must be a string.' })
-    paymentMethod!: string; // Required
+
+    @IsEnum(EPaymentMethod, {
+        message: (args: ValidationArguments) =>
+            `${args.value} is not a valid payment method. Accepted methods are: card, cash, vnpay'}`,
+    })
+    paymentMethod!: EPaymentMethod; // Required
 
     @IsString({ message: 'Shipping address must be a string.' })
     shippingAddress!: string; // Required
@@ -75,11 +78,11 @@ export class CreateOrderDto extends EntityDto {
     @Type(() => CreateOrderItemDto)
     items!: CreateOrderItemDto[]; // Required
 
-    @IsEnum(['card', 'cash'], {
+    @IsEnum(EPaymentMethod, {
         message: (args: ValidationArguments) =>
-            `${args.value} is not a valid payment method. Accepted methods are: card, cash'}`,
+            `${args.value} is not a valid payment method. Accepted methods are: card, cash, vnpay'}`,
     })
-    paymentMethod!: string; // Required
+    paymentMethod!: EPaymentMethod; // Required
 
     @IsString({ message: 'Shipping address must be a string.' })
     shippingAddress!: string; // Required

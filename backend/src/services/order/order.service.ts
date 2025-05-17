@@ -1,5 +1,5 @@
 import { DELIVERY_VAT } from '@/constants/delivery-vat';
-import Order, { EOrderStatus } from '@/models/order.model';
+import Order, { EOrderStatus, EPaymentMethod } from '@/models/order.model';
 import Product from '@/models/product.model';
 import mongoose from 'mongoose';
 import { BaseResponse } from '@/common/base-response';
@@ -18,19 +18,25 @@ import { DiscountCodeDto } from '@/services/discount-code/dto/discount-code.dto'
 import { EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
 import redis from '@/config/redis';
 import { DAILY_DISCOUNT_PERCENTAGE } from '@/constants/daily-discount-percentage';
+import { VnpayService } from '@/services/vnpay/vnpay.service';
+import { ZaloPayService } from '../zalopay/zalopay.service';
 
 @Service()
 export class OrderService {
     private orderCronService: OrderCronService;
     private discountCodeService: DiscountCodeService;
+    private vnpayService: VnpayService;
+    private zalopayService: ZaloPayService;
 
     constructor() {
         // Get the required services from the container
         this.orderCronService = Container.get(OrderCronService);
         this.discountCodeService = Container.get(DiscountCodeService);
+        this.vnpayService = Container.get(VnpayService);
+        this.zalopayService = Container.get(ZaloPayService);
     }
 
-    public async createOrder(customerId: string, dto: CreateOrderDto): Promise<BaseResponse<OrderDto | DiscountCodeDto>> {
+    public async createOrder(customerId: string, dto: CreateOrderDto): Promise<BaseResponse<OrderDto | DiscountCodeDto | unknown>> {
         try {
             const {
                 items,
@@ -127,10 +133,12 @@ export class OrderService {
                 Payment methods: cash or card 
              */
 
+            const orderStatus = paymentMethod === EPaymentMethod.Zalopay ? EOrderStatus.WaitingForPayment : EOrderStatus.Pending;
+
             const order = new Order({
                 customerId,
                 items: orderItems,
-                orderStatus: EOrderStatus.Pending,
+                orderStatus: orderStatus,
                 paymentMethod,
                 shippingAddress,
                 totalPrice
@@ -153,12 +161,18 @@ export class OrderService {
                 shippingAddress: order.shippingAddress,
                 totalPrice: order.totalPrice,
             }
-
             await order.save();
+
+            if (paymentMethod === EPaymentMethod.Zalopay) {
+                const zalopayData = await this.zalopayService.createPaymentData(order);
+
+                return BaseResponse.success({ zalopayData }, undefined, 'VNPay payment initialized', EHttpStatusCode.OK);
+            }
+
             this.orderCronService.scheduleOrderConfirmation(order._id as mongoose.Types.ObjectId); // Schedule confirmation job
             return BaseResponse.success(orderDto, undefined, 'Order created successfully', EHttpStatusCode.OK);
         } catch (error) {
-            return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
+            return BaseResponse.error('in orderservice' + (error as Error)?.message  || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 

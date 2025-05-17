@@ -61,9 +61,9 @@ export abstract class BaseCrudService {
       method: 'GET',
       url: `${this.basePath}${path}/${id}`,
     });
-  
+
     return res.result;
-  }  
+  }
 
   public async getAllInfinity<T>(
     params?: any,

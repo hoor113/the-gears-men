@@ -1,22 +1,25 @@
 // cart.reducer.ts
 import { IContextAction } from '@/services/common/common.model';
+
 import { TCartActionType, TCartItem, TCartState } from './cart.model';
 
 const cartReducer = (
     state: TCartState,
-    action: IContextAction<TCartActionType>
+    action: IContextAction<TCartActionType>,
 ): TCartState => {
     switch (action.type) {
         case 'ADD_ITEM': {
             const cartItem = action.payload as TCartItem;
-            const existing = state.items.find((item: TCartItem) => item.id === cartItem.id);
+            const existing = state.items.find(
+                (item: TCartItem) => item.id === cartItem.id,
+            );
             if (existing) {
                 return {
                     ...state,
                     items: state.items.map((item: TCartItem) =>
                         item.id === cartItem.id
                             ? { ...item, quantity: item.quantity + cartItem.quantity }
-                            : item
+                            : item,
                     ),
                 };
             }
@@ -32,7 +35,7 @@ const cartReducer = (
             return {
                 ...state,
                 items: state.items.map((item: TCartItem) =>
-                    item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+                    item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
                 ),
             };
         }
@@ -44,14 +47,16 @@ const cartReducer = (
                 items: state.items.map((item: TCartItem) =>
                     item.id === id && item.quantity > 1
                         ? { ...item, quantity: item.quantity - 1 }
-                        : item
+                        : item,
                 ),
             };
         }
 
         case 'REMOVE_ITEM': {
             const id = action.payload as string;
-            const filteredItems = state.items.filter((item: TCartItem) => item.id !== id);
+            const filteredItems = state.items.filter(
+                (item: TCartItem) => item.id !== id,
+            );
             // Nếu item bị xóa là item cuối cùng (mảng còn lại rỗng), trả về mảng rỗng
             return {
                 ...state,
@@ -60,11 +65,14 @@ const cartReducer = (
         }
 
         case 'FIX_QUANTITY': {
-            const { id, quantity } = action.payload as { id: string; quantity: number };
+            const { id, quantity } = action.payload as {
+                id: string;
+                quantity: number;
+            };
             return {
                 ...state,
                 items: state.items.map((item: TCartItem) =>
-                    item.id === id ? { ...item, quantity } : item
+                    item.id === id ? { ...item, quantity } : item,
                 ),
             };
         }

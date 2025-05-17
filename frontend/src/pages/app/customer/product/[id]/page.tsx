@@ -1,82 +1,305 @@
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-import productsService from "../../_services/product.service";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import productsService from '../../_services/product.service';
+import {
+  Box,
+  Typography,
+  Paper,
+  Chip,
+  Divider,
+  Button,
+  Collapse,
+} from '@mui/material';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import { Autoplay, Navigation } from 'swiper/modules';
+import parse from 'html-react-parser';
+import { categoriesObject } from '../../_services/product.model';
+import NiceModal from '@ebay/nice-modal-react';
+import ProductModal from '../../_components/product-modal';
+import { useCart } from '../../cart/context/cart.context';
 
 const SingleProductPage = () => {
-    const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
+    const [_, cartDispatch] = useCart(); 
+  const navigate = useNavigate();
 
-    const { data: product } = useQuery({
-        queryKey: ['products/getOne', id],
-        queryFn: () => productsService.getOne(id as string),
-        enabled: !!id,
-    }) as any;
+  const { data: product } = useQuery({
+    queryKey: ['products/getOne', id],
+    queryFn: () => productsService.getOne(id as string),
+    enabled: !!id,
+  }) as any;
 
-    console.log('product', product);
+  console.log('product', product);
 
-    // if (!product) return <div>Đang tải sản phẩm...</div>;
+  const hasImages = product?.images?.length > 0;
+  const [selectedImage, setSelectedImage] = useState<string>(
+    hasImages ? product.images[0] : '/assets/images/no-image.png',
+  );
 
-    return (
-        <div className="flex flex-col lg:flex-row items-start gap-8 p-8">
-            {/* Hình ảnh sản phẩm */}
-            <div className="flex flex-col items-center">
-                <div className="border-4 border-yellow-400 p-2 relative">
-                    <img
-                        src={product?.image || "/placeholder.png"} //thya product.image bằng lưu trong backend   
-                        alt={product?.name} //thay product.name bằng tên sản phẩm trong backend
-                        className="w-80 h-60 object-contain"
-                    />
-                    <span className="absolute bottom-2 left-2 bg-red-500 text-white px-2 py-1 text-sm font-bold rounded">
-                        SIÊU SALE
-                    </span>
-                </div>
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
-                {/* Hình ảnh nhỏ */}
-                <div className="flex gap-4 mt-4">
-                    {product?.images?.map((img: string, index: number) => (
-                        <img
-                            key={index}
-                            src={img}
-                            alt={`Ảnh phụ ${index + 1}`}
-                            className="w-16 h-12 object-contain border hover:border-orange-500 cursor-pointer"
-                        />
-                    ))}
-                </div>
-            </div>
+  const discountPercent = product?.priceAfterDiscount
+    ? Math.round(
+      ((product.price - product.priceAfterDiscount) / product.price) * 100,
+    )
+    : null;
 
-            {/* Thông tin sản phẩm */}
-            <div className="flex-1">
-                <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
-                <p className="mb-2">
-                    <span className="font-semibold">Tình trạng: </span>
-                    <span className={product?.stock > 0 ? "text-green-600" : "text-red-600"}>
-                        {product?.stock > 0 ? "Còn hàng" : "Hết hàng"}
-                    </span>
-                </p>
+    const handleAddToCart = () => {
+      NiceModal.show(ProductModal, {
+        product: product,
+        addToCart: (product: any, quantity: number) => {
+          cartDispatch({
+            type: 'ADD_ITEM',
+            payload: { ...product, quantity },
+          });
+        },
+      });
+    };
 
-                {/* Chọn số lượng */}
-                <div className="flex items-center gap-4 mb-4">
-                    <span className="font-semibold">Số lượng:</span>
-                    <div className="flex items-center border rounded overflow-hidden">
-                        <button className="px-3 py-1 bg-gray-200 hover:bg-gray-300">-</button>
-                        <input
-                            type="number"
-                            min={1}
-                            defaultValue={1}
-                            className="w-12 text-center outline-none"
-                        />
-                        <button className="px-3 py-1 bg-gray-200 hover:bg-gray-300">+</button>
-                    </div>
-                </div>
+  return (
+    <Box sx={{ backgroundColor: '#f5f5f5', py: 4, px: { xs: 2, md: 6 } }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Box display="flex" flexDirection={{ xs: 'column', lg: 'row' }} gap={4}>
+          {/* Hình ảnh sản phẩm */}
+          <Box flexShrink={0}>
+            <Box
+              sx={{
+                border: '2px solid #eee',
+                mb: 2,
+                position: 'relative',
+                width: 320,
+                height: 240,
+                backgroundColor: '#fff',
+                overflow: 'hidden', // quan trọng
+              }}
+            >
+              <img
+                src={selectedImage}
+                alt={product?.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              {discountPercent && (
+                <Chip
+                  label={`- ${discountPercent}%`}
+                  color="error"
+                  sx={{ position: 'absolute', top: 8, left: 8 }}
+                />
+              )}
+            </Box>
 
-                {/* Nút thêm vào giỏ */}
-                <button
-                    className="bg-orange-500 text-white px-6 py-2 font-bold rounded hover:bg-orange-600"
+            {/* Swiper hình nhỏ */}
+            {hasImages && product.images.length > 1 && (
+              <Box
+                className="w-full mt-2"
+                sx={{
+                  position: 'relative',
+                  maxWidth: 320,
+                  '& .swiper-button-prev, & .swiper-button-next': {
+                    color: 'rgba(0, 0, 0, 0.4)',
+                    width: 28,
+                    height: 28,
+                    transform: 'translateY(-50%)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    '&::after': {
+                      fontSize: 18,
+                      fontWeight: 'bold',
+                    },
+                    transition: 'color 0.3s ease, background-color 0.3s ease',
+                    '&:hover': {
+                      color: 'rgba(0, 0, 0, 0.75)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    },
+                  },
+                  '& .swiper-button-prev': { left: 4 },
+                  '& .swiper-button-next': { right: 4 },
+                }}
+              >
+                <Swiper
+                  modules={[Autoplay, Navigation]}
+                  spaceBetween={10}
+                  slidesPerView={4}
+                  loop
+                  navigation
+                  autoplay={{
+                    delay: 5000,
+                    disableOnInteraction: false,
+                  }}
+                  onSlideChange={(swiper) => setSelectedImage(product.images[swiper.realIndex])}
                 >
-                    THÊM VÀO GIỎ HÀNG
-                </button>
-            </div>
-        </div>
-    );
+                  {product.images.map((img: string, idx: number) => (
+                    <SwiperSlide key={idx}>
+                      <Box
+                        onClick={() => setSelectedImage(img)}
+                        sx={{
+                          cursor: 'pointer',
+                          borderRadius: 1,
+                          overflow: 'hidden',
+                          border:
+                            img === selectedImage
+                              ? '2px solid #3b82f6'
+                              : '2px solid transparent',
+                        }}
+                      >
+                        <img
+                          src={img}
+                          alt={`thumb-${idx}`}
+                          style={{
+                            width: '100%',
+                            height: '80px',
+                            objectFit: 'cover',
+                            borderRadius: '6px',
+                          }}
+                        />
+                      </Box>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </Box>
+            )}
+          </Box>
+
+          {/* Thông tin sản phẩm */}
+          <Box flex={1}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              {product?.name}
+            </Typography>
+
+            <Typography variant="body1" gutterBottom>
+              <strong>Tình trạng:</strong>{' '}
+              <span
+                style={{
+                  color: product?.stock > 0 ? 'green' : 'red',
+                  fontWeight: 500,
+                }}
+              >
+                {product?.stock > 0 ? 'Còn hàng' : 'Hết hàng'}
+              </span>
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>Danh mục:</strong>{' '}
+              {product?.category ? (
+                (() => {
+                  console.log(product.category);
+                  const category = categoriesObject.find(cat => cat.key === product.category?.toLowerCase());
+                  return category ? (
+                    <Button
+                      variant="text"
+                      onClick={() => navigate(`/customer/category/${product.category}`)}
+                      sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
+                    >
+                      {category.title}
+                    </Button>
+                  ) : (
+                    'Không có thông tin'
+                  );
+                })()
+              ) : (
+                'Không có thông tin'
+              )}
+            </Typography>
+
+            <Typography variant="body1" gutterBottom>
+              <strong>Cửa hàng:</strong>{' '}
+              {product?.storeId && product?.storeName
+                ? (
+                  <Button
+                    variant="text"
+                    onClick={() => navigate(`/customer/store/${product.storeId}`)}
+                    sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
+                  >
+                    {product.storeName}
+                  </Button>
+                )
+                : 'Không có thông tin'}
+            </Typography>
+
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* Giá */}
+            <Box display="flex" alignItems="center" gap={2} mb={2}>
+              <Typography fontWeight="medium">Giá:</Typography>
+              {product?.priceAfterDiscount ? (
+                <>
+                  <Typography variant="h6" fontWeight="bold" color="error">
+                    {product?.priceAfterDiscount?.toLocaleString()}₫
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      textDecoration: 'line-through',
+                      color: '#888',
+                    }}
+                  >
+                    {product?.price?.toLocaleString()}₫
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="h6" fontWeight="bold">
+                  {product?.price?.toLocaleString()}₫
+                </Typography>
+              )}
+            </Box>
+
+
+            {/* Nút thêm vào giỏ (chưa có logic) */}
+            <Button
+              variant="contained"
+              color="warning"
+              sx={{ fontWeight: 'bold', mt: 2 }}
+              onClick={handleAddToCart}
+            >
+              THÊM VÀO GIỎ HÀNG
+            </Button>
+          </Box>
+        </Box>
+
+        {/* Mô tả sản phẩm */}
+        {product?.description && (
+          <>
+            <Divider sx={{ my: 3 }} />
+            <Typography variant="h6" gutterBottom>
+              Mô tả sản phẩm
+            </Typography>
+            <Collapse in={showFullDesc}>
+              <Box
+                sx={{
+                  '& p': { mb: 1 },
+                }}
+              >
+                {parse(product.description)}
+              </Box>
+            </Collapse>
+            {!showFullDesc && (
+              <Box
+                sx={{
+                  maxHeight: 70,
+                  overflow: 'hidden',
+                  maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
+                }}
+              >
+                {parse(product.description)}
+              </Box>
+            )}
+            <Button
+              onClick={() => setShowFullDesc(!showFullDesc)}
+              sx={{ mt: 1 }}
+            >
+              {showFullDesc ? 'Thu gọn' : 'Xem thêm'}
+            </Button>
+          </>
+        )}
+      </Paper>
+    </Box>
+  );
 };
 
 export default SingleProductPage;

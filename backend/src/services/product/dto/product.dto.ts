@@ -8,6 +8,10 @@ export class ProductDto extends EntityDto {
     @IsString({ message: 'Store ID must be a string.' })
     storeId!: string; // Required
 
+    @IsString({ message: 'Store ID must be a string.' })
+    @IsOptional()
+    storeName?: string;
+
     @IsString({ message: 'Product name must be a string.' })
     name!: string; // Required
 

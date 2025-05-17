@@ -41,7 +41,7 @@ export class DiscountCodeService {
                 quantity: code.quantity,
                 discountCalculationMethod: code.discountCalculationMethod,
                 discountQuantity: code.discountQuantity,
-                expiryDate: code.expiryDate
+                expiryDate: code.expiryDate,
             }));
 
             return BaseResponse.success(responseData);
@@ -103,19 +103,39 @@ export class DiscountCodeService {
             }
 
             // Map the populated discount codes to the response format
-            let discountCodes = customer.discountCodes.map((discountCode: any) => ({
-                id: discountCode._id,
-                code: discountCode.code,
-                customerId: discountCode.customerId,
-                isUsed: discountCode.isUsed,
-            }));
+            // Get all discount code ids from customer
+            const discountCodeIds = customer.discountCodes.map((discountCode: any) => discountCode._id);
 
+            // Fetch all DiscountCodeCast documents for these codes
+            const discountCodesRaw = await DiscountCode.find({ _id: { $in: discountCodeIds } });
+
+            // Map discount codes with their corresponding DiscountCodeCast info
+            const discountCodes = await Promise.all(
+                discountCodesRaw.map(async (discountCode: any) => {
+                    // Find the DiscountCodeCast by code
+                    const discountCodeCast = await DiscountCodeCast.findOne({ code: discountCode.code });
+                    return {
+                        id: discountCode._id,
+                        code: discountCode.code,
+                        customerId: discountCode.customerId,
+                        isUsed: discountCode.isUsed,
+                        type: discountCodeCast?.type,
+                        discountCalculationMethod: discountCodeCast?.discountCalculationMethod,
+                        expiryDate: discountCodeCast?.expiryDate,
+                        quantity: discountCodeCast?.quantity,
+                        discountQuantity: discountCodeCast?.discountQuantity,
+
+                    };
+                })
+            );
+
+            console.log('discountCodes', discountCodes);
             // Filter the discount codes based on isUsed if provided in the DTO
+            let filteredDiscountCodes = discountCodes;
             if (dto.isUsed !== undefined) {
-                discountCodes = discountCodes.filter(code => code.isUsed === dto.isUsed);
+                filteredDiscountCodes = discountCodes.filter(code => code.isUsed === dto.isUsed);
             }
-
-            return BaseResponse.success(discountCodes);
+            return BaseResponse.success(filteredDiscountCodes);
         } catch (error: any) {
             return BaseResponse.error(
                 error.message || 'Failed to fetch discount codes',

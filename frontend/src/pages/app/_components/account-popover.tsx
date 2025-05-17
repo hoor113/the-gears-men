@@ -1,5 +1,7 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import LogoutIcon from '@mui/icons-material/Logout';
+// Thêm icon voucher
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // Thêm icon voucher
 import HistoryIcon from '@mui/icons-material/History';
 import {
@@ -93,16 +95,17 @@ const AccountPopover = (props: TAccountPopover) => {
           <span>{t('Danh sách voucher')}</span>
           <LocalOfferIcon fontSize="small" />
         </MenuItemStyled>
-        
+
         <Divider />
         <MenuItemStyled
           onClick={() => navigate('/customer/order-history')}
           className="item-order-history"
         >
           <span>{t('Đơn hàng')}</span>
+          
           <HistoryIcon />
         </MenuItemStyled>
-        <Divider />
+        <Divider /> 
         </>
         )}
         
@@ -126,7 +129,7 @@ const MenuItemStyled = styled(MenuItem)`
 
   position: relative;
   width: 100%;
-  
+
   &.item-logout > svg,
   &.item-voucher > svg {
     position: absolute;

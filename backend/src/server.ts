@@ -8,6 +8,7 @@ import { FileController } from '@/controllers/file.controller';
 import { DiscountCodeController } from '@/controllers/discount-code.controller';
 import { ShipmentController } from '@/controllers/shipment.controller';
 import connectDB from '@/config/database';
+import { ZalopayController } from './controllers/zalopay.controller';
 
 async function startServer() {
     try {
@@ -21,6 +22,7 @@ async function startServer() {
             FileController,
             DiscountCodeController,
             ShipmentController,
+            ZalopayController,
         ];
         const app = new App(controllers);
         const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;

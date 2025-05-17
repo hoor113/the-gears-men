@@ -1,5 +1,6 @@
 import { BaseCrudService, TBaseResponse } from '@/base/base-crud-service';
 import { httpService } from '@/base/http-service';
+
 // import { IPaginatedItems } from '@/base/base.model';
 // import { httpService } from '@/base/http-service';
 
@@ -10,13 +11,12 @@ import { httpService } from '@/base/http-service';
 class VoucherService extends BaseCrudService {
   constructor() {
     super('/discount-codes');
-
   }
 
   public async getDiscountCodesOfCustomer<T>(
     path = '/customer',
   ): Promise<{ data: T }> {
-    console.log("hard code", `${this.basePath}${path}`);
+    console.log('hard code', `${this.basePath}${path}`);
     const res = await httpService.request<TBaseResponse<{ data: T }>>({
       method: 'GET',
       url: `${this.basePath}${path}`,
@@ -25,17 +25,17 @@ class VoucherService extends BaseCrudService {
     return res.result;
   }
 
-  public async claimDiscountCode<T>(data: any, path = '/claim') {
-    const res = await httpService.request<TBaseResponse<T>>({
-      method: 'POST',
+  public async claim<T>(
+    data: any,
+    path = '/claim',
+  ): Promise<TBaseResponse<T>> {
+    const response = await httpService.request<TBaseResponse<T>>({
       url: `${this.basePath}${path}`,
+      method: 'POST',
       data,
     });
-
-    return res.result;
-
+    return response;
   }
-
 }
 
 const voucherService = new VoucherService();

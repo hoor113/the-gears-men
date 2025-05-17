@@ -54,7 +54,7 @@ export class OrderController {
     // }
 
     // Customer endpoints
-    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
+    @UseBefore(authorizeRoles([EUserRole.Customer, EUserRole.Admin]), TokenDecoderMiddleware)
     @Post('/create')
     @UseBefore(ValidationMiddleware(CreateOrderDto))
     async createOrder(@Req() req: Request, @Body() dto: CreateOrderDto, @Res() res: Response) {

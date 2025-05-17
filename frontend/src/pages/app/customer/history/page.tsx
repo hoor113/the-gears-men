@@ -27,7 +27,6 @@ import orderHistoryService, {
 } from './_services/history.services';
 import OrderItem from './_components/order-item';
 import UnconfirmedOrderItem from './_components/unconfirmed-order-item';
-import { EOrderStatus } from '@/services/order/order.model';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -148,16 +147,16 @@ export default function OrderHistoryPage() {
   });
 
   // Handle tab changes
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
   // Separate handlers for each pagination
-  const handlePendingPageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handlePendingPageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPendingPage(newPage);
   };
 
-  const handleHistoryPageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handleHistoryPageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setHistoryPage(newPage);
   };
 

@@ -10,7 +10,7 @@ export class ProductDiscountCronService {
 
     constructor() {
         // Test mode: Run every 2 minutes
-        this.dailyDiscountJob = new CronJob('* * * * *', async () => {
+        this.dailyDiscountJob = new CronJob('*/10 * * * *', async () => {
             await this.runDailyDiscountJob();
         })
         // Prod mode: Run every day at midnight

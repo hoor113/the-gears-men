@@ -23,6 +23,7 @@ import SingleProductPage from '@/pages/app/customer/product/[id]/page';
 import VoucherPage from '@/pages/app/customer/voucher/page';
 import CartPage from '@/pages/app/customer/cart/page';
 import AboutUs from '@/pages/app/customer/_components/aboutus';
+import OrderHistoryPage from '@/pages/app/customer/history/page';
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
             path: 'vouchers',
             element: <VoucherPage />,
           },
+          {
+            path: 'order-history',
+            element: <OrderHistoryPage />,
+          }, 
           {
             path: 'cart',
             element: <CartPage />,

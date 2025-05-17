@@ -18,6 +18,7 @@ export type TGetAllQuery = {
 export type TBaseResponse<T> = {
   success: boolean;
   result: T;
+  resultCount: number;
   data?: T;
 };
 

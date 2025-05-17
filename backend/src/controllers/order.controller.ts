@@ -18,6 +18,7 @@ import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     CancelOrderDto,
     CreateOrderDto,
+    GetAllOrderByCustomerDto,
 } from '@/services/order/dto/order.dto';
 import { OrderService } from '@/services/order/order.service';
 import { EHttpStatusCode } from '@/utils/enum';
@@ -77,6 +78,24 @@ export class OrderController {
         try {
             const customerId = (req as any).userId;
             const response = await this.orderService.cancelOrder(customerId, dto);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Internal Server Error',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
+
+    @Get('/history')
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
+    @UseBefore(ValidationMiddleware(GetAllOrderByCustomerDto))
+    async getAllOrderByCustomer(
+        @Req() req: Request, @QueryParams() dto: GetAllOrderByCustomerDto , @Res() res: Response) {
+        try {
+            const customerId = (req as any).userId;
+            const response = await this.orderService.getAllOrderByCustomer(customerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

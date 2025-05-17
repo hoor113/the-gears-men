@@ -108,7 +108,7 @@ export class ZaloPayService {
             const orderId = embedData.orderId;
 
             await Order.findByIdAndUpdate(orderId, {
-                orderStatus: EOrderStatus.Confirmed,
+                orderStatus: EOrderStatus.Pending,
             });
 
             return BaseResponse.success('Payment successful', EHttpStatusCode.OK);

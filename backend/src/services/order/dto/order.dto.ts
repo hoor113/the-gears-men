@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
-import { IsOptional, IsString, IsMongoId, IsArray, IsNumber, IsEnum, ValidateNested, ValidationArguments } from 'class-validator';
+import { IsOptional, IsString, IsMongoId, IsArray, IsNumber, IsEnum, ValidateNested, ValidationArguments, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EntityDto } from '@/common/entity-dto';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
 import { EPaymentMethod } from '@/models/order.model';
 
 export class OrderItemDto extends EntityDto {
@@ -94,4 +95,12 @@ export class CancelOrderDto extends EntityDto {
 
     // @IsMongoId({ message: 'Customer ID must be a valid MongoDB ID.' })
     // customerId!: string; // Required
+}
+
+export class GetAllOrderByCustomerDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsNumber({}, { message: 'In process must be a number.' })
+    isPending?: number;
+
+    maxResultCount: number = 5;
 }

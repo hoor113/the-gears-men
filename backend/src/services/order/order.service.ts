@@ -9,7 +9,8 @@ import {
     CreateOrderDto,
     CancelOrderDto,
     OrderDto,
-    OrderItemDto
+    OrderItemDto,
+    GetAllOrderByCustomerDto
 } from '@/services/order/dto/order.dto';
 import { OrderCronService } from '@/services/order/order-cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
@@ -238,6 +239,26 @@ export class OrderService {
         try {
             const orders = await Order.find({ customerId }).populate('items.productId');
             return BaseResponse.success(orders, undefined, 'Orders retrieved successfully', EHttpStatusCode.OK);
+        } catch (error) {
+            return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async getAllOrderByCustomer(customerId: string, dto: GetAllOrderByCustomerDto): Promise<BaseResponse<OrderDto[] | unknown>> {
+        try {
+            const filter: any = { customerId };
+            filter.orderStatus = dto.isPending ? EOrderStatus.Pending : { $ne: EOrderStatus.Pending };
+
+            const orders = await Order.find(filter)
+                .populate('items.shipmentId')
+                .populate('items.productId')
+                .populate('items.productDiscountCode')
+                .populate('items.shippingDiscountCode')
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount)
+                .sort({ createdAt: -1 });
+            const totalCount = await Order.countDocuments(filter);
+            return BaseResponse.success(orders, totalCount, 'Orders retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }

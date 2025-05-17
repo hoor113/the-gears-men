@@ -27,6 +27,7 @@ import AuthLayout from '@/pages/auth/layout';
 import LoginPage from '@/pages/auth/login.page';
 import RegisterPage from '@/pages/auth/register.page';
 import NotFoundPage from '@/pages/not-found.page';
+import CartPage from '@/pages/app/customer/cart/page';
 
 export const router = createBrowserRouter([
   {
@@ -65,8 +66,17 @@ export const router = createBrowserRouter([
             element: <VoucherPage />,
           },
           {
+            path: 'order-history',
+            element: <OrderHistoryPage />,
+          }, 
+          {
             path: 'cart',
             element: <CartPage />,
+          },
+          {
+            path: 'aboutus',
+            element: <AboutUs/>
+          }
           },
           {
             path: 'payment',

@@ -1,4 +1,4 @@
-import { DELIVERY_VAT } from '@/constants/delivery-vat'
+import { DELIVERY_VAT } from '@/constants/delivery-vat';
 import Order, { EOrderStatus } from '@/models/order.model';
 import Product from '@/models/product.model';
 import mongoose from 'mongoose';
@@ -9,12 +9,15 @@ import {
     CreateOrderDto,
     CancelOrderDto,
     OrderDto,
-    OrderItemDto
+    OrderItemDto,
+    GetAllOrderByCustomerDto
 } from '@/services/order/dto/order.dto';
-import { OrderCronService } from '@/services/cron/cron.service';
+import { OrderCronService } from '@/services/order/order-cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
 import { DiscountCodeDto } from '@/services/discount-code/dto/discount-code.dto';
 import { EDiscountCalculationMethod } from '@/models/discount-code-cast.model';
+import redis from '@/config/redis';
+import { DAILY_DISCOUNT_PERCENTAGE } from '@/constants/daily-discount-percentage';
 
 @Service()
 export class OrderService {
@@ -54,13 +57,18 @@ export class OrderService {
                         EHttpStatusCode.BAD_REQUEST
                     );
                 }
-
+                // Apply daily discount if available
+                const discountedList = await redis.getList('daily_discount');
+                console.log('Discounted List:', discountedList);
+                if (discountedList && discountedList.includes((product._id as string).toString())) {
+                    console.log('Product is in the discounted list:', product.name);
+                    // Apply discount logic here
+                    product.price -= (product.price * DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((product._id as string).toString())]) / 100; // Apply discount percentage to price
+                }
                 let productPrice: number = product.price * item.quantity;
                 let shippingPrice: number = productPrice * DELIVERY_VAT;
-                let productDiscountCode: string | null = null;
-                let shippingDiscountCode: string | null = null;
 
-                console.log(item.productDiscountCode, item.shippingDiscountCode);
+                // console.log(item.productDiscountCode, item.shippingDiscountCode);
 
                 // Process product discount code if provided
                 if (item.productDiscountCode) {
@@ -154,7 +162,7 @@ export class OrderService {
         }
     }
 
-    
+
 
     public async cancelOrder(customerId: string, dto: CancelOrderDto): Promise<BaseResponse<OrderDto | unknown>> {
         try {
@@ -186,7 +194,7 @@ export class OrderService {
                 order.orderStatus = EOrderStatus.Cancelled;
                 await order.save();
             }
-            
+
             this.orderCronService.cancelOrderConfirmation(orderId); // Cancel confirmation job
 
             const orderDto: OrderDto = {
@@ -217,6 +225,26 @@ export class OrderService {
         try {
             const orders = await Order.find({ customerId }).populate('items.productId');
             return BaseResponse.success(orders, undefined, 'Orders retrieved successfully', EHttpStatusCode.OK);
+        } catch (error) {
+            return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async getAllOrderByCustomer(customerId: string, dto: GetAllOrderByCustomerDto): Promise<BaseResponse<OrderDto[] | unknown>> {
+        try {
+            const filter: any = { customerId };
+            filter.orderStatus = dto.isPending ? EOrderStatus.Pending : { $ne: EOrderStatus.Pending };
+
+            const orders = await Order.find(filter)
+                .populate('items.shipmentId')
+                .populate('items.productId')
+                .populate('items.productDiscountCode')
+                .populate('items.shippingDiscountCode')
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount)
+                .sort({ createdAt: -1 });
+            const totalCount = await Order.countDocuments(filter);
+            return BaseResponse.success(orders, totalCount, 'Orders retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }

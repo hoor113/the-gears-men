@@ -1,0 +1,1 @@
+export const DAILY_DISCOUNT_PERCENTAGE = [10, 15, 20, 25, 30];

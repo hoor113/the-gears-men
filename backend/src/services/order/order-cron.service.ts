@@ -11,14 +11,14 @@ export class OrderCronService {
     private shipmentService: CronShipmentService;
     
     // For testing: 3 minutes instead of 24 hours
-    // private readonly CONFIRMATION_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes in milliseconds
-    private readonly CONFIRMATION_TIMEOUT_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    private readonly CONFIRMATION_TIMEOUT_MS = 1 * 60 * 1000; // 3 minutes in milliseconds
+    // private readonly CONFIRMATION_TIMEOUT_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     
     constructor() {
         this.shipmentService = Container.get(CronShipmentService);
         
         // Run every hour to check for orders that need confirmation (more frequent for testing)
-        this.orderConfirmationJob = new CronJob('0 * * * *', async () => {
+        this.orderConfirmationJob = new CronJob('* * * * *', async () => {
             await this.processOrderConfirmations();
         });
         
@@ -28,7 +28,7 @@ export class OrderCronService {
         // });
         
         this.orderConfirmationJob.start();
-        console.log('🕒 Order confirmation cron job started (TEST MODE: 3 minutes timeout)');
+        console.log('🕒 Order confirmation cron job started (TEST MODE: 10 minutes timeout)');
     }
 
     /**

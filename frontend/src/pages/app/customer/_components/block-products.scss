@@ -1,0 +1,54 @@
+.block {
+    // background-color: gray;
+    padding: 20px 40px;
+    margin: 80px 0 80px 0;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    .block-name {
+        padding: 10px;
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    .products {
+        .slick-next:before {
+            font-size: 30px;
+            color: red;
+            position: absolute;
+            right: -15px;
+            top: -45px;
+            font-size: 40px;
+        }
+
+        .slick-prev:before {
+            font-size: 30px;
+            color: red;
+            position: absolute;
+            left: -15px;
+            top: -45px;
+            font-size: 40px;
+        }
+
+        .slick-track{
+            padding: 20px 0;
+        }
+    }
+
+    .view-all {
+        text-align: center;
+        button {
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 6px;
+            color: rgb(219, 88, 12);    
+            background-color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover{
+            color: #fff;    
+            background-color: rgb(219, 88, 12);
+        }
+    }
+}

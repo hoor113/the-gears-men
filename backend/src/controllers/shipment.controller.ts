@@ -7,6 +7,7 @@ import {
     Delete,
     Get,
     JsonController,
+    Param,
     Post,
     Put,
     QueryParams,
@@ -28,11 +29,13 @@ import { ShipmentStoreOwnerService } from '@/services/shipment/shipment-store-ow
 import { ShipmentDeliveryCompanyService } from '@/services/shipment/shipment-delivery-company.service';
 import { ShipmentDeliveryPersonnelService } from '@/services/shipment/shipment-delivery-personnel.service';
 import { ShipmentCommonService } from '@/services/shipment/shipment-common.service';
+import { ShipmentAdminService } from '@/services/shipment/shipment-admin.service';
 import { EHttpStatusCode } from '@/utils/enum';
 import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from '@/config/jwt';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/shipments')
@@ -41,12 +44,14 @@ export class ShipmentController {
     private shipmentDeliveryCompanyService: ShipmentDeliveryCompanyService;
     private shipmentDeliveryPersonnelService: ShipmentDeliveryPersonnelService;
     private shipmentCommonService: ShipmentCommonService; 
+    private shipmentAdminService: ShipmentAdminService;
 
     constructor() {
         this.shipmentStoreOwnerService = Container.get(ShipmentStoreOwnerService);
         this.shipmentDeliveryCompanyService = Container.get(ShipmentDeliveryCompanyService);
         this.shipmentDeliveryPersonnelService = Container.get(ShipmentDeliveryPersonnelService);
         this.shipmentCommonService = Container.get(ShipmentCommonService);
+        this.shipmentAdminService = Container.get(ShipmentAdminService);
     }
 
 
@@ -54,22 +59,14 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
     @Get('/store/')
     @UseBefore(ValidationMiddleware(GetShipmentFromCustomerDto))
+    @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromCustomer(
         @Req() req: any,
         @Body() dto: GetShipmentFromCustomerDto,
         @Res() res: Response,
     ) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const ownerId = decoded.id;
+            const ownerId = (req as any)?.userId;
             const response = await this.shipmentStoreOwnerService.getShipmentsFromCustomer(ownerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -105,22 +102,14 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.DeliveryCompany]))
     @Get('/company/')
     @UseBefore(ValidationMiddleware(GetShipmentFromStoreDto))
+    @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromStore(
         @Req() req: Request,
         @Body() dto: GetShipmentFromStoreDto,
         @Res() res: Response,
     ) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const companyId = decoded.id;
+            const companyId = (req as any).userId;
             const response = await this.shipmentDeliveryCompanyService.getShipmentFromStore(companyId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -162,16 +151,7 @@ export class ShipmentController {
         @Res() res: Response,
     ) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const personnelId = decoded.id;
+            const personnelId = (req as any).userId;
             const response = await this.shipmentDeliveryPersonnelService.getAssignedShipments(personnelId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -205,21 +185,13 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.DeliveryCompany, EUserRole.DeliveryPersonnel, EUserRole.Admin]))
     @Post('/cancel')
     @UseBefore(ValidationMiddleware(StringEntityDto))
+    @UseBefore(TokenDecoderMiddleware)
     public async cancelShipment(
         @Req() req: Request,
         shipmentId: StringEntityDto,
         @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const cancellerId = decoded.id;
+            const cancellerId = (req as any).userId;
             const response = await this.shipmentCommonService.cancelShipment(cancellerId, shipmentId);
             return res.status(response.statusCode).json(response);
         } catch (error) {
@@ -231,59 +203,41 @@ export class ShipmentController {
         }
     }
     // Admin access - for convenience
-    // @Get('/detail')
-    // @UseBefore(authorizeRoles([EUserRole.Admin, EUserRole.Customer, EUserRole.StoreOwner, EUserRole.DeliveryCompany, EUserRole.DeliveryPersonnel]))
-    // async getShipmentById(
-    //     @QueryParams() query: StringEntityDto,
-    //     @Res() res: Response,
-    // ) {
-    //     const id = query.id;
-    //     if (!id) {
-    //         return res.status(400).json({ 
-    //             success: false, 
-    //             message: 'Missing id parameter',
-    //             statusCode: EHttpStatusCode.BAD_REQUEST
-    //         });
-    //     }
+    @Get('/GetById/:id')
+    @UseBefore(authorizeRoles([EUserRole.Admin]))
+    async getShipmentById(
+        @Param('id') id: string,
+        @Res() res: Response,
+    ) {
+        try {
+            // Implement this method in one of your services or create a new shared method
+            const response = await this.shipmentAdminService.getShipmentById(id);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Shipment Not Found',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
 
-    //     try {
-    //         // Implement this method in one of your services or create a new shared method
-    //         const response = await this.shipmentCustomerService.getShipmentById(id);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Shipment Not Found',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
-
-    // @Delete('/')
-    // @UseBefore(authorizeRoles([EUserRole.Admin]))
-    // async deleteShipment(
-    //     @QueryParams() query: StringEntityDto,
-    //     @Res() res: Response,
-    // ) {
-    //     const id = query.id;
-    //     if (!id) {
-    //         return res.status(400).json({ 
-    //             success: false, 
-    //             message: 'Missing id parameter',
-    //             statusCode: EHttpStatusCode.BAD_REQUEST
-    //         });
-    //     }
-
-    //     try {
-    //         // Implement this method in one of your services or create a shared method
-    //         const response = await this.shipmentCustomerService.deleteShipment(id);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
+    @Delete('/Delete/:id')
+    @UseBefore(authorizeRoles([EUserRole.Admin]))
+    async deleteShipment(
+        @Param('id') id: string,
+        @Res() res: Response,
+    ) {
+        try {
+            // Implement this method in one of your services or create a shared method
+            const response = await this.shipmentAdminService.deleteShipment(id);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Internal Server Error',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
 }

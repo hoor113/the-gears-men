@@ -1,0 +1,13 @@
+.top-nav-cart {
+    cursor: pointer;
+}
+
+@media screen and (max-width: 500px){
+    .top-nav-group-name {
+        display: none;
+    }
+
+    .top-nav-cart{
+        display: none;
+    }
+}

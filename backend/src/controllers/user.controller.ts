@@ -38,6 +38,7 @@ import {
 import { UserService } from '@/services/user/user.service';
 import { EHttpStatusCode } from '@/utils/enum';
 import Container from 'typedi';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/users')
@@ -152,8 +153,10 @@ export class UserController {
 =======
 
     @Get('/MyInfo')
+    @UseBefore(TokenDecoderMiddleware)
     async myInfo(@Req() req: Request, @Res() res: Response) {
         try {
+<<<<<<< HEAD
             const authHeader = (req.headers as any)?.authorization;
             const token = authHeader?.split(' ')[1];
             if (!token) {
@@ -170,6 +173,10 @@ export class UserController {
 >>>>>>> e65dd44d474f28c07dc6c6d97dd41a4f565a984c
 =======
             const role = decoded.role;
+=======
+            const userId = (req as any).userId;
+            const role = (req as any).role;
+>>>>>>> bf65217a05eb98c5454a1834052969877dd3060e
             const response = await this.userService.getUserById(userId, role);
 >>>>>>> e246fa2b273ba2562f731ef3577a964ddd43f150
             return res.status(response.statusCode).json(response);

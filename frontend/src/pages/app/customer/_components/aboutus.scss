@@ -1,0 +1,28 @@
+.my-20 {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
+}
+
+.custom-nav-btn {
+  color: #ff6a00;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(255, 106, 0, 0.7);
+  &:hover {
+    color: #ee0979;
+  }
+}
+
+/* Bạn có thể thêm hiệu ứng cho nút mũi tên swiper, ví dụ kiểu bánh răng quay */
+.swiper-button-next,
+.swiper-button-prev {
+  transition: transform 0.3s ease;
+}
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  transform: rotate(15deg);
+  color: #ff6a00;
+}
+
+.swiper.swiper-initialized.swiper-horizontal.swiper-backface-hidden.group {
+    padding: 30px;
+}

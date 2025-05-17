@@ -42,8 +42,8 @@ export class BaseDiscountCodeDto {
 
 // DTO for discount code response
 export class DiscountCodeDto extends BaseDiscountCodeDto {
-    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
-    customerId!: mongoose.Types.ObjectId;
+    // @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
+    // customerId!: mongoose.Types.ObjectId;
 
     @IsBoolean({message: 'isUsed must be a boolean value.'})
     isUsed!: boolean;
@@ -54,6 +54,12 @@ export class DiscountCodeCastDto extends BaseDiscountCodeDto {
     @IsNumber({}, {message: 'Quantity must be a number.'})
     @Min(1, {message: 'Quantity must be at least 1.'})
     quantity!: number;
+}
+
+export class GetDiscountCodeCustomerDto extends BaseGetAllDto {    
+    @IsBoolean({message: 'isUsed must be a boolean value.'})
+    @IsOptional()
+    isUsed?: boolean;
 }
 
 // DTO for creating a new discount code cast
@@ -80,16 +86,6 @@ export class CreateDiscountCodeCastDto {
     quantity!: number;
 }
 
-// DTO for updating a discount code
-export class UpdateDiscountCodeDto {
-    @IsOptional()
-    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
-    customerId?: mongoose.Types.ObjectId;
-
-    @IsOptional()
-    @IsBoolean({message: 'isUsed must be a boolean value.'})
-    isUsed?: boolean;
-}
 
 // DTO for validating a general discount code
 export class ValidateDiscountCodeDto {

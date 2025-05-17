@@ -11,14 +11,15 @@ import {
     QueryParams,
     Res,
     UseBefore,
-    Req
+    Req,
+    Param
 } from 'routing-controllers';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     GetAllDiscountCodesDto,
-    UpdateDiscountCodeDto,
     CreateDiscountCodeCastDto,
+    GetDiscountCodeCustomerDto,
 } from '@/services/discount-code/dto/discount-code.dto';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
 import { EHttpStatusCode } from '@/utils/enum';
@@ -26,6 +27,7 @@ import { EUserRole } from '@/models/user.model';
 import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from '@/config/jwt';
+import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/discount-codes')
@@ -78,23 +80,17 @@ export class DiscountCodeController {
         }
     }
 
-    @Get('/customer')
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
+    @Get('/customer/')
+    @UseBefore(ValidationMiddleware(GetDiscountCodeCustomerDto))
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
     async getDiscountCodeCustomer(
-        @Req() req: Request,
-        @Res() res: Response,) {
+        @Req() req: Request, 
+        @QueryParams() dto: GetDiscountCodeCustomerDto, 
+        @Res() res: Response
+    ) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const customerId = decoded.id;
-            const response = await this.discountCodeService.getDiscountCodeCustomer(customerId);
+            const customerId = (req as any).userId;
+            const response = await this.discountCodeService.getDiscountCodeCustomer(customerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({
@@ -106,11 +102,10 @@ export class DiscountCodeController {
     }
 
     // @Put('/Update')
-    // @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
-    // @UseBefore(ValidationMiddleware(UpdateDiscountCodeDto))
-    // async updateDiscountCode(@Body() dto: UpdateDiscountCodeDto, @Res() res: Response) {
+    // @UseBefore(authorizeRoles([EUserRole.Admin]))
+    // async updateDiscountCodeCast(@Body() dto: StringEntityDto, @Res() res: Response) {
     //     try {
-    //         const response = await this.discountCodeService.updateDiscountCode(dto);
+    //         const response = await this.discountCodeService.updateDiscountCodeCast(dto);
     //         return res.status(response.statusCode).json(response);
     //     } catch (error) {
     //         return res.status(500).json({
@@ -121,34 +116,28 @@ export class DiscountCodeController {
     //     }
     // }
 
-    // @Delete('/Delete')
-    // @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
-    // async deleteDiscountCode(
-    //     @QueryParams() query: StringEntityDto,
-    //     @Res() res: Response,
-    // ) {
-    //     const id = query.id;
-    //     if (!id) {
-    //         return res
-    //             .status(400)
-    //             .json({ success: false, message: 'Missing id parameter' });
-    //     }
-    //     try {
-    //         const response = await this.discountCodeService.deleteDiscountCode(id);
-    //         return res.status(response.statusCode).json(response);
-    //     } catch (error) {
-    //         return res.status(500).json({
-    //             success: false,
-    //             message: (error as any)?.message || 'Internal Server Error',
-    //             statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
-    //         });
-    //     }
-    // }
+    @Delete('/Delete')
+    @UseBefore(authorizeRoles([EUserRole.Admin]))
+    async deleteDiscountCodeCast(
+        @Body() dto: StringEntityDto,
+        @Res() res: Response,
+    ) {
+        try {
+            const response = await this.discountCodeService.deleteDiscountCodeCast(dto);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: (error as any)?.message || 'Internal Server Error',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
 
     /**
      * Creates a new discount code cast
      */
-    @Post('/cast')
+    @Post('/Create')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
     @UseBefore(ValidationMiddleware(CreateDiscountCodeCastDto))
     async createDiscountCodeCast(@Body() dto: CreateDiscountCodeCastDto, @Res() res: Response) {
@@ -165,23 +154,14 @@ export class DiscountCodeController {
     }
 
     @Post('/claim')
-    @UseBefore(authorizeRoles([EUserRole.Customer]))
+    @UseBefore(authorizeRoles([EUserRole.Customer]), TokenDecoderMiddleware)
     @UseBefore(ValidationMiddleware(StringEntityDto))
     public async claimDiscountCode(
         @Req() req: Request,
         @Body() code: StringEntityDto,
         @Res() res: Response) {
         try {
-            const authHeader = (req.headers as any)?.authorization;
-            const token = authHeader?.split(' ')[1];
-            if (!token) {
-                return res
-                    .status(401)
-                    .json(BaseResponse.error('Token missing', 401));
-            }
-            const decoded = verifyToken(token) as JwtPayload;
-            console.log('decoded', decoded);
-            const customerId = decoded.id;
+            const customerId = (req as any).userId;
             const response = await this.discountCodeService.claimDiscountCode(customerId, code);
             return res.status(response.statusCode).json(response);
         } catch (error) {

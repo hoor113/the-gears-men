@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Typography, styled, Chip } from '@mui/material';
 import { EShipmentStatus } from '@/services/shipment/shipment.model';
 import useTranslation from '@/hooks/use-translation';
@@ -138,7 +137,7 @@ export default function ShipmentStatusGraph({ status }: ShipmentStatusGraphProps
     );
   };
   
-  const renderLine = (fromStatus: EShipmentStatus, toStatus: EShipmentStatus) => {
+  const renderLine = (fromStatus: EShipmentStatus, _toStatus: EShipmentStatus) => {
     const fromIndex = [
       EShipmentStatus.Pending,
       EShipmentStatus.Confirmed,

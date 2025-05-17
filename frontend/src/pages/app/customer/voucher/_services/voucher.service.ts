@@ -3,9 +3,9 @@ import { httpService } from '@/base/http-service';
 // import { IPaginatedItems } from '@/base/base.model';
 // import { httpService } from '@/base/http-service';
 
-interface DiscountCode {
-  id: String
-}
+// interface DiscountCode {
+//   id: String
+// }
 
 class VoucherService extends BaseCrudService {
   constructor() {

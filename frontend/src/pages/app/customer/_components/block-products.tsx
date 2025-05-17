@@ -56,7 +56,7 @@ const BlockProducts = ({ title, products, path }: BlockProductsProps) => {
           <Button
             variant="outlined"
             size="large"
-            onClick={() => navigate(`/category/${path}`)}
+            onClick={() => navigate(`/customer/category/${path}`)}
           >
             Xem tất cả
           </Button>

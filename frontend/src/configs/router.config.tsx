@@ -29,6 +29,9 @@ import RegisterPage from '@/pages/auth/register.page';
 import NotFoundPage from '@/pages/not-found.page';
 import OrderHistoryPage from '@/pages/app/customer/history/page';
 import AboutUs from '@/pages/app/customer/_components/aboutus';
+import SingleCategoryPage from '@/pages/app/customer/category/[id]/page';
+import SaleProductPage from '@/pages/app/customer/category/sale/page';
+import SingleStorePage from '@/pages/app/customer/store/[id]/page';
 
 export const router = createBrowserRouter([
   {
@@ -77,6 +80,18 @@ export const router = createBrowserRouter([
           {
             path: 'aboutus',
             element: <AboutUs/>
+          },
+          {
+            path: 'category/:id',
+            element: <SingleCategoryPage />,
+          },
+          {
+            path: 'store/:id',
+            element: <SingleStorePage />,
+          },
+          {
+            path: 'category/sale',
+            element: <SaleProductPage />
           },
           {
             path: 'payment',

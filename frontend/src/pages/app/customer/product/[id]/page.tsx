@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -21,19 +21,26 @@ import { categoriesObject } from '../../_services/product.model';
 import NiceModal from '@ebay/nice-modal-react';
 import ProductModal from '../../_components/product-modal';
 import { useCart } from '../../cart/context/cart.context';
+import appService from '@/services/app/app.service';
 
 const SingleProductPage = () => {
   const { id } = useParams<{ id: string }>();
-    const [_, cartDispatch] = useCart(); 
+  const [_, cartDispatch] = useCart();
   const navigate = useNavigate();
 
-  const { data: product } = useQuery({
+  const { data: product, isLoading } = useQuery({
     queryKey: ['products/getOne', id],
     queryFn: () => productsService.getOne(id as string),
     enabled: !!id,
   }) as any;
 
-  console.log('product', product);
+  useEffect(() => {
+    if (isLoading) {
+      appService.showLoadingModal();
+    } else {
+      appService.hideLoadingModal();
+    }
+  }, [isLoading]);
 
   const hasImages = product?.images?.length > 0;
   const [selectedImage, setSelectedImage] = useState<string>(
@@ -48,20 +55,20 @@ const SingleProductPage = () => {
     )
     : null;
 
-    const handleAddToCart = () => {
-      NiceModal.show(ProductModal, {
-        product: product,
-        addToCart: (product: any, quantity: number) => {
-          cartDispatch({
-            type: 'ADD_ITEM',
-            payload: { ...product, quantity },
-          });
-        },
-      });
-    };
+  const handleAddToCart = () => {
+    NiceModal.show(ProductModal, {
+      product: product,
+      addToCart: (product: any, quantity: number) => {
+        cartDispatch({
+          type: 'ADD_ITEM',
+          payload: { ...product, quantity },
+        });
+      },
+    });
+  };
 
   return (
-    <Box sx={{ backgroundColor: '#f5f5f5', py: 4, px: { xs: 2, md: 6 } }}>
+    <Box sx={{ backgroundColor: '#f5f5f5', py: 4, px: { xs: 2, md: 6 }, height: '100vh' }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Box display="flex" flexDirection={{ xs: 'column', lg: 'row' }} gap={4}>
           {/* Hình ảnh sản phẩm */}

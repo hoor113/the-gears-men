@@ -232,7 +232,10 @@ export class OrderService {
 
     public async getAllOrderByCustomer(customerId: string, dto: GetAllOrderByCustomerDto): Promise<BaseResponse<OrderDto[] | unknown>> {
         try {
-            const orders = await Order.find({ customerId })
+            const filter: any = { customerId };
+            filter.orderStatus = dto.isPending ? EOrderStatus.Pending : { $ne: EOrderStatus.Pending };
+
+            const orders = await Order.find(filter)
                 .populate('items.shipmentId')
                 .populate('items.productId')
                 .populate('items.productDiscountCode')
@@ -240,7 +243,8 @@ export class OrderService {
                 .skip(dto.skipCount)
                 .limit(dto.maxResultCount)
                 .sort({ createdAt: -1 });
-            return BaseResponse.success(orders, undefined, 'Orders retrieved successfully', EHttpStatusCode.OK);
+            const totalCount = await Order.countDocuments(filter);
+            return BaseResponse.success(orders, totalCount, 'Orders retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
         }

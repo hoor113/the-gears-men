@@ -99,7 +99,7 @@ const AccountPopover = (props: TAccountPopover) => {
           onClick={() => navigate('/customer/order-history')}
           className="item-order-history"
         >
-          <span>{t('Lịch sử đơn hàng')}</span>
+          <span>{t('Đơn hàng')}</span>
           <HistoryIcon />
         </MenuItemStyled>
         <Divider />

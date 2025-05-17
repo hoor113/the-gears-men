@@ -1448,6 +1448,19 @@ export const initial = {
   'Đang giao': '',
   'Đã giao': '',
   'Dự kiến giao hàng': '',
+  'Đang xác nhận': '',
+  'Hủy đơn hàng': '',
+  'Sản phẩm': '',
+  'Ship': '',
+  'Đơn hàng': '',
+  'Lịch sử đặt hàng': '',
+  'Bạn không có đơn hàng đang xác nhận': '',
+  'Bạn chưa có lịch sử đơn hàng': '',
+  'Đơn hàng đã được hủy thành công': '',
+  'Không thể hủy đơn hàng. Vui lòng thử lại sau.': '',
+  'Xác nhận hủy đơn hàng': '',
+  'Bạn có chắc chắn muốn hủy đơn hàng này không? Thao tác này không thể hoàn tác.': '',
+  'Không': '',
 };
 
 type TObj = typeof initial;

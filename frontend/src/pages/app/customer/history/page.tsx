@@ -6,189 +6,342 @@ import {
   Paper,
   CircularProgress,
   Pagination,
-  Divider
+  Divider,
+  Tabs,
+  Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  Snackbar,
+  Alert
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import useTranslation from '@/hooks/use-translation';
-import orderHistoryService from './_services/history.services';
+import orderHistoryService, { 
+  IPendingOrderResponse, 
+  IOrderHistory, 
+  IPendingOrder 
+} from './_services/history.services';
 import OrderItem from './_components/order-item';
+import UnconfirmedOrderItem from './_components/unconfirmed-order-item';
+import { EOrderStatus } from '@/services/order/order.model';
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`order-history-tabpanel-${index}`}
+      aria-labelledby={`order-history-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `order-history-tab-${index}`,
+    'aria-controls': `order-history-tabpanel-${index}`,
+  };
+}
 
 export default function OrderHistoryPage() {
   const { t } = useTranslation();
-  const [page, setPage] = useState(1);
+  const [tabValue, setTabValue] = useState(0);
+  const [pendingPage, setPendingPage] = useState(1);
+  const [historyPage, setHistoryPage] = useState(1);
   const [rowsPerPage] = useState(5);
+  const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error'
+  });
+  
+  const queryClient = useQueryClient();
 
-  // Query for order history
-  const { data, isLoading } = useQuery({
-    queryKey: ['orders/history', page],
+  // Query for pending orders
+  const {
+    data: pendingData,
+    isLoading: pendingIsLoading
+  } = useQuery<IPendingOrderResponse>({
+    queryKey: ['orders/pending', pendingPage],
     queryFn: async () => {
       try {
-        return orderHistoryService.getOrderHistory(page, rowsPerPage);
+        return orderHistoryService.getPendingOrders(pendingPage, rowsPerPage);
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error("Error fetching pending orders:", error);
+        return {
+          items: [] as IPendingOrder[],
+          totalPages: 0,
+          totalCount: 0,
+          totalRecords: 0,
+          data: []
+        };
       }
-      // return {
-      //     items: [
-      //       { 
-      //         id: '1', 
-      //         date: '2023-05-08T10:30:00', 
-      //         status: EOrderStatus.Confirmed, 
-      //         total: 250000,
-      //         shipments: [
-      //           {
-      //             id: 'ship-1-1',
-      //             status: EShipmentStatus.Delivered,
-      //             estimatedDelivery: '2023-05-15T10:30:00',
-      //             deliveryDate: '2023-05-14T16:45:00',
-      //             product: {
-      //               id: 'prod-1',
-      //               name: 'Bàn phím cơ Logitech G Pro X',
-      //               price: 150000,
-      //               quantity: 1,
-      //               imageUrl: 'https://resource.logitech.com/w_800,c_limit,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/keyboards/pro-x-gaming-keyboard/gallery/proX-keyboard-gallery-1.png?v=1'
-      //             },
-      //             productDiscountCode: 'GEAR15',
-      //             shippingPrice: 15000
-      //           },
-      //           {
-      //             id: 'ship-1-2',
-      //             status: EShipmentStatus.Confirmed,
-      //             estimatedDelivery: '2023-05-18T10:30:00',
-      //             product: {
-      //               id: 'prod-2',
-      //               name: 'Chuột không dây Logitech G502',
-      //               price: 85000,
-      //               quantity: 1,
-      //               imageUrl: 'https://resource.logitech.com/w_800,c_limit,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/g502-lightspeed-wireless-gaming-mouse/g502-lightspeed-gallery-1.png'
-      //             },
-      //             shippingDiscountCode: 'FREESHIP',
-      //             shippingPrice: 0
-      //           }
-      //         ]
-      //       },
-      //       { 
-      //         id: '2', 
-      //         date: '2023-04-20T15:20:00', 
-      //         status: EOrderStatus.Confirmed, 
-      //         total: 175000,
-      //         shipments: [
-      //           {
-      //             id: 'ship-2-1',
-      //             status: EShipmentStatus.Failed,
-      //             estimatedDelivery: '2023-04-27T15:20:00',
-      //             product: {
-      //               id: 'prod-3',
-      //               name: 'Tai nghe SteelSeries Arctis 7',
-      //               price: 175000,
-      //               quantity: 1,
-      //               imageUrl: 'https://media.steelseriescdn.com/thumbs/catalog/items/61463/8f38ba261b0e4179b2adf693ea73a556.png.500x400_q100_crop-fit_optimize.png'
-      //             },
-      //             shippingPrice: 25000
-      //           }
-      //         ]
-      //       },
-      //       { 
-      //         id: '3', 
-      //         date: '2023-04-01T09:15:00', 
-      //         status: EOrderStatus.Cancelled, 
-      //         total: 320000,
-      //         shipments: []
-      //       },
-      //       { 
-      //         id: '4', 
-      //         date: '2023-03-18T14:45:00', 
-      //         status: EOrderStatus.Confirmed, 
-      //         total: 430000,
-      //         shipments: [
-      //           {
-      //             id: 'ship-4-1',
-      //             status: EShipmentStatus.Pending,
-      //             estimatedDelivery: '2023-03-25T10:30:00',
-      //             product: {
-      //               id: 'prod-4',
-      //               name: 'Màn hình Dell 27" S2721DGF',
-      //               price: 430000,
-      //               quantity: 1
-      //             },
-      //             shippingPrice: 40000
-      //           }
-      //         ]
-      //       },
-      //       { 
-      //         id: '5', 
-      //         date: '2023-03-05T11:10:00', 
-      //         status: EOrderStatus.Confirmed, 
-      //         total: 195000,
-      //         shipments: [
-      //           {
-      //             id: 'ship-5-1',
-      //             status: EShipmentStatus.Stored,
-      //             estimatedDelivery: '2023-03-12T10:30:00',
-      //             product: {
-      //               id: 'prod-5',
-      //               name: 'Bàn di chuột Razer Gigantus V2 XXL',
-      //               price: 75000,
-      //               quantity: 2
-      //             },
-      //             productDiscountCode: 'NEWUSER',
-      //             shippingPrice: 15000,
-      //             shippingDiscountCode: 'HALFSHIP'
-      //           }
-      //         ]
-      //       },
-      //     ],
-      //     totalPages: 3,
-      //     totalItems: 25,
-      //     currentPage: page,
-      //     pageSize: rowsPerPage
-      //   };
+    },
+    enabled: tabValue === 0, // Only run when this tab is active
+  });
+
+  // Query for confirmed/history orders
+  const {
+    data: historyData,
+    isLoading: historyIsLoading
+  } = useQuery<IOrderHistory>({
+    queryKey: ['orders/history', historyPage],
+    queryFn: async () => {
+      try {
+        return orderHistoryService.getConfirmedOrders(historyPage, rowsPerPage);
+      } catch (error) {
+        console.error("Error fetching order history:", error);
+        return {
+          items: [],
+          totalPages: 0,
+          totalCount: 0,
+          totalRecords: 0,
+          data: []
+        };
+      }
+    },
+    enabled: tabValue === 1, // Only run when this tab is active
+  });
+
+  // Mutation for cancelling orders
+  const cancelOrderMutation = useMutation({
+    mutationFn: (orderId: string) => {
+      return orderHistoryService.cancelOrder(orderId);
+    },
+    onSuccess: () => {
+      // Invalidate pending orders query to refresh data
+      queryClient.invalidateQueries({ queryKey: ['orders/pending'] });
+      // Invalidate history orders query as the cancelled order will move there
+      queryClient.invalidateQueries({ queryKey: ['orders/history'] });
+      
+      setSnackbar({
+        open: true,
+        message: t('Đơn hàng đã được hủy thành công'),
+        severity: 'success'
+      });
+    },
+    onError: (error) => {
+      console.error('Error cancelling order:', error);
+      setSnackbar({
+        open: true,
+        message: t('Không thể hủy đơn hàng. Vui lòng thử lại sau.'),
+        severity: 'error'
+      });
     }
   });
 
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
-    setPage(newPage);
+  // Handle tab changes
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  // Separate handlers for each pagination
+  const handlePendingPageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+    setPendingPage(newPage);
+  };
+
+  const handleHistoryPageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+    setHistoryPage(newPage);
+  };
+
+  // Cancel order handlers
+  const handleCancelOrderClick = (orderId: string) => {
+    setCancelOrderId(orderId);
+    setCancelDialogOpen(true);
+  };
+
+  const handleConfirmCancel = () => {
+    if (cancelOrderId) {
+      cancelOrderMutation.mutate(cancelOrderId);
+    }
+    setCancelDialogOpen(false);
+    setCancelOrderId(null);
+  };
+
+  const handleCancelDialogClose = () => {
+    setCancelDialogOpen(false);
+    setCancelOrderId(null);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false
+    });
   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" gutterBottom>
-        {t('Lịch sử đơn hàng')}
+        {t('Đơn hàng')}
       </Typography>
       <Divider sx={{ mb: 3 }} />
 
-      <Paper elevation={3} sx={{ p: 3 }}>
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-            <CircularProgress />
+      <Paper elevation={3}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs 
+            value={tabValue} 
+            onChange={handleTabChange} 
+            aria-label="order history tabs"
+            variant="fullWidth"
+          >
+            <Tab label={t('Đang xác nhận')} {...a11yProps(0)} />
+            <Tab label={t('Lịch sử đặt hàng')} {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+        
+        {/* Pending orders tab */}
+        <TabPanel value={tabValue} index={0}>
+          <Box sx={{ p: 3 }}>
+            {pendingIsLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+              </Box>
+            ) : pendingData?.items && pendingData.items.length > 0 ? (
+              <>
+                <Box>
+                  {pendingData.items.map((order) => (
+                    <UnconfirmedOrderItem
+                      key={order._id}
+                      order={{
+                        id: order._id,
+                        date: order.createdAt,
+                        status: order.orderStatus,
+                        total: order.totalPrice,
+                        items: order.items.map((item) => ({
+                          id: item._id,
+                          product: {
+                            id: item.productId._id,
+                            name: item.productId.name,
+                            price: item.price,
+                            imageUrl: item.productId.imageUrl
+                          },
+                          quantity: item.quantity,
+                          price: item.price,
+                          shippingPrice: item.shippingPrice,
+                          productDiscountCode: item.productDiscountCode?.code,
+                          shippingDiscountCode: item.shippingDiscountCode?.code
+                        }))
+                      }}
+                      onCancel={handleCancelOrderClick}
+                    />
+                  ))}
+                </Box>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                  <Pagination 
+                    count={pendingData.totalPages || 1} 
+                    page={pendingPage} 
+                    onChange={handlePendingPageChange} 
+                    color="primary" 
+                  />
+                </Box>
+              </>
+            ) : (
+              <Box sx={{ py: 3, textAlign: 'center' }}>
+                <Typography variant="body1" color="text.secondary">
+                  {t('Bạn không có đơn hàng đang xác nhận')}
+                </Typography>
+              </Box>
+            )}
           </Box>
-        ) : data?.items && data.items.length > 0 ? (
-          <>
-            <Box>
-              {data.items.map((order) => (
-                <OrderItem
-                  key={order.id}
-                  order={order}
-                />
-              ))}
-            </Box>
-
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <Pagination
-                count={data.totalPages || 1}
-                page={page}
-                onChange={handleChangePage}
-                color="primary"
-              />
-            </Box>
-          </>
-        ) : (
-          <Box sx={{ py: 3, textAlign: 'center' }}>
-            <Typography variant="body1" color="text.secondary">
-              {t('Bạn chưa có đơn hàng nào')}
-            </Typography>
+        </TabPanel>
+        
+        {/* History orders tab */}
+        <TabPanel value={tabValue} index={1}>
+          <Box sx={{ p: 3 }}>
+            {historyIsLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+              </Box>
+            ) : historyData?.items && historyData.items.length > 0 ? (
+              <>
+                <Box>
+                  {historyData.items.map((order) => (
+                    <OrderItem 
+                      key={order.id}
+                      order={order}
+                    />
+                  ))}
+                </Box>
+                
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                  <Pagination 
+                    count={historyData.totalPages || 1} 
+                    page={historyPage} 
+                    onChange={handleHistoryPageChange} 
+                    color="primary" 
+                  />
+                </Box>
+              </>
+            ) : (
+              <Box sx={{ py: 3, textAlign: 'center' }}>
+                <Typography variant="body1" color="text.secondary">
+                  {t('Bạn chưa có lịch sử đơn hàng')}
+                </Typography>
+              </Box>
+            )}
           </Box>
-        )}
+        </TabPanel>
       </Paper>
+
+      {/* Confirmation Dialog for Cancelling Orders */}
+      <Dialog
+        open={cancelDialogOpen}
+        onClose={handleCancelDialogClose}
+        aria-labelledby="cancel-order-dialog-title"
+        aria-describedby="cancel-order-dialog-description"
+      >
+        <DialogTitle id="cancel-order-dialog-title">
+          {t('Xác nhận hủy đơn hàng')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="cancel-order-dialog-description">
+            {t('Bạn có chắc chắn muốn hủy đơn hàng này không? Thao tác này không thể hoàn tác.')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDialogClose} color="inherit">
+            {t('Không')}
+          </Button>
+          <Button onClick={handleConfirmCancel} color="error" autoFocus>
+            {t('Hủy đơn hàng')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

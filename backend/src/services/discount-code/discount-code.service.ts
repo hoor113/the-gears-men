@@ -41,7 +41,7 @@ export class DiscountCodeService {
                 quantity: code.quantity,
                 discountCalculationMethod: code.discountCalculationMethod,
                 discountQuantity: code.discountQuantity,
-                expiryDate: code.expiryDate
+                expiryDate: code.expiryDate,
             }));
 
             return BaseResponse.success(responseData);
@@ -122,7 +122,9 @@ export class DiscountCodeService {
                         type: discountCodeCast?.type,
                         discountCalculationMethod: discountCodeCast?.discountCalculationMethod,
                         expiryDate: discountCodeCast?.expiryDate,
-                        quantity: discountCodeCast?.quantity
+                        quantity: discountCodeCast?.quantity,
+                        discountQuantity: discountCodeCast?.discountQuantity,
+
                     };
                 })
             );

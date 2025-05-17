@@ -92,8 +92,8 @@ const VoucherDialog = NiceModal.create((props: VoucherDialogProps) => {
                   <Stack spacing={0.5}>
                     <Typography variant="body2">
                       {v.discountCalculationMethod === 'percentage'
-                        ? `Giảm ${v.quantity}%`
-                        : `Giảm ${v.quantity.toLocaleString()}₫`}
+                        ? `Giảm ${v.discountQuantity}%`
+                        : `Giảm ${v.discountQuantity?.toLocaleString()}₫`}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {v.code}
@@ -121,8 +121,8 @@ const VoucherDialog = NiceModal.create((props: VoucherDialogProps) => {
                   <Stack spacing={0.5}>
                     <Typography variant="body2">
                       {v.type === 'percentage'
-                        ? `Giảm ${v.quantity}%`
-                        : `Giảm ${v.quantity.toLocaleString()}₫`}
+                        ? `Giảm ${v.discountQuantity}%`
+                        : `Giảm ${v.discountQuantity?.toLocaleString()}₫`}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {v.code}

@@ -38,6 +38,8 @@ export default function CheckoutPage() {
         queryFn: () => voucherService.getDiscountCodesOfCustomer(),
     }) as any;
 
+    console.log('myVouchers', myVouchers);
+
     const [discountCodeMap, setDiscountCodeMap] = useState<{
         [productId: string]: {
             productDiscount: any;
@@ -101,8 +103,8 @@ export default function CheckoutPage() {
     ): number => {
         if (!discount) return price;
         return discount.discountCalculationMethod === 'percentage'
-            ? Math.max(0, price * (1 - discount.quantity / 100))
-            : Math.max(0, price - discount.quantity * quantity);
+            ? Math.max(0, price * (1 - discount.discountQuantity / 100))
+            : Math.max(0, price - discount.discountQuantity * quantity);
     };
 
     const calculateShipping = (
@@ -112,8 +114,8 @@ export default function CheckoutPage() {
     ): number => {
         if (!discount) return baseShipping;
         return discount.discountCalculationMethod === 'percentage'
-            ? Math.max(0, baseShipping * (1 - discount.quantity / 100))
-            : Math.max(0, baseShipping - discount.quantity * quantity);
+            ? Math.max(0, baseShipping * (1 - discount.discountQuantity / 100))
+            : Math.max(0, baseShipping - discount.discountQuantity * quantity);
     };
 
     // Trong CheckoutPage, sau khi useMemo của availableDiscounts:
@@ -188,7 +190,7 @@ export default function CheckoutPage() {
         },
         onError: (err: any) => {
             appService.hideLoadingModal();
-            // window.location.href = `/customer/payment/fail`;
+            window.location.href = `/customer/payment/fail`;
             enqueueSnackbar(err.response.data.message || 'Đã có lỗi xảy ra', {
                 variant: 'error',
             });
@@ -458,9 +460,9 @@ export default function CheckoutPage() {
                                                                 {discountCodeMap[item.id].productDiscount.code} -
                                                                 giảm{' '}
                                                                 {discountCodeMap[item.id].productDiscount
-                                                                    .discountCalculationMethod === '%'
-                                                                    ? `${discountCodeMap[item.id].productDiscount.quantity}%`
-                                                                    : `${discountCodeMap[item.id].productDiscount.quantity.toLocaleString()}đ`}
+                                                                    .discountCalculationMethod === 'percentage'
+                                                                    ? `${discountCodeMap[item.id].productDiscount.discountQuantity}%`
+                                                                    : `${discountCodeMap[item.id].productDiscount.discountQuantity.toLocaleString()}đ`}
                                                             </Typography>
                                                         )}
 
@@ -473,9 +475,9 @@ export default function CheckoutPage() {
                                                                 {discountCodeMap[item.id].shippingDiscount.code} -
                                                                 giảm{' '}
                                                                 {discountCodeMap[item.id].shippingDiscount
-                                                                    .discountCalculationMethod === '%'
-                                                                    ? `${discountCodeMap[item.id].shippingDiscount.quantity}%`
-                                                                    : `${discountCodeMap[item.id].shippingDiscount.quantity.toLocaleString()}đ`}
+                                                                    .discountCalculationMethod === 'percentage'
+                                                                    ? `${discountCodeMap[item.id].shippingDiscount.discountQuantity}%`
+                                                                    : `${discountCodeMap[item.id].shippingDiscount.discountQuantity.toLocaleString()}đ`}
                                                             </Typography>
                                                         )}
 

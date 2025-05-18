@@ -10,7 +10,8 @@ import {
     CancelOrderDto,
     OrderDto,
     OrderItemDto,
-    GetAllOrderByCustomerDto
+    GetAllOrderByCustomerDto,
+    GetAllOrderDto
 } from '@/services/order/dto/order.dto';
 import { OrderCronService } from '@/services/order/order-cron.service';
 import { DiscountCodeService } from '@/services/discount-code/discount-code.service';
@@ -20,6 +21,7 @@ import redis from '@/config/redis';
 import { DAILY_DISCOUNT_PERCENTAGE } from '@/constants/daily-discount-percentage';
 import { VnpayService } from '@/services/vnpay/vnpay.service';
 import { ZaloPayService } from '../zalopay/zalopay.service';
+import { buildQuery } from '@/utils/utils';
 
 @Service()
 export class OrderService {
@@ -264,6 +266,88 @@ export class OrderService {
             return BaseResponse.success(orders, totalCount, 'Orders retrieved successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error((error as Error)?.message || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+        public async getAllOrder(dto: GetAllOrderDto): Promise<BaseResponse<OrderDto[] | unknown>> {
+        try {
+            const { productId, ...restDto } = dto;
+
+            // Build query cho các trường khác (ví dụ shippingAddress)
+            const searchableFields = ['shippingAddress'];
+            const baseMatch = buildQuery(restDto, searchableFields);
+
+            // Pipeline aggregate
+            const pipeline: any[] = [];
+
+            // Match các điều kiện khác trước
+            if (Object.keys(baseMatch).length > 0) {
+                pipeline.push({ $match: baseMatch });
+            }
+
+            // Unwind items để xử lý từng item riêng biệt
+            pipeline.push({ $unwind: "$items" });
+
+            // Lookup product dựa trên items.productId
+            pipeline.push({
+                $lookup: {
+                    from: "products",               // collection products
+                    localField: "items.productId", // id product trong items
+                    foreignField: "_id",
+                    as: "product"
+                }
+            });
+
+            // product là mảng 1 phần tử sau lookup
+            pipeline.push({ $unwind: "$product" });
+
+            // Match theo productId nếu có
+            if (productId) {
+                pipeline.push({
+                    $match: {
+                        "items.productId": new mongoose.Types.ObjectId(productId)
+                    }
+                });
+            }
+
+            // Group lại từng order, gom items lại
+            pipeline.push({
+                $group: {
+                    _id: "$_id",
+                    customerId: { $first: "$customerId" },
+                    shippingAddress: { $first: "$shippingAddress" },
+                    paymentMethod: { $first: "$paymentMethod" },
+                    orderStatus: { $first: "$orderStatus" },
+                    totalPrice: { $first: "$totalPrice" },
+                    items: { $push: "$items" },
+                    createdAt: { $first: "$createdAt" },
+                    updatedAt: { $first: "$updatedAt" }
+                }
+            });
+
+            // (Optional) sort theo createdAt mới nhất
+            pipeline.push({ $sort: { createdAt: -1 } });
+
+            // Count tổng số bản ghi matching
+            const countPipeline = [...pipeline, { $count: "total" }];
+            const countResult = await Order.aggregate(countPipeline);
+            const totalRecords = countResult[0]?.total || 0;
+
+            // Pagination (nếu có)
+            const skip = Number(dto.skipCount || 0);
+            const limit = Number(dto.maxResultCount || 10);
+            pipeline.push({ $skip: skip });
+            pipeline.push({ $limit: limit });
+
+            // Lấy dữ liệu theo pipeline
+            const orders = await Order.aggregate(pipeline);
+
+            return BaseResponse.success(orders, totalRecords, 'Orders retrieved successfully', EHttpStatusCode.OK);
+        } catch (error) {
+            return BaseResponse.error(
+                (error as Error)?.message || 'Internal Server Error',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR
+            );
         }
     }
 }

@@ -1,8 +1,8 @@
-import { Box, Typography, Paper, styled } from '@mui/material';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import { Box, Paper, Typography, styled } from '@mui/material';
+
 import useTranslation from '@/hooks/use-translation';
 import { EDiscountCodeType } from '@/services/discount-code/discount-code.model';
-
 
 interface DiscountBadgeProps {
   discountCode: string;
@@ -20,19 +20,24 @@ const DiscountContainer = styled(Paper)(({ theme }) => ({
   border: `1px dashed ${theme.palette.primary.main}`,
 }));
 
-export default function DiscountBadge({ discountCode, type }: DiscountBadgeProps) {
+export default function DiscountBadge({
+  discountCode,
+  type,
+}: DiscountBadgeProps) {
   const { t } = useTranslation();
-  
+
   return (
     <DiscountContainer elevation={0}>
-      <LocalOfferIcon 
-        color="primary" 
-        fontSize="small" 
+      <LocalOfferIcon
+        color="primary"
+        fontSize="small"
         sx={{ marginRight: 1, transform: 'rotate(90deg)' }}
       />
       <Box>
         <Typography variant="caption" color="textSecondary">
-          {type === 'product' ? t('Mã giảm giá sản phẩm') : t('Mã giảm giá vận chuyển')}
+          {type === 'product'
+            ? t('Mã giảm giá sản phẩm')
+            : t('Mã giảm giá vận chuyển')}
         </Typography>
         <Typography variant="body2" fontWeight={500}>
           {discountCode}

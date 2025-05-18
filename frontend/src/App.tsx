@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { GlobalScrollbar } from 'mac-scrollbar';
 import { RouterProvider } from 'react-router-dom';
 
@@ -15,6 +16,7 @@ const App = () => {
         </BaseLayout>
         <GlobalScrollbar />
       </ThemeRegistry>
+      <ReactQueryDevtools initialIsOpen={true} />
     </ReactQueryProvider>
   );
 };

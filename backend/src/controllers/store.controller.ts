@@ -19,6 +19,7 @@ import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
     CreateStoreDto,
     GetStoresDto,
+    UpdateStoreDto,
 } from '@/services/store/dto/store.dto';
 import { StoreService } from '@/services/store/store.service';
 import { EHttpStatusCode } from '@/utils/enum';
@@ -109,12 +110,11 @@ export class StoreController {
     @Put('/Update')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
     async updateStore(
-        @QueryParams() query: StringEntityDto,
-        @Body() dto: CreateStoreDto,
+        @Body() dto: UpdateStoreDto,
         @Res() res: Response
     ) {
         try {
-            const response = await this.storeService.updateStore(query.id, dto);
+            const response = await this.storeService.updateStore(dto.id.toString(), dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

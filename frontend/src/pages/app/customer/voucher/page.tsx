@@ -1,17 +1,10 @@
 // ./voucher/page.tsx
-import {
-  Box,
-  Container,
-  Tab,
-  Tabs,
-  Typography,
-  Paper,
-} from '@mui/material';
+import { Box, Container, Paper, Tab, Tabs, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import voucherService from './_services/voucher.service';
 import Item from './_components/item';
+import voucherService from './_services/voucher.service';
 
 const VoucherPage = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -32,7 +25,9 @@ const VoucherPage = () => {
     enabled: activeTab === 1 || activeTab === 0,
   } as any);
 
-  const myVoucherIds = Array.isArray(myVouchers) ? myVouchers.map((v: any) => v.code) : []; // hoặc id nếu có id
+  const myVoucherIds = Array.isArray(myVouchers)
+    ? myVouchers.map((v: any) => v.code)
+    : []; // hoặc id nếu có id
 
   const renderVoucherList = (isTabMyVoucher = false) => {
     const data = isTabMyVoucher ? myVouchers : allVouchers;
@@ -49,7 +44,9 @@ const VoucherPage = () => {
       const isMyVoucher = myVoucherIds?.includes(item.code); // xác định thuộc user chưa
       const isUsed =
         isTabMyVoucher &&
-        (Array.isArray(myVouchers) ? myVouchers.find((v: any) => v.code === item.code)?.isUsed : undefined);
+        (Array.isArray(myVouchers)
+          ? myVouchers.find((v: any) => v.code === item.code)?.isUsed
+          : undefined);
 
       return (
         <Item

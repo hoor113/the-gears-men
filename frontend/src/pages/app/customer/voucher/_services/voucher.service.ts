@@ -25,10 +25,7 @@ class VoucherService extends BaseCrudService {
     return res.result;
   }
 
-  public async claim<T>(
-    data: any,
-    path = '/claim',
-  ): Promise<TBaseResponse<T>> {
+  public async claim<T>(data: any, path = '/claim'): Promise<TBaseResponse<T>> {
     const response = await httpService.request<TBaseResponse<T>>({
       url: `${this.basePath}${path}`,
       method: 'POST',

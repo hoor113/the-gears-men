@@ -96,9 +96,11 @@ export class ProductController {
 
     @Get('/GetDailyDiscount')
     @UseBefore(ValidationMiddleware(GetProductsDto))
-    async getDailyDiscount(@Res() res: Response) {
+    async getDailyDiscount(
+        @QueryParams() dto: GetProductsDto,
+        @Res() res: Response) {
         try {
-            const response = await this.productService.getDailyDiscount();
+            const response = await this.productService.getDailyDiscount(dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

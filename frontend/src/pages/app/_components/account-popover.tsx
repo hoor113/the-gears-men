@@ -1,9 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import LogoutIcon from '@mui/icons-material/Logout';
-// Thêm icon voucher
-// import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // Thêm icon voucher
-import HistoryIcon from '@mui/icons-material/History';
 import {
   Divider,
   MenuItem,
@@ -20,7 +16,6 @@ import { useNavigate } from 'react-router-dom';
 import useTranslation from '@/hooks/use-translation';
 import { AuthContext } from '@/services/auth/auth.context';
 import authService from '@/services/auth/auth.service';
-import { EUserRole } from '@/services/auth/auth.model';
 
 type TAccountPopover = {
   anchorEl: any;
@@ -76,39 +71,12 @@ const AccountPopover = (props: TAccountPopover) => {
         >
           <Typography variant="overline">{t('Tài khoản')}</Typography>
           <Typography color="text.secondary" variant="body2">
-            {authState.currentUser?.userName}
+            {authState.currentUser?.username}
           </Typography>
           <AccountCircleIcon />
         </MenuItemStyled>
         <Divider />
-        
-        {/* Thêm mục Voucher & Order History nếu User là Customer */}     
-        {authState.currentUser?.role == EUserRole.Customer && (
-        <>
-        <MenuItemStyled 
-          onClick={() => {
-            onClose?.();
-            navigate('/customer/vouchers');
-          }}
-          className="item-voucher"
-        >
-          <span>{t('Danh sách voucher')}</span>
-          <LocalOfferIcon fontSize="small" />
-        </MenuItemStyled>
 
-        <Divider />
-        <MenuItemStyled
-          onClick={() => navigate('/customer/order-history')}
-          className="item-order-history"
-        >
-          <span>{t('Đơn hàng')}</span>
-          
-          <HistoryIcon />
-        </MenuItemStyled>
-        <Divider /> 
-        </>
-        )}
-        
         <MenuItemStyled onClick={() => handleLogout()} className="item-logout">
           <span>{t('Đăng xuất')}</span>
           <LogoutIcon fontSize="small" />

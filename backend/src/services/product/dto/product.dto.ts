@@ -48,6 +48,10 @@ export class GetProductsDto extends BaseGetAllDto {
     category?: EProductCategory;
 
     @IsOptional()
+    @IsString({ message: 'Store ID must be a string.' })
+    storeId?: string; 
+
+    @IsOptional()
     @IsNumber({}, { message: 'Minimum price must be a number.' })
     minPrice?: number;
 

@@ -1,32 +1,34 @@
-import React, { useState } from 'react';
 import {
+  Alert,
   Box,
-  Typography,
-  Container,
-  Paper,
+  Button,
   CircularProgress,
-  Pagination,
-  Divider,
-  Tabs,
-  Tab,
+  Container,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
+  DialogTitle,
+  Divider,
+  Pagination,
+  Paper,
   Snackbar,
-  Alert
+  Tab,
+  Tabs,
+  Typography,
 } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+
 import useTranslation from '@/hooks/use-translation';
-import orderHistoryService, { 
-  IPendingOrderResponse, 
-  IOrderHistory, 
-  IPendingOrder 
-} from './_services/history.services';
+
 import OrderItem from './_components/order-item';
 import UnconfirmedOrderItem from './_components/unconfirmed-order-item';
+import orderHistoryService, {
+  IOrderHistory,
+  IPendingOrder,
+  IPendingOrderResponse,
+} from './_services/history.services';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -68,56 +70,55 @@ export default function OrderHistoryPage() {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
-    severity: 'success' as 'success' | 'error'
+    severity: 'success' as 'success' | 'error',
   });
-  
+
   const queryClient = useQueryClient();
 
   // Query for pending orders
-  const {
-    data: pendingData,
-    isLoading: pendingIsLoading
-  } = useQuery<IPendingOrderResponse>({
-    queryKey: ['orders/pending', pendingPage],
-    queryFn: async () => {
-      try {
-        return orderHistoryService.getPendingOrders(pendingPage, rowsPerPage);
-      } catch (error) {
-        console.error("Error fetching pending orders:", error);
-        return {
-          items: [] as IPendingOrder[],
-          totalPages: 0,
-          totalCount: 0,
-          totalRecords: 0,
-          data: []
-        };
-      }
-    },
-    enabled: tabValue === 0, // Only run when this tab is active
-  });
+  const { data: pendingData, isLoading: pendingIsLoading } =
+    useQuery<IPendingOrderResponse>({
+      queryKey: ['orders/pending', pendingPage],
+      queryFn: async () => {
+        try {
+          return orderHistoryService.getPendingOrders(pendingPage, rowsPerPage);
+        } catch (error) {
+          console.error('Error fetching pending orders:', error);
+          return {
+            items: [] as IPendingOrder[],
+            totalPages: 0,
+            totalCount: 0,
+            totalRecords: 0,
+            data: [],
+          };
+        }
+      },
+      enabled: tabValue === 0, // Only run when this tab is active
+    });
 
   // Query for confirmed/history orders
-  const {
-    data: historyData,
-    isLoading: historyIsLoading
-  } = useQuery<IOrderHistory>({
-    queryKey: ['orders/history', historyPage],
-    queryFn: async () => {
-      try {
-        return orderHistoryService.getConfirmedOrders(historyPage, rowsPerPage);
-      } catch (error) {
-        console.error("Error fetching order history:", error);
-        return {
-          items: [],
-          totalPages: 0,
-          totalCount: 0,
-          totalRecords: 0,
-          data: []
-        };
-      }
-    },
-    enabled: tabValue === 1, // Only run when this tab is active
-  });
+  const { data: historyData, isLoading: historyIsLoading } =
+    useQuery<IOrderHistory>({
+      queryKey: ['orders/history', historyPage],
+      queryFn: async () => {
+        try {
+          return orderHistoryService.getConfirmedOrders(
+            historyPage,
+            rowsPerPage,
+          );
+        } catch (error) {
+          console.error('Error fetching order history:', error);
+          return {
+            items: [],
+            totalPages: 0,
+            totalCount: 0,
+            totalRecords: 0,
+            data: [],
+          };
+        }
+      },
+      enabled: tabValue === 1, // Only run when this tab is active
+    });
 
   // Mutation for cancelling orders
   const cancelOrderMutation = useMutation({
@@ -129,11 +130,11 @@ export default function OrderHistoryPage() {
       queryClient.invalidateQueries({ queryKey: ['orders/pending'] });
       // Invalidate history orders query as the cancelled order will move there
       queryClient.invalidateQueries({ queryKey: ['orders/history'] });
-      
+
       setSnackbar({
         open: true,
         message: t('Đơn hàng đã được hủy thành công'),
-        severity: 'success'
+        severity: 'success',
       });
     },
     onError: (error) => {
@@ -141,9 +142,9 @@ export default function OrderHistoryPage() {
       setSnackbar({
         open: true,
         message: t('Không thể hủy đơn hàng. Vui lòng thử lại sau.'),
-        severity: 'error'
+        severity: 'error',
       });
-    }
+    },
   });
 
   // Handle tab changes
@@ -152,11 +153,17 @@ export default function OrderHistoryPage() {
   };
 
   // Separate handlers for each pagination
-  const handlePendingPageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handlePendingPageChange = (
+    _event: React.ChangeEvent<unknown>,
+    newPage: number,
+  ) => {
     setPendingPage(newPage);
   };
 
-  const handleHistoryPageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handleHistoryPageChange = (
+    _event: React.ChangeEvent<unknown>,
+    newPage: number,
+  ) => {
     setHistoryPage(newPage);
   };
 
@@ -182,7 +189,7 @@ export default function OrderHistoryPage() {
   const handleSnackbarClose = () => {
     setSnackbar({
       ...snackbar,
-      open: false
+      open: false,
     });
   };
 
@@ -195,9 +202,9 @@ export default function OrderHistoryPage() {
 
       <Paper elevation={3}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange} 
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
             aria-label="order history tabs"
             variant="fullWidth"
           >
@@ -205,7 +212,7 @@ export default function OrderHistoryPage() {
             <Tab label={t('Lịch sử đặt hàng')} {...a11yProps(1)} />
           </Tabs>
         </Box>
-        
+
         {/* Pending orders tab */}
         <TabPanel value={tabValue} index={0}>
           <Box sx={{ p: 3 }}>
@@ -230,26 +237,26 @@ export default function OrderHistoryPage() {
                             id: item.productId._id,
                             name: item.productId.name,
                             price: item.price,
-                            imageUrl: item.productId.imageUrl
+                            imageUrl: item.productId.imageUrl,
                           },
                           quantity: item.quantity,
                           price: item.price,
                           shippingPrice: item.shippingPrice,
                           productDiscountCode: item.productDiscountCode?.code,
-                          shippingDiscountCode: item.shippingDiscountCode?.code
-                        }))
+                          shippingDiscountCode: item.shippingDiscountCode?.code,
+                        })),
                       }}
                       onCancel={handleCancelOrderClick}
                     />
                   ))}
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                  <Pagination 
-                    count={pendingData.totalPages || 1} 
-                    page={pendingPage} 
-                    onChange={handlePendingPageChange} 
-                    color="primary" 
+                  <Pagination
+                    count={pendingData.totalPages || 1}
+                    page={pendingPage}
+                    onChange={handlePendingPageChange}
+                    color="primary"
                   />
                 </Box>
               </>
@@ -262,7 +269,7 @@ export default function OrderHistoryPage() {
             )}
           </Box>
         </TabPanel>
-        
+
         {/* History orders tab */}
         <TabPanel value={tabValue} index={1}>
           <Box sx={{ p: 3 }}>
@@ -274,19 +281,16 @@ export default function OrderHistoryPage() {
               <>
                 <Box>
                   {historyData.items.map((order) => (
-                    <OrderItem 
-                      key={order.id}
-                      order={order}
-                    />
+                    <OrderItem key={order.id} order={order} />
                   ))}
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                  <Pagination 
-                    count={historyData.totalPages || 1} 
-                    page={historyPage} 
-                    onChange={handleHistoryPageChange} 
-                    color="primary" 
+                  <Pagination
+                    count={historyData.totalPages || 1}
+                    page={historyPage}
+                    onChange={handleHistoryPageChange}
+                    color="primary"
                   />
                 </Box>
               </>
@@ -313,7 +317,9 @@ export default function OrderHistoryPage() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="cancel-order-dialog-description">
-            {t('Bạn có chắc chắn muốn hủy đơn hàng này không? Thao tác này không thể hoàn tác.')}
+            {t(
+              'Bạn có chắc chắn muốn hủy đơn hàng này không? Thao tác này không thể hoàn tác.',
+            )}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

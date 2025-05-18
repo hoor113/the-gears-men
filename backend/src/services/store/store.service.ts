@@ -3,7 +3,8 @@ import Store from '@/models/store.model';
 import { 
     CreateStoreDto, 
     GetStoresDto,
-    StoreDto 
+    StoreDto, 
+    UpdateStoreDto
 } from '@/services/store/dto/store.dto';
 import mongoose from 'mongoose';
 import { BaseResponse } from '@/common/base-response';
@@ -139,7 +140,7 @@ export class StoreService {
 
 
 
-    public async updateStore(id: string, dto: CreateStoreDto): Promise<BaseResponse<StoreDto>> {
+    public async updateStore(id: string, dto: UpdateStoreDto): Promise<BaseResponse<StoreDto>> {
         try {
             const store = await Store.findById(id);
             if (!store) {

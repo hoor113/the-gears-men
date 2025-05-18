@@ -54,8 +54,8 @@ export interface GetUserInfoApiParams {
 
 export interface IUserInfo {
   id: string;
-  userName: string;
-  fullName: string;
+  username: string;
+  fullname: string;
   email: string;
   password: string;
   role: EUserRole;

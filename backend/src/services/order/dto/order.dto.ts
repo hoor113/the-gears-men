@@ -3,11 +3,15 @@ import { IsOptional, IsString, IsMongoId, IsArray, IsNumber, IsEnum, ValidateNes
 import { Type } from 'class-transformer';
 import { EntityDto } from '@/common/entity-dto';
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
-import { EPaymentMethod } from '@/models/order.model';
+import { EOrderStatus, EPaymentMethod } from '@/models/order.model';
 
 export class OrderItemDto extends EntityDto {
     @IsString({ message: 'Product ID must be a string.' })
     productId!: string; // Required
+
+    @IsOptional()
+    @IsString({ message: 'Product Name must be a string.' })
+    productName?: string; // Required
 
     @IsNumber({}, { message: 'Quantity must be a number.' })
     quantity!: number; // Required
@@ -31,6 +35,14 @@ export class OrderItemDto extends EntityDto {
 export class OrderDto extends EntityDto {
     @IsString({ message: 'Customer ID must be a string.' })
     customerId!: string; // Required
+
+    @IsOptional()
+    @IsString({ message: 'Store ID must be a string.' })
+    storeId?: string; // Required
+
+    @IsOptional()
+    @IsString({ message: 'Store Name must be a string.' })
+    storeName?: string; // Required
 
     @IsArray({ message: 'Items must be an array.' })
     @ValidateNested({ each: true, message: 'Each order item must be valid.' })
@@ -103,4 +115,36 @@ export class GetAllOrderByCustomerDto extends BaseGetAllDto {
     isPending?: number;
 
     maxResultCount: number = 5;
+}
+
+export class GetAllOrderDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsString({ message: 'Product ID must be a string.' })
+    productId?: string; 
+
+    @IsOptional()
+    @IsString({ message: 'Customer ID must be a string.' })
+    customerId?: string; 
+
+    @IsOptional()
+    @IsEnum(EOrderStatus, {
+        message: (args: ValidationArguments) =>
+            `${args.value} is not a valid payment method. Accepted methods are: waiting_for_payment, pending, confirmed, cancelled'}`,
+    })
+    orderStatus?: EOrderStatus; // Required
+
+    @IsOptional()
+    @IsMongoId({ message: 'Product discount code must be a Mongo ID.' })
+    productDiscountCode?: mongoose.Types.ObjectId; // Optional
+
+    @IsOptional()
+    @IsMongoId({ message: 'Shipping discount code must be a Mongo ID.' })
+    shippingDiscountCode?: mongoose.Types.ObjectId; // Optional
+
+    @IsOptional()
+    @IsEnum(EPaymentMethod, {
+        message: (args: ValidationArguments) =>
+            `${args.value} is not a valid payment method. Accepted methods are: card, cash, vnpay, zalopay'}`,
+    })
+    paymentMethod?: EPaymentMethod;
 }

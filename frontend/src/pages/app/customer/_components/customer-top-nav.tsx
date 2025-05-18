@@ -128,6 +128,7 @@ export default function CustomerTopNav() {
             <MenuIcon />
           </IconButton>
 
+
           {/* Logo nhỏ cho mobile */}
           <div
             className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden"

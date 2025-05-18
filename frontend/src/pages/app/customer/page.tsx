@@ -1,11 +1,10 @@
 import { Box, Button, Container, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-
-import AdviceSection from './_components/advice-section';
-import BlockProducts from './_components/block-products';
-import SaleBanner from './_components/sale-banner';
 import { EProductCategory, Product } from './_services/product.model';
+import BlockProducts from './_components/block-products';
+import { useMemo, useRef } from 'react';
+import AdviceSection from './_components/advice-section';
+import SaleBanner from './_components/sale-banner';
 import productsService from './_services/product.service';
 
 interface Category {
@@ -16,73 +15,82 @@ interface Category {
 }
 
 const CustomerPage = () => {
+
+  const saleRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScrollToSale = () => {
+    if (saleRef.current) {
+      saleRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const categories: Category[] = useMemo(
     () => [
       {
         key: 'phone',
-        title: 'Điện thoại',
+        title: 'điện thoại',
         category: EProductCategory.Phone,
         products: [],
       },
       {
         key: 'laptop',
-        title: 'Laptop',
+        title: 'laptop',
         category: EProductCategory.Laptop,
         products: [],
       },
       { key: 'pc', title: 'PC', category: EProductCategory.PC, products: [] },
       {
         key: 'tablet',
-        title: 'Máy tính bảng',
+        title: 'máy tính bảng',
         category: EProductCategory.Tablet,
         products: [],
       },
       {
         key: 'accessories',
-        title: 'Phụ kiện',
+        title: 'phụ kiện',
         category: EProductCategory.Accessories,
         products: [],
       },
       {
         key: 'wearable',
-        title: 'Thiết bị đeo',
+        title: 'thiết bị đeo',
         category: EProductCategory.Wearable,
         products: [],
       },
       { key: 'tv', title: 'TV', category: EProductCategory.TV, products: [] },
       {
         key: 'audio',
-        title: 'Âm thanh',
+        title: 'âm thanh',
         category: EProductCategory.Audio,
         products: [],
       },
       {
         key: 'camera',
-        title: 'Máy ảnh',
+        title: 'máy ảnh',
         category: EProductCategory.Camera,
         products: [],
       },
       {
         key: 'smartHome',
-        title: 'Nhà thông minh',
+        title: 'nhà thông minh',
         category: EProductCategory.SmartHome,
         products: [],
       },
       {
         key: 'homeAppliance',
-        title: 'Đồ gia dụng',
+        title: 'đồ gia dụng',
         category: EProductCategory.HomeAppliance,
         products: [],
       },
       {
         key: 'gaming',
-        title: 'Gaming',
+        title: 'gaming',
         category: EProductCategory.Gaming,
         products: [],
       },
       {
         key: 'others',
-        title: 'Khác',
+        title: 'khác',
         category: EProductCategory.Others,
         products: [],
       },
@@ -130,7 +138,7 @@ const CustomerPage = () => {
 
   return (
     <>
-      <Box
+      <Box ref={saleRef}
       // sx={{
       //   minHeight: '100vh',
       //   background: `url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat`, py: 4,
@@ -146,7 +154,7 @@ const CustomerPage = () => {
             mt={4}
             mb={2}
           >
-            Chào mừng bạn đến với The Gear men – Trung tâm công nghệ hàng đầu!
+            Chào mừng bạn đến với The Gears Men – Trung tâm công nghệ hàng đầu!
           </Typography>
           <Typography
             variant="body1"
@@ -163,7 +171,7 @@ const CustomerPage = () => {
           <AdviceSection />
 
           <BlockProducts
-            path="sale"
+            path="category/sale"
             key={'index'}
             title={`Giá sốc hôm nay`}
             products={
@@ -175,13 +183,9 @@ const CustomerPage = () => {
           {queryResults.map((item, idx) => (
             <BlockProducts
               key={item?.data?.key}
-              path={categories[idx].key}
-              title={`Danh mục ${item?.data?.category || ''}`}
-              products={
-                Array.isArray(item?.data?.products)
-                  ? (item.data.products as Product[])
-                  : []
-              }
+              path={`category/categories[idx].key`}
+              title={`Danh mục ${item?.data?.title || ""}`}
+              products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []}
             />
           ))}
 
@@ -210,8 +214,9 @@ const CustomerPage = () => {
               variant="contained"
               color="secondary"
               size="large"
-              href="#sale"
+              onClick={handleScrollToSale}
             >
+            
               Xem sản phẩm của chúng tôi
             </Button>
           </Box>

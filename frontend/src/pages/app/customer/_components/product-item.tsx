@@ -1,7 +1,7 @@
 import NiceModal from '@ebay/nice-modal-react';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +14,8 @@ type ProductProps = {
 };
 
 const ProductItem: React.FC<ProductProps> = ({ product }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [_, cartDispatch] = useCart();
   const navigate = useNavigate();
 
@@ -45,8 +47,8 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
 
   const discountPercent = hasDiscount
     ? Math.round(
-        ((product.price - product.priceAfterDiscount!) / product.price) * 100,
-      )
+      ((product.price - product.priceAfterDiscount!) / product.price) * 100,
+    )
     : 0;
 
   const formatCurrency = (value: number) =>
@@ -58,7 +60,7 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
   return (
     <Box
       className="rounded-lg overflow-hidden shadow-sm transition-all duration-300 bg-white hover:shadow-md hover:bg-gray-100 flex flex-col mx-auto"
-      sx={{ maxWidth: 280, width: '100%' }}
+      sx={{ maxWidth: 280, width: '100%', height: '100%', minHeight: 360 }}
     >
       <Box className="relative group aspect-square">
         <img
@@ -73,18 +75,20 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
           </Box>
         )}
 
-        <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center gap-2 bg-white/90 p-1.5 rounded-full shadow-sm">
-          <IconButton size="small" onClick={handleViewDetail}>
-            <SearchIcon />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={handleAddToCart}
-            disabled={product.stock === 0}
-          >
-            <ShoppingCartIcon />
-          </IconButton>
-        </Box>
+        {!isMobile && (
+          <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center gap-2 bg-white/90 p-1.5 rounded-full shadow-sm">
+            <IconButton size="small" onClick={handleViewDetail}>
+              <SearchIcon />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+            >
+              <ShoppingCartIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       <Box className="p-3 space-y-1">
@@ -122,6 +126,29 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
         >
           {stockText}
         </Typography>
+
+        {isMobile && (
+          <Box className="flex justify-center gap-2 mt-3">
+            <IconButton
+              color="primary"
+              size="medium"
+              onClick={handleViewDetail}
+              aria-label="Xem chi tiết"
+            >
+              <SearchIcon fontSize="inherit" />
+            </IconButton>
+            <IconButton
+              color="primary"
+              size="medium"
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+              aria-label="Thêm vào giỏ hàng"
+            >
+              <ShoppingCartIcon fontSize="inherit" />
+            </IconButton>
+          </Box>
+        )}
+
       </Box>
     </Box>
   );

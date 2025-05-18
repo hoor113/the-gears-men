@@ -117,18 +117,31 @@ export default function CustomerTopNav() {
   return (
     <div className="w-full bg-[#e46842] px-4 md:px-10 py-3 flex justify-between items-center gap-y-3 text-white relative">
       {/* Vùng bên trái (Tiêu đề và Thanh tìm kiếm) */}
-      <div className="flex items-center gap-x-4 w-2/3">
+      <div className="flex items-center justify-between gap-x-4 w-2/3">
         {/* Menu Drawer */}
-        <IconButton onClick={() => toggleDrawer(true)} sx={{ color: 'white' }}>
-          <MenuIcon />
-        </IconButton>
+        <div className="flex items-center gap-x-4">
+          {/* Menu Drawer */}
+          <IconButton onClick={() => toggleDrawer(true)} sx={{ color: 'white' }}>
+            <MenuIcon />
+          </IconButton>
 
-        <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded-sm" />
-        <span className="font-bold text-base md:text-lg">
-          <span className="text-yellow-400 top-nav-group-name">
-            The Gears Men
+
+          {/* Logo nhỏ cho mobile */}
+          <div
+            className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden"
+            onClick={() => navigate('/customer')}
+          />
+
+          {/* Logo chữ cho desktop */}
+          <span
+            className="hidden md:inline font-bold text-base md:text-lg cursor-pointer"
+            onClick={() => navigate('/customer')}
+          >
+            <span className="text-yellow-400 top-nav-group-name">
+              The Gears Men
+            </span>
           </span>
-        </span>
+        </div>
 
         {/* Thanh tìm kiếm */}
         <ClickAwayListener onClickAway={handleSearchBlur}>
@@ -166,6 +179,12 @@ export default function CustomerTopNav() {
                   maxHeight: 300,
                   overflowY: 'auto',
                   borderRadius: 2,
+                  // width: "300px",
+                  '@media (max-width:500px)': {
+                    width: '300px',
+                    left: "50%",
+                    transform: "TranslateX(-50%)",
+                  },
                 }}
               >
                 {getAllAccessories?.length > 0 ? (
@@ -269,7 +288,25 @@ export default function CustomerTopNav() {
         </ClickAwayListener>
       </div>
 
+      {/* <div className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden" onClick={() => navigate('/customer')}/>
+        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer')} style={{"cursor":"pointer"}}>
+          <span className="text-yellow-400 top-nav-group-name"
+
+          >
+            Về chúng tôi
+          </span>
+        </span> */}
+
+
+
       <div className="flex items-center gap-x-4">
+        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer/aboutus')} style={{ "cursor": "pointer" }}>
+          <span className="text-white-400 top-nav-group-name" style={{ "fontSize": "14px" }}
+          >
+            Về chúng tôi
+          </span>
+        </span>
+
         {/* Tài khoản */}
         <IconButton
           style={{ padding: 0 }}

@@ -22,6 +22,7 @@ type ProductModalProps = {
   addToCart: (product: Product, quantity: number) => void;
 };
 
+
 const ProductModal = NiceModal.create(
   ({ product, addToCart }: ProductModalProps) => {
     const modal = useModal();
@@ -31,11 +32,41 @@ const ProductModal = NiceModal.create(
 
     const [selectedImage, setSelectedImage] = useState<string>(images[0]);
     const [quantity, setQuantity] = useState<number>(1);
+    const [inputQtt, setInputQtt] = useState("1");
 
     const handleAddToCart = () => {
       addToCart(product, quantity);
       modal.hide();
     };
+
+    const handleChangeQuantityByButton = (sign: string) => {
+      let newQuantity = quantity;
+
+      if (sign === "+") {
+        newQuantity = quantity + 1;
+      } else if (quantity > 1) {
+        newQuantity = quantity - 1;
+      }
+
+      setQuantity(newQuantity);
+      setInputQtt(String(newQuantity));
+      console.log(quantity);
+      console.log(inputQtt);
+      
+      
+    }
+
+    const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+
+
+      // Nếu là chuỗi rỗng hoặc số hợp lệ thì cập nhật quantity
+      if (value === '' || /^[1-9]\d*$/.test(value)) {
+        setInputQtt(value);
+        setQuantity(value === '' ? 1 : parseInt(value, 10));
+      }
+    };
+
 
     return (
       <Dialog {...muiDialogV5(modal)} maxWidth="md" fullWidth>
@@ -152,19 +183,15 @@ const ProductModal = NiceModal.create(
                 {product.priceAfterDiscount ? (
                   <>
                     <span className="text-red-600">
-                      Giá:{' '}
-                      {(
-                        product.priceAfterDiscount * quantity
-                      )?.toLocaleString()}{' '}
-                      VNĐ
+                      Giá: {(product.priceAfterDiscount * quantity)?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                     </span>
                     <span className="text-gray-500 line-through text-base">
-                      {(product.price * quantity)?.toLocaleString()} VNĐ
+                      {(product.price * quantity)?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                     </span>
                   </>
                 ) : (
                   <span className="text-red-600">
-                    Giá: {(product.price * quantity)?.toLocaleString()} VNĐ
+                    Giá: {(product.price * quantity)?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                   </span>
                 )}
               </Typography>
@@ -174,21 +201,28 @@ const ProductModal = NiceModal.create(
                   variant="outlined"
                   size="small"
                   sx={{ minWidth: 36, height: 36 }}
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  onClick={() => handleChangeQuantityByButton("-")}
                 >
                   -
                 </Button>
                 <input
                   type="text"
-                  readOnly
-                  value={quantity}
+
+                  value={inputQtt}
                   className="w-12 text-center border rounded-md py-1"
+                  onChange={handleQuantityChange}
+                  onBlur={(e) => {
+                    if(e.target.value=="") {
+                      setInputQtt("1")
+                      setQuantity(1)
+                    }
+                  }}  
                 />
                 <Button
                   variant="outlined"
                   size="small"
                   sx={{ minWidth: 36, height: 36 }}
-                  onClick={() => setQuantity((q) => q + 1)}
+                  onClick={() => handleChangeQuantityByButton("+")}
                 >
                   +
                 </Button>

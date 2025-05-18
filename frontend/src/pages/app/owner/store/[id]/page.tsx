@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { OwnerStoreInfo } from '../_components/store-info';
 import { ShipmentCard } from './shipment/_components/shipment-card';
 import shipmentService from './shipment/_services/shipment.service';
+import OwnerProductCard from './products/_components/product-card';
 
 const OwnerSingleStorePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,6 +63,25 @@ const OwnerSingleStorePage = () => {
         </Box>
 
         <ShipmentCard />
+
+        <Box sx={{ my: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 500,
+              color: 'text.primary',
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              '&:hover': {
+                color: 'primary.main',
+              },
+            }}
+            onClick={() => navigate(`/owner/store/${id}/products`)}
+          >
+            Danh sách sản phẩm
+          </Typography>
+          <OwnerProductCard />
+        </Box>
       </Box>
     </>
   );

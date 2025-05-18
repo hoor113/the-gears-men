@@ -1,7 +1,14 @@
 import NiceModal from '@ebay/nice-modal-react';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Tooltip,
+} from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +22,7 @@ type ProductProps = {
 
 const ProductItem: React.FC<ProductProps> = ({ product }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [_, cartDispatch] = useCart();
   const navigate = useNavigate();
 
@@ -43,12 +50,15 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
   const hasDiscount =
     product.priceAfterDiscount !== null &&
     product.priceAfterDiscount < product.price;
-  const displayPrice = hasDiscount ? product.priceAfterDiscount : product.price;
+
+  const displayPrice = hasDiscount
+    ? product.priceAfterDiscount
+    : product.price;
 
   const discountPercent = hasDiscount
     ? Math.round(
-      ((product.price - product.priceAfterDiscount!) / product.price) * 100,
-    )
+        ((product.price - product.priceAfterDiscount!) / product.price) * 100,
+      )
     : 0;
 
   const formatCurrency = (value: number) =>
@@ -77,16 +87,22 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
 
         {!isMobile && (
           <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center gap-2 bg-white/90 p-1.5 rounded-full shadow-sm">
-            <IconButton size="small" onClick={handleViewDetail}>
-              <SearchIcon />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={handleAddToCart}
-              disabled={product.stock === 0}
-            >
-              <ShoppingCartIcon />
-            </IconButton>
+            <Tooltip title="Xem chi tiết">
+              <IconButton size="small" onClick={handleViewDetail}>
+                <SearchIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Thêm vào giỏ hàng">
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                >
+                  <ShoppingCartIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
           </Box>
         )}
       </Box>
@@ -129,26 +145,31 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
 
         {isMobile && (
           <Box className="flex justify-center gap-2 mt-3">
-            <IconButton
-              color="primary"
-              size="medium"
-              onClick={handleViewDetail}
-              aria-label="Xem chi tiết"
-            >
-              <SearchIcon fontSize="inherit" />
-            </IconButton>
-            <IconButton
-              color="primary"
-              size="medium"
-              onClick={handleAddToCart}
-              disabled={product.stock === 0}
-              aria-label="Thêm vào giỏ hàng"
-            >
-              <ShoppingCartIcon fontSize="inherit" />
-            </IconButton>
+            <Tooltip title="Xem chi tiết">
+              <IconButton
+                color="primary"
+                size="medium"
+                onClick={handleViewDetail}
+                aria-label="Xem chi tiết"
+              >
+                <SearchIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Thêm vào giỏ hàng">
+              <span>
+                <IconButton
+                  color="primary"
+                  size="medium"
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  aria-label="Thêm vào giỏ hàng"
+                >
+                  <ShoppingCartIcon fontSize="inherit" />
+                </IconButton>
+              </span>
+            </Tooltip>
           </Box>
         )}
-
       </Box>
     </Box>
   );

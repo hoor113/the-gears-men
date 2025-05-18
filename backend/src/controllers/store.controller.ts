@@ -125,10 +125,9 @@ export class StoreController {
         }
     }
 
-    @Delete('/Delete')
+    @Delete('/Delete/:id')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
-    async deleteStore(@QueryParams() query: StringEntityDto, @Res() res: Response) {
-        const id = query.id;
+    async deleteStore(@Param('id') id: string, @Res() res: Response) {
         if (!id) {
             return res.status(400).json({
                 success: false,

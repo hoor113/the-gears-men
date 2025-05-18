@@ -5,7 +5,7 @@ import { EntityDto } from '@/common/entity-dto';
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
 import { EOrderStatus, EPaymentMethod } from '@/models/order.model';
 
-export class OrderItemDto {
+export class OrderItemDto extends EntityDto {
     @IsString({ message: 'Product ID must be a string.' })
     productId!: string; // Required
 

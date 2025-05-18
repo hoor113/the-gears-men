@@ -33,6 +33,7 @@ import SingleCategoryPage from '@/pages/app/customer/category/[id]/page';
 import SaleProductPage from '@/pages/app/customer/category/sale/page';
 import SingleStorePage from '@/pages/app/customer/store/[id]/page';
 import OwnerSingleStorePage from '@/pages/app/owner/store/[id]/page';
+import OwnerShipmentPage from '@/pages/app/owner/store/[id]/shipment/page';
 
 export const router = createBrowserRouter([
   {
@@ -142,6 +143,10 @@ export const router = createBrowserRouter([
                   {
                     index: true,
                     element: <OwnerSingleStorePage />,
+                  },
+                  {
+                    path: 'shipment',
+                    element: <OwnerShipmentPage />
                   }
                 ]
               }

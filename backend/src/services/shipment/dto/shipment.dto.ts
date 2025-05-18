@@ -8,8 +8,20 @@ export class ShipmentDto extends EntityDto {
     @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
     storeId!: mongoose.Types.ObjectId; // Required
 
+    @IsOptional()
+    @IsString({ message: 'Store name must be a string.' })
+    storeName?: string; // Required
+
     @IsMongoId({ message: 'Shipment item ID must be a valid MongoDB ID.' })
     orderItemId!: mongoose.Types.ObjectId; // Required
+
+    @IsOptional()
+    @IsString({ message: 'Item name must be a string.' })
+    orderItemName?: string; // Required
+
+    @IsOptional()
+    @IsString({ message: 'Item image must be a string.' })
+    orderItemImage?: string; // Required
 
     @IsEnum(EShipmentStatus, { message: 'Status must be a valid shipment status.' })
     status!: EShipmentStatus; // Required
@@ -23,16 +35,41 @@ export class ShipmentDto extends EntityDto {
 
     @IsOptional()
     @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID.' })
+    deliveryCompanyName?: mongoose.Types.ObjectId;
+
+    @IsOptional()
+    @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID.' })
     deliveryPersonnel?: mongoose.Types.ObjectId; // Optional
+
+    @IsOptional()
+    @IsString({ message: 'Delivery personnel name must be a string.' })
+    deliveryPersonnelName?: string; // Optional
+
+    @IsOptional()
+    @IsDate({ message: 'Delivery date must be a string.' })
+    deliveryDate?: Date; // Optional
 
     @IsOptional()
     @IsMongoId({ message: 'Shipment canceller must be a valid MongoDB ID.' })
     canceller?: string; // Optional
+
+    @IsOptional()
+    @IsMongoId({ message: 'Shipment canceller name must be a valid MongoDB ID.' })
+    cancellerName?: string; // Optional
 }
 
 export class GetShipmentFromCustomerDto extends BaseGetAllDto {
-    // @IsString({ message: 'Store ID must be a valid MongoDB ID.' })
-    // storeId!: string; // Required
+    @IsOptional()
+    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
+    storeId?: string;
+
+    @IsOptional()
+    @IsMongoId({ message: 'Item ID must be a valid MongoDB ID.' })
+    orderItemId?: string; 
+
+    @IsOptional()
+    @IsEnum(EShipmentStatus, { message: 'Status must be a valid shipment status.' })
+    status?: EShipmentStatus; 
 }
 
 export class ConfirmAndSendShipmentToDeliveryCompanyDto {
@@ -44,9 +81,17 @@ export class ConfirmAndSendShipmentToDeliveryCompanyDto {
 }
 
 export class GetShipmentFromStoreDto extends BaseGetAllDto {
+    @IsOptional()
+    @IsMongoId({ message: 'Store ID must be a valid MongoDB ID.' })
+    storeId?: string;
 
-    // @IsMongoId({ message: 'Delivery company ID must be a valid MongoDB ID.' })
-    // deliveryCompanyId!: string;
+    @IsOptional()
+    @IsMongoId({ message: 'Item ID must be a valid MongoDB ID.' })
+    orderItemId?: string; 
+
+    @IsOptional()
+    @IsEnum(EShipmentStatus, { message: 'Status must be a valid shipment status.' })
+    status?: EShipmentStatus; 
 }
 
 export class SendShipmentToDeliveryPersonnelDto extends EntityDto {

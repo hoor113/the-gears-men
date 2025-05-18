@@ -44,7 +44,6 @@ const OwnerPage = () => {
   });
 
 
-
   const { mutate, isLoading: deleteMutationLoading } = useMutation({
     mutationFn: (id: any) => storeService.delete(id),
     onSuccess: () => {

@@ -47,3 +47,21 @@ export class CreateStoreDto {
     @IsString({ message: 'Description must be a string.' })
     description?: string;
 }
+
+export class UpdateStoreDto extends EntityDto {
+    @IsOptional()
+    @IsMongoId({ message: 'Store owner ID must be a valid MongoDB ID.' })
+    ownerId?: mongoose.Types.ObjectId; 
+
+    @IsOptional()
+    @IsString({ message: 'Store name must be a string.' })
+    name?: string;
+
+    @IsOptional()
+    @IsString({ message: 'Location must be a string.' })
+    location?: string; 
+
+    @IsOptional()
+    @IsString({ message: 'Description must be a string.' })
+    description?: string;
+}

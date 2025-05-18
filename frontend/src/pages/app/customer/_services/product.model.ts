@@ -105,5 +105,4 @@ export const menuItems = [
   { label: "Thanh toán", path: "/customer/payment" },
   { label: "Tài khoản", path: "/settings/my-account" },
   { label: "Về chúng tôi", path: "/customer/aboutus" },
-
 ];

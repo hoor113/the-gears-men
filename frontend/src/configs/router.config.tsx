@@ -28,10 +28,11 @@ import LoginPage from '@/pages/auth/login.page';
 import RegisterPage from '@/pages/auth/register.page';
 import NotFoundPage from '@/pages/not-found.page';
 import OrderHistoryPage from '@/pages/app/customer/history/page';
-import AboutUs from '@/pages/app/customer/_components/aboutus';
+import AboutUs from '@/pages/app/_components/aboutus';
 import SingleCategoryPage from '@/pages/app/customer/category/[id]/page';
 import SaleProductPage from '@/pages/app/customer/category/sale/page';
 import SingleStorePage from '@/pages/app/customer/store/[id]/page';
+import OwnerSingleStorePage from '@/pages/app/owner/store/[id]/page';
 
 export const router = createBrowserRouter([
   {
@@ -132,6 +133,20 @@ export const router = createBrowserRouter([
             index: true,
             element: <OwnerPage />,
           },
+          {
+            path: 'store',
+            children: [
+              {
+                path: ':id',
+                children: [
+                  {
+                    index: true,
+                    element: <OwnerSingleStorePage />,
+                  }
+                ]
+              }
+            ]
+          }
         ],
       },
       {

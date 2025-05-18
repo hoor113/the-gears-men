@@ -36,6 +36,7 @@ import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from '@/config/jwt';
 import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/shipments')
@@ -56,13 +57,13 @@ export class ShipmentController {
 
 
     // Store Owner endpoints
-    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
     @Get('/store/')
     @UseBefore(ValidationMiddleware(GetShipmentFromCustomerDto))
     @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromCustomer(
         @Req() req: any,
-        @Body() dto: GetShipmentFromCustomerDto,
+        @QueryParams() dto: BaseGetAllDto,
         @Res() res: Response,
     ) {
         try {
@@ -105,7 +106,7 @@ export class ShipmentController {
     @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromStore(
         @Req() req: Request,
-        @Body() dto: GetShipmentFromStoreDto,
+        @QueryParams() dto: BaseGetAllDto,
         @Res() res: Response,
     ) {
         try {

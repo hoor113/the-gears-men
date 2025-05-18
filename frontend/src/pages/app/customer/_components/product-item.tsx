@@ -3,11 +3,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Product } from '../_services/product.model';
 import { useCart } from '../cart/context/cart.context';
 import ProductModal from './product-modal';
-import { useNavigate } from 'react-router-dom';
 
 type ProductProps = {
   product: Product;

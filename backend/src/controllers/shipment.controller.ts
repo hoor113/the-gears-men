@@ -36,6 +36,7 @@ import { BaseResponse } from '@/common/base-response';
 import { JwtPayload } from 'jsonwebtoken';
 import { verifyToken } from '@/config/jwt';
 import { TokenDecoderMiddleware } from '@/middlewares/token-decoder.middleware';
+import { BaseGetAllDto } from '@/common/base-get-all-dto';
 
 @UseBefore(AuthMiddleware)
 @JsonController('/shipments')
@@ -56,13 +57,13 @@ export class ShipmentController {
 
 
     // Store Owner endpoints
-    @UseBefore(authorizeRoles([EUserRole.StoreOwner]))
-    @Get('/store/')
+    @UseBefore(authorizeRoles([EUserRole.StoreOwner, EUserRole.Admin]))
+    @Get('/store')
     @UseBefore(ValidationMiddleware(GetShipmentFromCustomerDto))
     @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromCustomer(
         @Req() req: any,
-        @Body() dto: GetShipmentFromCustomerDto,
+        @QueryParams() dto: GetShipmentFromCustomerDto,
         @Res() res: Response,
     ) {
         try {
@@ -105,7 +106,7 @@ export class ShipmentController {
     @UseBefore(TokenDecoderMiddleware)
     async getShipmentsFromStore(
         @Req() req: Request,
-        @Body() dto: GetShipmentFromStoreDto,
+        @QueryParams() dto: GetShipmentFromStoreDto,
         @Res() res: Response,
     ) {
         try {
@@ -145,6 +146,7 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.DeliveryPersonnel]))
     @Get('/personnel/')
     @UseBefore(ValidationMiddleware(GetAssignedShipmentsDto))
+    @UseBefore(TokenDecoderMiddleware)
     async getAssignedShipments(
         @Req() req: Request,
         @QueryParams() dto: GetAssignedShipmentsDto,
@@ -188,11 +190,11 @@ export class ShipmentController {
     @UseBefore(TokenDecoderMiddleware)
     public async cancelShipment(
         @Req() req: Request,
-        shipmentId: StringEntityDto,
+        @Body() dto: StringEntityDto,
         @Res() res: Response) {
         try {
             const cancellerId = (req as any).userId;
-            const response = await this.shipmentCommonService.cancelShipment(cancellerId, shipmentId);
+            const response = await this.shipmentCommonService.cancelShipment(cancellerId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

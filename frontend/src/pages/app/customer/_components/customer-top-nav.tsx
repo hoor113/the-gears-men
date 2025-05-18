@@ -9,13 +9,8 @@ import {
   Button,
   ClickAwayListener,
   Divider,
-  Drawer,
   IconButton,
   InputBase,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   Paper,
   Popover,
   Typography,
@@ -31,9 +26,9 @@ import usePopover from '@/hooks/use-popover';
 import productsService from '@/pages/app/customer/_services/product.service';
 
 import AccountPopover from '../../_components/account-popover';
-import { categoriesObject } from '../_services/product.model';
 import { useCart } from '../cart/context/cart.context';
 import './custom-top-nav.scss';
+import LeftDrawer from './left-drawer';
 
 const AvatarStyled = styled(Avatar)(({ theme }) => ({
   border: `1px solid ${alpha(theme.palette.primary.main, 0.6)}`,
@@ -75,18 +70,20 @@ export default function CustomerTopNav() {
   const isCartOpen = Boolean(cartAnchorEl);
   const totalItems = useMemo(
     () => cartState.items.reduce((sum, item) => sum + item.quantity, 0),
-    [currentCartState.items, cartState.items],
+    [cartState.items],
   );
   const totalPrice = useMemo(
     () =>
       cartState.items.reduce(
         (sum, item) =>
           sum +
-          ((item.priceAfterDiscount != null ? item.priceAfterDiscount : item.price) *
-            item.quantity),
+          (item.priceAfterDiscount != null
+            ? item.priceAfterDiscount
+            : item.price) *
+            item.quantity,
         0,
       ),
-    [currentCartState.items, cartState.items],
+    [cartState.items],
   );
 
   const { data: getAllAccessories } = useQuery({
@@ -113,7 +110,7 @@ export default function CustomerTopNav() {
     setSearchResultOpen(true);
   };
 
-  const toggleDrawer = (open: boolean) => () => {
+  const toggleDrawer = (open: boolean) => {
     setDrawerOpen(open);
   };
 
@@ -443,31 +440,7 @@ export default function CustomerTopNav() {
             )}
           </Popover>
         </Box>
-
-        <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-          <Box
-            sx={{ width: 250 }}
-            role="presentation"
-            onClick={toggleDrawer(false)}
-            onKeyDown={toggleDrawer(false)}
-          >
-            <Typography variant="h6" sx={{ p: 2 }}>
-              Danh mục sản phẩm
-            </Typography>
-            <Divider />
-            <List>
-              {categoriesObject.map((category) => (
-                <ListItem key={category.key} disablePadding>
-                  <ListItemButton
-                    onClick={() => navigate(`/category/${category.key}`)}
-                  >
-                    <ListItemText primary={category.title} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        </Drawer>
+        <LeftDrawer drawerOpen={drawerOpen} toggleDrawer={toggleDrawer} />
       </div>
     </div>
   );

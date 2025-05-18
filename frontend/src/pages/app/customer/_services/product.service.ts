@@ -11,10 +11,12 @@ class ProductsService extends BaseCrudService {
 
   public async getDailyDiscount<T>(
     path = '/GetDailyDiscount',
+    params?: Record<string, any>,
   ): Promise<{ data: T }> {
     const res = await httpService.request<TBaseResponse<{ data: T }>>({
       method: 'GET',
       url: `${this.basePath}${path}`,
+      params, // thêm dòng này để gửi query string
     });
 
     return res.result;

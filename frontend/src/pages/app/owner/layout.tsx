@@ -6,10 +6,14 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
 import { EUserRole } from '@/services/auth/auth.model';
 
+import OwnerTopNav from './_components/owner-top-nav';
+import StoreProvider from './store/_services/store.context';
+
 const StyledWrapper = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   height: '100dvh',
+  backgroundColor: '#f5f5f5',
 });
 
 const OwnerLayout = () => {
@@ -23,9 +27,12 @@ const OwnerLayout = () => {
   }, [authQuery.isSuccess, authQuery.data, navigate]);
 
   return authQuery.isSuccess ? (
-    <StyledWrapper>
-      <Outlet />
-    </StyledWrapper>
+    <StoreProvider>
+      <StyledWrapper>
+        <OwnerTopNav />
+        <Outlet />
+      </StyledWrapper>
+    </StoreProvider>
   ) : (
     <></>
   );

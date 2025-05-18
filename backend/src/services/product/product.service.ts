@@ -88,9 +88,9 @@ export class ProductService {
             const product = await Product.findById(id);
             const store = product ? await Store.findById(product.storeId) : null;
 
+
             // RETRIEVE DISCOUNT FROM REDIS
             const discountedList: string[] = await redis.getList('daily_discount') || [];
-
             const productWithDiscount = product ? {
                 id: product._id as string,
                 storeId: product.storeId.toString(),
@@ -98,8 +98,8 @@ export class ProductService {
                 name: product.name,
                 description: product.description,
                 price: product.price,
-                priceAfterDiscount: discountedList.includes(product._id as string) ?
-                    product.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(product._id as string)]) / 100 : null,
+                priceAfterDiscount: discountedList.includes((product._id as string).toString()) ?
+                    product.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((product._id as string).toString())]) / 100 : null,
                 stock: product.stock,
                 category: product.category,
                 images: product.images,
@@ -114,7 +114,7 @@ export class ProductService {
         }
     }
 
-    public async getDailyDiscount(): Promise<BaseResponse<ProductDto[]>> {
+    public async getDailyDiscount(dto: GetProductsDto): Promise<BaseResponse<ProductDto[]>> {
         try {
             const discountedList = await redis.getList('daily_discount');
             if (!discountedList) {
@@ -124,7 +124,24 @@ export class ProductService {
                 );
             }
 
-            const products = await Product.find({ _id: { $in: discountedList } });
+            const searchableFields = ['name'];
+            const extraCondition: IExtraCondition[] = [
+                {
+                    field: 'price',
+                    type: EExtraConditionType.InRange,
+                    fromField: 'minPrice',
+                    toField: 'maxPrice'
+                }
+            ];
+
+            // Build query from dto and add _id in discountedList
+            const baseQuery = buildQuery(dto, searchableFields, extraCondition);
+            const query = {
+                ...baseQuery,
+                _id: { $in: discountedList }
+            };
+
+            const products = await Product.find(query);
             const productDtos = products.map((item) => ({
                 id: item._id as string,
                 storeId: item.storeId.toString(),

@@ -1,24 +1,26 @@
-import { useState } from 'react';
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  Typography, 
-  Chip, 
-  Grid,
-  styled,
-  Collapse,
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Box,
   Button,
-  Divider
+  Card,
+  CardContent,
+  Chip,
+  Collapse,
+  Divider,
+  Grid,
+  Typography,
+  styled,
 } from '@mui/material';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { EOrderStatus } from '@/services/order/order.model';
+import { useState } from 'react';
+
 import useTranslation from '@/hooks/use-translation';
-import ShipmentBox from './shipment-box';
+import { EOrderStatus } from '@/services/order/order.model';
 import { EShipmentStatus } from '@/services/shipment/shipment.model';
+
+import ShipmentBox from './shipment-box';
 
 interface ShipmentItem {
   id: string;
@@ -66,12 +68,15 @@ const StatusChip = styled(Chip)(({ theme, color }) => ({
 export default function OrderItem({ order }: OrderItemProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  
+
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', { 
-      style: 'currency', 
-      currency: 'VND' 
-    }).format(amount);
+    // Round up to the nearest thousand
+    const roundedAmount = Math.ceil(amount / 1000) * 1000;
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      maximumFractionDigits: 0,
+    }).format(roundedAmount);
   };
 
   const formatDate = (dateString: string) => {
@@ -79,7 +84,9 @@ export default function OrderItem({ order }: OrderItemProps) {
   };
 
   const getStatusInfo = (status: EOrderStatus) => {
-    switch(status) {
+    switch (status) {
+      case EOrderStatus.WaitingForPayment:
+        return { label: t('Chờ thanh toán'), color: 'warning' };
       case EOrderStatus.Pending:
         return { label: t('Đang xử lý'), color: 'warning' };
       case EOrderStatus.Confirmed:
@@ -94,10 +101,10 @@ export default function OrderItem({ order }: OrderItemProps) {
   const statusInfo = getStatusInfo(order.status);
 
   return (
-    <Card 
-      sx={{ 
+    <Card
+      sx={{
         mb: 2,
-        '&:hover': { boxShadow: 3 } 
+        '&:hover': { boxShadow: 3 },
       }}
     >
       <CardContent sx={{ pb: 1 }}>
@@ -114,21 +121,27 @@ export default function OrderItem({ order }: OrderItemProps) {
             <Typography variant="subtitle2" color="text.secondary">
               {t('Ngày đặt')}
             </Typography>
-            <Typography variant="body1">
-              {formatDate(order.date)}
-            </Typography>
+            <Typography variant="body1">{formatDate(order.date)}</Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
             <Box display="flex" justifyContent="flex-end" alignItems="center">
               <Box mr={2}>
-                <Typography variant="subtitle2" color="text.secondary" align="right">
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  align="right"
+                >
                   {t('Tổng tiền')}
                 </Typography>
-                <Typography variant="body1" fontWeight={600} color="primary.main">
+                <Typography
+                  variant="body1"
+                  fontWeight={600}
+                  color="primary.main"
+                >
                   {formatCurrency(order.total)}
                 </Typography>
               </Box>
-              <StatusChip 
+              <StatusChip
                 label={statusInfo.label}
                 color={statusInfo.color as any}
                 size="small"
@@ -136,9 +149,9 @@ export default function OrderItem({ order }: OrderItemProps) {
             </Box>
           </Grid>
         </Grid>
-        
+
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-          <Button 
+          <Button
             onClick={() => setExpanded(!expanded)}
             startIcon={expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             size="small"
@@ -148,14 +161,14 @@ export default function OrderItem({ order }: OrderItemProps) {
           </Button>
         </Box>
       </CardContent>
-      
+
       <Collapse in={expanded}>
         <Divider />
         <Box sx={{ px: 2, pb: 2, pt: 1 }}>
           <Typography variant="subtitle2" gutterBottom>
             {t('Chi tiết vận chuyển')} ({order.shipments.length})
           </Typography>
-          
+
           {order.shipments.map((shipment) => (
             <ShipmentBox
               key={shipment.id}

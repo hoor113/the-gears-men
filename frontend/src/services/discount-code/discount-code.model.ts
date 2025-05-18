@@ -1,4 +1,4 @@
 export enum EDiscountCodeType {
-    ProductDiscount = 'product',
-    ShippingDiscount = 'shipping'
+  ProductDiscount = 'product',
+  ShippingDiscount = 'shipping',
 }

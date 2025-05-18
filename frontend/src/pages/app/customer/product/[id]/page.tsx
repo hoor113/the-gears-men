@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router-dom';
-
-import productsService from '../../_services/product.service';
+import NiceModal from '@ebay/nice-modal-react';
 import {
   Box,
-  Typography,
-  Paper,
-  Chip,
-  Divider,
   Button,
+  Chip,
   Collapse,
+  Divider,
+  Paper,
+  Typography,
 } from '@mui/material';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { useQuery } from '@tanstack/react-query';
+import parse from 'html-react-parser';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import { Autoplay, Navigation } from 'swiper/modules';
-import parse from 'html-react-parser';
-import { categoriesObject } from '../../_services/product.model';
-import NiceModal from '@ebay/nice-modal-react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+import appService from '@/services/app/app.service';
+
 import ProductModal from '../../_components/product-modal';
+import { categoriesObject } from '../../_services/product.model';
+import productsService from '../../_services/product.service';
 import { useCart } from '../../cart/context/cart.context';
 
 const formatCurrency = (value: number) =>
@@ -30,12 +32,11 @@ const SingleProductPage = () => {
   const [_, cartDispatch] = useCart();
   const navigate = useNavigate();
 
-  const { data: product } = useQuery({
+  const { data: product, isLoading } = useQuery({
     queryKey: ['products/getOne', id],
     queryFn: () => productsService.getOne(id as string),
     enabled: !!id,
   }) as any;
-
 
   console.log('product', product);
 
@@ -50,8 +51,8 @@ const SingleProductPage = () => {
 
   const discountPercent = product?.priceAfterDiscount
     ? Math.round(
-      ((product.price - product.priceAfterDiscount) / product.price) * 100,
-    )
+        ((product.price - product.priceAfterDiscount) / product.price) * 100,
+      )
     : null;
 
   const handleAddToCart = () => {
@@ -155,7 +156,9 @@ const SingleProductPage = () => {
                     delay: 5000,
                     disableOnInteraction: false,
                   }}
-                  onSlideChange={(swiper) => setSelectedImage(product.images[swiper.realIndex])}
+                  onSlideChange={(swiper) =>
+                    setSelectedImage(product.images[swiper.realIndex])
+                  }
                 >
                   {product.images.map((img: string, idx: number) => (
                     <SwiperSlide key={idx}>
@@ -208,42 +211,43 @@ const SingleProductPage = () => {
             </Typography>
             <Typography variant="body1" gutterBottom>
               <strong>Danh mục:</strong>{' '}
-              {product?.category ? (
-                (() => {
-                  console.log(product.category);
-                  const category = categoriesObject.find(cat => cat.key === product.category?.toLowerCase());
-                  return category ? (
-                    <Button
-                      variant="text"
-                      onClick={() => navigate(`/customer/category/${product.category}`)}
-                      sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
-                    >
-                      {category.title}
-                    </Button>
-                  ) : (
-                    'Không có thông tin'
-                  );
-                })()
-              ) : (
-                'Không có thông tin'
-              )}
+              {product?.category
+                ? (() => {
+                    console.log(product.category);
+                    const category = categoriesObject.find(
+                      (cat) => cat.key === product.category?.toLowerCase(),
+                    );
+                    return category ? (
+                      <Button
+                        variant="text"
+                        onClick={() =>
+                          navigate(`/customer/category/${product.category}`)
+                        }
+                        sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
+                      >
+                        {category.title}
+                      </Button>
+                    ) : (
+                      'Không có thông tin'
+                    );
+                  })()
+                : 'Không có thông tin'}
             </Typography>
 
             <Typography variant="body1" gutterBottom>
               <strong>Cửa hàng:</strong>{' '}
-              {product?.storeId && product?.storeName
-                ? (
-                  <Button
-                    variant="text"
-                    onClick={() => navigate(`/customer/store/${product.storeId}`)}
-                    sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
-                  >
-                    {product.storeName}
-                  </Button>
-                )
-                : 'Không có thông tin'}
+              {product?.storeId && product?.storeName ? (
+                <Button
+                  variant="text"
+                  onClick={() => navigate(`/customer/store/${product.storeId}`)}
+                  sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
+                >
+                  {product.storeName}
+                </Button>
+              ) : (
+                'Không có thông tin'
+              )}
             </Typography>
-
 
             <Divider sx={{ my: 2 }} />
 
@@ -271,7 +275,6 @@ const SingleProductPage = () => {
                 </Typography>
               )}
             </Box>
-
 
             {/* Nút thêm vào giỏ (chưa có logic) */}
             <Button
@@ -306,7 +309,8 @@ const SingleProductPage = () => {
                 sx={{
                   maxHeight: 70,
                   overflow: 'hidden',
-                  maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)',
+                  maskImage:
+                    'linear-gradient(to bottom, black 50%, transparent 100%)',
                 }}
               >
                 {parse(product.description)}

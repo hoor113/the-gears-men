@@ -1,15 +1,15 @@
 import { Add, Delete, Remove } from '@mui/icons-material';
 import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Divider,
-    Grid,
-    IconButton,
-    Link,
-    TextField,
-    Typography,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Grid,
+  IconButton,
+  Link,
+  TextField,
+  Typography,
 } from '@mui/material';
 
 import parse from 'html-react-parser';
@@ -31,30 +31,30 @@ const CartPage = () => {
     const navigate = useNavigate()
     const [cartState, cartDispatch] = useCart();
 
-    const handleQuantityChange = (id: string, value: number, max: number) => {
-        const newQuantity = isNaN(value) ? 1 : Math.min(Math.max(value, 1), max);
-        cartDispatch({
-            type: 'FIX_QUANTITY',
-            payload: { id, quantity: newQuantity },
-        });
-    };
+  const handleQuantityChange = (id: string, value: number, max: number) => {
+    const newQuantity = isNaN(value) ? 1 : Math.min(Math.max(value, 1), max);
+    cartDispatch({
+      type: 'FIX_QUANTITY',
+      payload: { id, quantity: newQuantity },
+    });
+  };
 
-    const handleRemove = (id: string) => {
-        cartDispatch({ type: 'REMOVE_ITEM', payload: id });
-        if (cartState.items.length === 0) {
-            cartDispatch({ type: 'CLEAR_CART' });
-        }
-    };
+  const handleRemove = (id: string) => {
+    cartDispatch({ type: 'REMOVE_ITEM', payload: id });
+    if (cartState.items.length === 0) {
+      cartDispatch({ type: 'CLEAR_CART' });
+    }
+  };
 
-    const totalPrice = cartState.items.reduce(
-        (sum, item) =>
-            sum + (item.priceAfterDiscount || item.price) * item.quantity,
-        0,
-    );
+  const totalPrice = cartState.items.reduce(
+    (sum, item) =>
+      sum + (item.priceAfterDiscount || item.price) * item.quantity,
+    0,
+  );
 
-    const hasInvalidStock = cartState.items.some(
-        (item) => item.quantity > item.stock,
-    );
+  const hasInvalidStock = cartState.items.some(
+    (item) => item.quantity > item.stock,
+  );
 
     return (
         <Box sx={{ p: 2, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
@@ -188,28 +188,28 @@ const CartPage = () => {
                     </Card>
                 </Grid>
 
-                {/* Tổng tiền + ghi chú */}
-                <Grid item xs={12} md={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h6">Tổng tiền</Typography>
-                            <Typography
-                                variant="h5"
-                                color="primary"
-                                fontWeight="bold"
-                                sx={{ mt: 1 }}
-                            >
-                                {totalPrice.toLocaleString('vi-VN')}₫
-                            </Typography>
+        {/* Tổng tiền + ghi chú */}
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6">Tổng tiền</Typography>
+              <Typography
+                variant="h5"
+                color="primary"
+                fontWeight="bold"
+                sx={{ mt: 1 }}
+              >
+                {totalPrice.toLocaleString('vi-VN')}₫
+              </Typography>
 
-                            <TextField
-                                fullWidth
-                                multiline
-                                minRows={3}
-                                label="Ghi chú đơn hàng"
-                                variant="outlined"
-                                sx={{ mt: 3 }}
-                            />
+              <TextField
+                fullWidth
+                multiline
+                minRows={3}
+                label="Ghi chú đơn hàng"
+                variant="outlined"
+                sx={{ mt: 3 }}
+              />
 
                             <Button
                                 fullWidth
@@ -222,23 +222,23 @@ const CartPage = () => {
                                 Tiến hành thanh toán
                             </Button>
 
-                            {hasInvalidStock && (
-                                <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-                                    Vui lòng điều chỉnh số lượng không vượt quá tồn kho.
-                                </Typography>
-                            )}
+              {hasInvalidStock && (
+                <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                  Vui lòng điều chỉnh số lượng không vượt quá tồn kho.
+                </Typography>
+              )}
 
-                            <Box sx={{ mt: 2, textAlign: 'center' }}>
-                                <Link href="/" underline="hover">
-                                    ← Quay lại trang chủ
-                                </Link>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
-        </Box>
-    );
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Link href="/" underline="hover">
+                  ← Quay lại trang chủ
+                </Link>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 };
 
 export default CartPage;

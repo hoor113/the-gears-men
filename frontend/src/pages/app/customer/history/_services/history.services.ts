@@ -109,13 +109,14 @@ export interface IPendingOrderResponse extends IPaginatedItems<IPendingOrder> {
 
 // Transform the raw order data to the format expected by the frontend
 function transformOrderData(orders: IOrderRaw[]): IOrderHistoryItem[] {
-  return orders.map(order => {
+  return orders.map((order) => {
     // Transform each order item to a shipment info
-    const shipments = order.items.map(item => {
+    const shipments = order.items.map((item) => {
       const shipmentInfo: IShipmentInfo = {
         id: item.shipmentId?._id || `no-shipment-${item._id}`,
         status: item.shipmentId?.status || EShipmentStatus.Pending,
-        estimatedDelivery: item.shipmentId?.estimatedDelivery || order.createdAt,
+        estimatedDelivery:
+          item.shipmentId?.estimatedDelivery || order.createdAt,
         deliveryDate: item.shipmentId?.deliveryDate,
         product: {
           id: item.productId._id,
@@ -149,7 +150,7 @@ class OrderHistoryService extends BaseCrudService {
 
   public async getOrderHistory(
     page: number,
-    pageSize: number
+    pageSize: number,
   ): Promise<IOrderHistory> {
     const res = await httpService.request<TBaseResponse<any>>({
       method: 'GET',
@@ -157,7 +158,7 @@ class OrderHistoryService extends BaseCrudService {
       params: {
         skipCount: (page - 1 || 0) * pageSize,
         maxResultCount: pageSize,
-      }
+      },
     });
     // console.log('Order history data:', res);
     // Transform the data from backend format to frontend format
@@ -172,7 +173,7 @@ class OrderHistoryService extends BaseCrudService {
       totalPages: Math.ceil(totalRecords / pageSize),
       totalCount: totalRecords,
       totalRecords: totalRecords,
-      data: transformedItems
+      data: transformedItems,
     };
   }
 
@@ -191,7 +192,7 @@ class OrderHistoryService extends BaseCrudService {
   public async getOrdersByStatus(
     page: number,
     pageSize: number,
-    isPending: number
+    isPending: number,
   ): Promise<IPendingOrderResponse | IOrderHistory> {
     const res = await httpService.request<TBaseResponse<any>>({
       method: 'GET',
@@ -199,8 +200,8 @@ class OrderHistoryService extends BaseCrudService {
       params: {
         skipCount: (page - 1 || 0) * pageSize,
         maxResultCount: pageSize,
-        isPending: isPending
-      }
+        isPending: isPending,
+      },
     });
 
     // Log the response for debugging
@@ -208,52 +209,58 @@ class OrderHistoryService extends BaseCrudService {
 
     const totalRecords = res.resultCount || 0;
     const totalPages = Math.ceil(totalRecords / pageSize) || 1;
-    
+
     if (isPending === 1) {
       // For pending orders, we return the data in the pending order format
       // This avoids transformation errors
       const orders = res.result || [];
-      
+
       return {
         items: orders.map((order: any) => ({
           _id: order._id || '',
           createdAt: order.createdAt || new Date().toISOString(),
           orderStatus: order.orderStatus || EOrderStatus.Pending,
           totalPrice: order.totalPrice || 0,
-          items: Array.isArray(order.items) ? order.items.map((item: any) => ({
-            _id: item._id || '',
-            productId: item.productId ? {
-              _id: item.productId._id || '',
-              name: item.productId.name || 'Unknown Product',
-              price: item.productId.price || 0,
-              imageUrl: item.productId.imageUrl
-            } : {
-              _id: '',
-              name: 'Unknown Product',
-              price: 0
-            },
-            quantity: item.quantity || 1,
-            price: item.price || 0,
-            shippingPrice: item.shippingPrice || 0,
-            productDiscountCode: item.productDiscountCode,
-            shippingDiscountCode: item.shippingDiscountCode
-          })) : []
+          items: Array.isArray(order.items)
+            ? order.items.map((item: any) => ({
+                _id: item._id || '',
+                productId: item.productId
+                  ? {
+                      _id: item.productId._id || '',
+                      name: item.productId.name || 'Unknown Product',
+                      price: item.productId.price || 0,
+                      imageUrl: item.productId.imageUrl,
+                    }
+                  : {
+                      _id: '',
+                      name: 'Unknown Product',
+                      price: 0,
+                    },
+                quantity: item.quantity || 1,
+                price: item.price || 0,
+                shippingPrice: item.shippingPrice || 0,
+                productDiscountCode: item.productDiscountCode,
+                shippingDiscountCode: item.shippingDiscountCode,
+              }))
+            : [],
         })),
         totalPages,
         totalCount: totalRecords,
         totalRecords,
-        data: res.result || []
+        data: res.result || [],
       } as IPendingOrderResponse;
     } else {
       // For confirmed orders, use the regular transformation
-      const transformedItems = transformOrderData(Array.isArray(res.result) ? res.result : []);
+      const transformedItems = transformOrderData(
+        Array.isArray(res.result) ? res.result : [],
+      );
 
       return {
         items: transformedItems,
         totalPages,
         totalCount: totalRecords,
         totalRecords,
-        data: transformedItems
+        data: transformedItems,
       } as IOrderHistory;
     }
   }
@@ -261,15 +268,19 @@ class OrderHistoryService extends BaseCrudService {
   // Get pending orders (convenience method)
   public async getPendingOrders(
     page: number,
-    pageSize: number
+    pageSize: number,
   ): Promise<IPendingOrderResponse> {
-    return this.getOrdersByStatus(page, pageSize, 1) as Promise<IPendingOrderResponse>;
+    return this.getOrdersByStatus(
+      page,
+      pageSize,
+      1,
+    ) as Promise<IPendingOrderResponse>;
   }
 
   // Get confirmed orders (convenience method)
   public async getConfirmedOrders(
     page: number,
-    pageSize: number
+    pageSize: number,
   ): Promise<IOrderHistory> {
     return this.getOrdersByStatus(page, pageSize, 0) as Promise<IOrderHistory>;
   }
@@ -280,8 +291,8 @@ class OrderHistoryService extends BaseCrudService {
       method: 'POST',
       url: `${this.basePath}/cancel`,
       data: {
-        orderId
-      }
+        orderId,
+      },
     });
   }
 }

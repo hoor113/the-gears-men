@@ -111,8 +111,7 @@ export abstract class BaseCrudService {
   public async delete<T>(id: string | number, path = '/Delete') {
     const res = await httpService.request<TBaseResponse<T>>({
       method: 'DELETE',
-      url: `${this.basePath}${path}`,
-      params: { id },
+      url: `${this.basePath}${path}/${id}`,
     });
 
     return res.result;

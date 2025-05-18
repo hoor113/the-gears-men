@@ -6,6 +6,8 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
 import { EUserRole } from '@/services/auth/auth.model';
 
+import PersonnelTopNav from './_components/personnel-top-nav';
+
 const StyledWrapper = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
@@ -27,6 +29,7 @@ const PersonnelLayout = () => {
 
   return authQuery.isSuccess ? (
     <StyledWrapper>
+      <PersonnelTopNav />
       <Outlet />
     </StyledWrapper>
   ) : (

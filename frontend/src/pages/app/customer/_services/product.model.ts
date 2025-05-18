@@ -97,3 +97,12 @@ export interface Product {
   images: string[];
   id: string;
 }
+
+export const menuItems = [
+  { label: 'Vouchers', path: '/customer/vouchers' },
+  { label: 'Lịch sử đơn hàng', path: '/customer/order-history' },
+  { label: 'Giỏ hàng', path: '/customer/cart' },
+  { label: 'Thanh toán', path: '/customer/payment' },
+  { label: 'Tài khoản', path: '/settings/my-account' },
+  { label: 'Về chúng tôi', path: '/customer/aboutus' },
+];

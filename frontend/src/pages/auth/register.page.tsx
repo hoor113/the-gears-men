@@ -197,7 +197,6 @@ const RegisterPage = () => {
               ))}
             </Select>
           </Box>
-          //thêm onSubmit sau
           <Box component="form">
             <TextField
               fullWidth

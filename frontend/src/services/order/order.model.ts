@@ -1,9 +1,12 @@
 export enum EOrderStatus {
-    Pending = 'pending',
-    Confirmed = 'confirmed',
-    Cancelled = 'cancelled',
+  WaitingForPayment = 'waiting_for_payment',
+  Pending = 'pending',
+  Confirmed = 'confirmed',
+  Cancelled = 'cancelled',
 }
 export enum EPaymentMethod {
-    Card = 'card',
-    Cash = 'cash',
+  Card = 'card',
+  Cash = 'cash',
+  Zalopay = 'zalopay',
+  Vnpay = 'vnpay',
 }

@@ -1,22 +1,21 @@
-import { BaseCrudService, TBaseResponse } from "@/base/base-crud-service";
-import { httpService } from "@/base/http-service";
-import { IStore } from "./store.model";
+import { BaseCrudService, TBaseResponse } from '@/base/base-crud-service';
+import { httpService } from '@/base/http-service';
+
+import { IStore } from './store.model';
 
 class StoreService extends BaseCrudService {
-    constructor() {
-        super('/stores');
-    }
+  constructor() {
+    super('/stores');
+  }
 
-    public async getMyStore(
-        path = '/GetMyStore',
-    ): Promise<{ data: IStore[] }> {
-        const res = await httpService.request<TBaseResponse<{ data: IStore[] }>>({
-            method: 'GET',
-            url: `${this.basePath}${path}`,
-        });
+  public async getMyStore(path = '/GetMyStore'): Promise<{ data: IStore[] }> {
+    const res = await httpService.request<TBaseResponse<{ data: IStore[] }>>({
+      method: 'GET',
+      url: `${this.basePath}${path}`,
+    });
 
-        return res.result;
-    }
+    return res.result;
+  }
 }
 
 const storeService = new StoreService();

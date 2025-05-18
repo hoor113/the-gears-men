@@ -5,6 +5,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 
 import useAuth from '@/hooks/use-auth';
 import { EUserRole } from '@/services/auth/auth.model';
+
 import OwnerTopNav from './_components/owner-top-nav';
 import StoreProvider from './store/_services/store.context';
 

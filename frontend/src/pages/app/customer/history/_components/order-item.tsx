@@ -1,24 +1,26 @@
-import { useState } from 'react';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Box,
+  Button,
   Card,
   CardContent,
-  Typography,
   Chip,
-  Grid,
-  styled,
   Collapse,
-  Button,
-  Divider
+  Divider,
+  Grid,
+  Typography,
+  styled,
 } from '@mui/material';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { EOrderStatus } from '@/services/order/order.model';
+import { useState } from 'react';
+
 import useTranslation from '@/hooks/use-translation';
-import ShipmentBox from './shipment-box';
+import { EOrderStatus } from '@/services/order/order.model';
 import { EShipmentStatus } from '@/services/shipment/shipment.model';
+
+import ShipmentBox from './shipment-box';
 
 interface ShipmentItem {
   id: string;
@@ -73,7 +75,7 @@ export default function OrderItem({ order }: OrderItemProps) {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(roundedAmount);
   };
 
@@ -102,7 +104,7 @@ export default function OrderItem({ order }: OrderItemProps) {
     <Card
       sx={{
         mb: 2,
-        '&:hover': { boxShadow: 3 }
+        '&:hover': { boxShadow: 3 },
       }}
     >
       <CardContent sx={{ pb: 1 }}>
@@ -119,17 +121,23 @@ export default function OrderItem({ order }: OrderItemProps) {
             <Typography variant="subtitle2" color="text.secondary">
               {t('Ngày đặt')}
             </Typography>
-            <Typography variant="body1">
-              {formatDate(order.date)}
-            </Typography>
+            <Typography variant="body1">{formatDate(order.date)}</Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
             <Box display="flex" justifyContent="flex-end" alignItems="center">
               <Box mr={2}>
-                <Typography variant="subtitle2" color="text.secondary" align="right">
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  align="right"
+                >
                   {t('Tổng tiền')}
                 </Typography>
-                <Typography variant="body1" fontWeight={600} color="primary.main">
+                <Typography
+                  variant="body1"
+                  fontWeight={600}
+                  color="primary.main"
+                >
                   {formatCurrency(order.total)}
                 </Typography>
               </Box>

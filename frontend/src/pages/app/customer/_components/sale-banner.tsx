@@ -1,18 +1,19 @@
-import { Box } from "@mui/material";
-import { Autoplay, Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-
+import { Box } from '@mui/material';
+import { Autoplay, Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 const SaleBanner = () => {
   const banners = [
     {
       id: 1,
-      imageUrl: 'https://theme.hstatic.net/1000410088/1001129080/14/slider_1.jpg?v=32',
+      imageUrl:
+        'https://theme.hstatic.net/1000410088/1001129080/14/slider_1.jpg?v=32',
       alt: 'Sale banner 1',
     },
     {
       id: 2,
-      imageUrl: 'https://theme.hstatic.net/1000410088/1001129080/14/slider_2.jpg?v=32',
+      imageUrl:
+        'https://theme.hstatic.net/1000410088/1001129080/14/slider_2.jpg?v=32',
       alt: 'Sale banner 2',
     },
   ];
@@ -48,4 +49,4 @@ const SaleBanner = () => {
   );
 };
 
-export default SaleBanner
+export default SaleBanner;

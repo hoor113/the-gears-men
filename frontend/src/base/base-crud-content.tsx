@@ -408,7 +408,7 @@ const BaseCrudContent = (props: TBaseCrudContentProps) => {
             tabFields: viewTabFields,
             defaultValues: !getOnePath
               ? getAllQuery?.data?.data?.find((item: any) => item.id === id) ||
-                getAllQuery?.data?.items?.find((item: any) => item.id === id) 
+                getAllQuery?.data?.items?.find((item: any) => item.id === id)
               : {},
             maxWidth:
               beautyView && !!beautyViewFormWidth

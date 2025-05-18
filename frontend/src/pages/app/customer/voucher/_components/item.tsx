@@ -1,16 +1,13 @@
 // ./_components/Item.tsx
-import {
-  Box,
-  Button,
-  Card,
-  Typography,
-} from '@mui/material';
 import DiscountIcon from '@mui/icons-material/LocalOffer';
-import dayjs from 'dayjs';
-import voucherService from '../_services/voucher.service';
+import { Box, Button, Card, Typography } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import appService from '@/services/app/app.service';
+import dayjs from 'dayjs';
 import { enqueueSnackbar } from 'notistack';
+
+import appService from '@/services/app/app.service';
+
+import voucherService from '../_services/voucher.service';
 
 interface ItemProps {
   isMyVoucher?: boolean;
@@ -31,12 +28,11 @@ const Item = ({
   expiryDate,
   isAllTab,
 }: ItemProps) => {
-
   const queryClient = useQueryClient();
   const handleClick = () => {
     mutate({
       id: voucherCode,
-    })
+    });
     appService.showLoadingModal();
   };
 
@@ -120,7 +116,7 @@ const Item = ({
 
         <Box>
           <Typography variant="h6" fontWeight="bold">
-            Giảm {' '} {quantity} {type === 'fixed' ? 'đ' : '%'}
+            Giảm {quantity} {type === 'fixed' ? 'đ' : '%'}
           </Typography>
           <Typography color="text.secondary">
             Mã: <strong>{voucherCode}</strong>

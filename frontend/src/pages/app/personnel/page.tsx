@@ -1,11 +1,11 @@
 import BaseTabsPage from '@/base/base-tabs-page';
-import { EShipmentStatus } from './_services/shipment.model';
+
 import PersonnelMainShipmentPage from './_components/personnel-main-shipment';
+import { EShipmentStatus } from './_services/shipment.model';
 
 const PersonnelPage = () => {
   return (
     <>
-
       <BaseTabsPage
         title="Quản lý đơn hàng"
         name="shipmentPage"
@@ -16,15 +16,21 @@ const PersonnelPage = () => {
           },
           {
             label: 'Đang giao',
-            Component: <PersonnelMainShipmentPage status={EShipmentStatus.Stored} />,
+            Component: (
+              <PersonnelMainShipmentPage status={EShipmentStatus.Stored} />
+            ),
           },
           {
             label: 'Đã giao',
-            Component: <PersonnelMainShipmentPage status={EShipmentStatus.Delivered} />,
+            Component: (
+              <PersonnelMainShipmentPage status={EShipmentStatus.Delivered} />
+            ),
           },
           {
             label: 'Đã hủy',
-            Component: <PersonnelMainShipmentPage status={EShipmentStatus.Failed} />,
+            Component: (
+              <PersonnelMainShipmentPage status={EShipmentStatus.Failed} />
+            ),
           },
         ]}
       />

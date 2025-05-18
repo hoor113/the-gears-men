@@ -76,7 +76,7 @@ const AccountPopover = (props: TAccountPopover) => {
           <AccountCircleIcon />
         </MenuItemStyled>
         <Divider />
-        
+
         <MenuItemStyled onClick={() => handleLogout()} className="item-logout">
           <span>{t('Đăng xuất')}</span>
           <LogoutIcon fontSize="small" />

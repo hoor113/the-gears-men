@@ -1,10 +1,9 @@
-import { BaseCrudService } from "@/base/base-crud-service";
+import { BaseCrudService } from '@/base/base-crud-service';
 
 class OwnerUserService extends BaseCrudService {
-    constructor() {
-        super('/users');
-    }
-
+  constructor() {
+    super('/users');
+  }
 }
 
 const ownerUserService = new OwnerUserService();

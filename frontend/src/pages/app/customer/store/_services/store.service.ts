@@ -4,9 +4,9 @@ import { BaseCrudService } from '@/base/base-crud-service';
 // import { httpService } from '@/base/http-service';
 
 class StoreService extends BaseCrudService {
-    constructor() {
-        super('/stores');
-    }
+  constructor() {
+    super('/stores');
+  }
 }
 
 const storeService = new StoreService();

@@ -1,7 +1,8 @@
-import { Box, Typography, styled, Chip } from '@mui/material';
-import { EShipmentStatus } from '@/services/shipment/shipment.model';
-import useTranslation from '@/hooks/use-translation';
 import ErrorIcon from '@mui/icons-material/Error';
+import { Box, Chip, Typography, styled } from '@mui/material';
+
+import useTranslation from '@/hooks/use-translation';
+import { EShipmentStatus } from '@/services/shipment/shipment.model';
 
 interface ShipmentStatusGraphProps {
   status: EShipmentStatus;
@@ -32,42 +33,52 @@ const StatusContainer = styled(Box)(({ theme }) => ({
 }));
 
 // Use numeric values (0 or 1) instead of booleans
-const StatusNode = styled(Box)<StatusNodeProps>(({ theme, active, completed, failed }) => ({
-  width: 20, // Smaller nodes
-  height: 20,  
-  borderRadius: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'relative',
-  backgroundColor: failed === 1
-    ? theme.palette.error.main 
-    : (active === 1 || completed === 1) 
-      ? theme.palette.success.main 
-      : theme.palette.grey[300],
-  border: `2px solid ${failed === 1
-    ? theme.palette.error.main 
-    : (active === 1 || completed === 1) 
-      ? theme.palette.success.main 
-      : theme.palette.grey[400]
-  }`,
-  zIndex: 2,
-  fontSize: '0.6rem',
-  color: (active === 1 || completed === 1 || failed === 1) ? 'white' : theme.palette.text.secondary,
-}));
+const StatusNode = styled(Box)<StatusNodeProps>(
+  ({ theme, active, completed, failed }) => ({
+    width: 20, // Smaller nodes
+    height: 20,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    backgroundColor:
+      failed === 1
+        ? theme.palette.error.main
+        : active === 1 || completed === 1
+          ? theme.palette.success.main
+          : theme.palette.grey[300],
+    border: `2px solid ${
+      failed === 1
+        ? theme.palette.error.main
+        : active === 1 || completed === 1
+          ? theme.palette.success.main
+          : theme.palette.grey[400]
+    }`,
+    zIndex: 2,
+    fontSize: '0.6rem',
+    color:
+      active === 1 || completed === 1 || failed === 1
+        ? 'white'
+        : theme.palette.text.secondary,
+  }),
+);
 
 // Use numeric values for transient props
-const StatusLine = styled(Box)<StatusLineProps>(({ theme, completed, failed }) => ({
-  height: 2,
-  width: '100%',  
-  maxWidth: '120px',  
-  backgroundColor: failed === 1
-    ? theme.palette.error.main
-    : completed === 1
-      ? theme.palette.success.main
-      : theme.palette.grey[300],
-  zIndex: 1,
-}));
+const StatusLine = styled(Box)<StatusLineProps>(
+  ({ theme, completed, failed }) => ({
+    height: 2,
+    width: '100%',
+    maxWidth: '120px',
+    backgroundColor:
+      failed === 1
+        ? theme.palette.error.main
+        : completed === 1
+          ? theme.palette.success.main
+          : theme.palette.grey[300],
+    zIndex: 1,
+  }),
+);
 
 const StatusLabel = styled(Typography)(({ theme }) => ({
   fontSize: '0.65rem',
@@ -92,68 +103,80 @@ const FailureChip = styled(Chip)(({ theme }) => ({
   height: '22px',
 }));
 
-export default function ShipmentStatusGraph({ status }: ShipmentStatusGraphProps) {
+export default function ShipmentStatusGraph({
+  status,
+}: ShipmentStatusGraphProps) {
   const { t } = useTranslation();
-  
+
   const isFailed = status === EShipmentStatus.Failed;
-  
+
   const getNodeStatus = (nodeStatus: EShipmentStatus) => {
     const statuses = [
       EShipmentStatus.Pending,
       EShipmentStatus.Confirmed,
       EShipmentStatus.Stored,
-      EShipmentStatus.Delivered
+      EShipmentStatus.Delivered,
     ];
-    
+
     const currentIndex = statuses.indexOf(status);
     const nodeIndex = statuses.indexOf(nodeStatus);
-    
+
     if (isFailed) {
       return { active: 0, completed: 0, failed: 1 }; // Using numeric values
     }
-    
+
     return {
       active: currentIndex === nodeIndex ? 1 : 0, // Using numeric values
       completed: currentIndex > nodeIndex ? 1 : 0, // Using numeric values
-      failed: 0
+      failed: 0,
     };
   };
 
   const renderNode = (nodeStatus: EShipmentStatus, label: string) => {
     const { active, completed, failed } = getNodeStatus(nodeStatus);
     return (
-      <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <StatusNode 
-          active={active}
-          completed={completed}
-          failed={failed}
-        >
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <StatusNode active={active} completed={completed} failed={failed}>
           {active === 1 && failed === 0 ? '✓' : ''}
         </StatusNode>
-        <StatusLabel color={active === 1 ? 'primary' : failed === 1 ? 'error' : 'textSecondary'}>
+        <StatusLabel
+          color={
+            active === 1 ? 'primary' : failed === 1 ? 'error' : 'textSecondary'
+          }
+        >
           {label}
         </StatusLabel>
       </Box>
     );
   };
-  
-  const renderLine = (fromStatus: EShipmentStatus, _toStatus: EShipmentStatus) => {
+
+  const renderLine = (
+    fromStatus: EShipmentStatus,
+    _toStatus: EShipmentStatus,
+  ) => {
     const fromIndex = [
       EShipmentStatus.Pending,
       EShipmentStatus.Confirmed,
       EShipmentStatus.Stored,
-      EShipmentStatus.Delivered
+      EShipmentStatus.Delivered,
     ].indexOf(fromStatus);
-    
+
     const currentIndex = [
       EShipmentStatus.Pending,
       EShipmentStatus.Confirmed,
       EShipmentStatus.Stored,
-      EShipmentStatus.Delivered
+      EShipmentStatus.Delivered,
     ].indexOf(status);
-    
+
     return (
-      <StatusLine 
+      <StatusLine
         completed={currentIndex > fromIndex ? 1 : 0}
         failed={status === EShipmentStatus.Failed ? 1 : 0}
       />
@@ -161,12 +184,19 @@ export default function ShipmentStatusGraph({ status }: ShipmentStatusGraphProps
   };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
       {isFailed && (
-        <FailureChip 
-          icon={<ErrorIcon fontSize="small" />} 
+        <FailureChip
+          icon={<ErrorIcon fontSize="small" />}
           label={t('Giao hàng thất bại')}
-          size="small" 
+          size="small"
         />
       )}
       <StatusContainer>

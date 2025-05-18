@@ -2,7 +2,6 @@ import { RemoveCircle } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-
 import {
   Avatar,
   Badge,
@@ -71,18 +70,20 @@ export default function CustomerTopNav() {
   const isCartOpen = Boolean(cartAnchorEl);
   const totalItems = useMemo(
     () => cartState.items.reduce((sum, item) => sum + item.quantity, 0),
-    [currentCartState.items, cartState.items],
+    [cartState.items],
   );
   const totalPrice = useMemo(
     () =>
       cartState.items.reduce(
         (sum, item) =>
           sum +
-          ((item.priceAfterDiscount != null ? item.priceAfterDiscount : item.price) *
-            item.quantity),
+          (item.priceAfterDiscount != null
+            ? item.priceAfterDiscount
+            : item.price) *
+            item.quantity,
         0,
       ),
-    [currentCartState.items, cartState.items],
+    [cartState.items],
   );
 
   const { data: getAllAccessories } = useQuery({

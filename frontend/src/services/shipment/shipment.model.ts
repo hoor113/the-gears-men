@@ -1,7 +1,7 @@
 export enum EShipmentStatus {
   Pending = 'pending',
   Confirmed = 'confirmed',
-  Stored = 'stored', 
+  Stored = 'stored',
   Delivered = 'delivered',
   Failed = 'failed',
 }

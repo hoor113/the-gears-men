@@ -10,10 +10,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { Autoplay, Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { Product } from '../_services/product.model';
 
@@ -85,7 +85,7 @@ const ProductModal = NiceModal.create(
                       },
                       transition: 'color 0.3s ease, background-color 0.3s ease',
                       '&:hover': {
-                        color: 'rgba(0, 0, 0, 0.75)',  // hover màu đậm hơn
+                        color: 'rgba(0, 0, 0, 0.75)', // hover màu đậm hơn
                         backgroundColor: 'rgba(0, 0, 0, 0.3)',
                       },
                     },
@@ -107,7 +107,9 @@ const ProductModal = NiceModal.create(
                       delay: 5000,
                       disableOnInteraction: false,
                     }}
-                    onSlideChange={(swiper) => setSelectedImage(images[swiper.realIndex])}
+                    onSlideChange={(swiper) =>
+                      setSelectedImage(images[swiper.realIndex])
+                    }
                   >
                     {images.map((img, idx) => (
                       <SwiperSlide key={idx}>
@@ -143,11 +145,18 @@ const ProductModal = NiceModal.create(
 
             {/* Right: Product Info */}
             <Box className="flex-1 flex flex-col gap-6">
-              <Typography variant="h5" className="font-semibold flex items-center gap-3">
+              <Typography
+                variant="h5"
+                className="font-semibold flex items-center gap-3"
+              >
                 {product.priceAfterDiscount ? (
                   <>
                     <span className="text-red-600">
-                      Giá: {(product.priceAfterDiscount * quantity)?.toLocaleString()} VNĐ
+                      Giá:{' '}
+                      {(
+                        product.priceAfterDiscount * quantity
+                      )?.toLocaleString()}{' '}
+                      VNĐ
                     </span>
                     <span className="text-gray-500 line-through text-base">
                       {(product.price * quantity)?.toLocaleString()} VNĐ
@@ -199,7 +208,7 @@ const ProductModal = NiceModal.create(
         </DialogContent>
       </Dialog>
     );
-  }
+  },
 );
 
 export default ProductModal;

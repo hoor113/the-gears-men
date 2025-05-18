@@ -5,6 +5,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 
 import useAuth from '@/hooks/use-auth';
 import { EUserRole } from '@/services/auth/auth.model';
+
 import CompanyTopNav from './_components/company-top-nav';
 
 const StyledWrapper = styled(Box)({

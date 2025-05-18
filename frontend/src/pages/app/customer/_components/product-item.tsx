@@ -58,7 +58,7 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
   return (
     <Box
       className="rounded-lg overflow-hidden shadow-sm transition-all duration-300 bg-white hover:shadow-md hover:bg-gray-100 flex flex-col mx-auto"
-      sx={{ maxWidth: 280, width: '100%' }}
+      sx={{ maxWidth: 280, width: '100%', height: '100%', minHeight: 360}}
     >
       <Box className="relative group aspect-square">
         <img

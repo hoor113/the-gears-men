@@ -126,9 +126,11 @@ export default function CustomerTopNav() {
           <MenuIcon />
         </IconButton>
 
-        <div className="w-8 h-8 md:w-10 md:h-10 bg-yellow-400 rounded-sm" />
-        <span className="font-bold text-base md:text-lg">
-          <span className="text-yellow-400 top-nav-group-name">
+        <div className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden" onClick={() => navigate('/customer')}/>
+        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer')} style={{"cursor":"pointer"}}>
+          <span className="text-yellow-400 top-nav-group-name"
+
+          >
             The Gears Men
           </span>
         </span>

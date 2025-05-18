@@ -24,7 +24,7 @@ import { useCart } from '../../cart/context/cart.context';
 
 const SingleProductPage = () => {
   const { id } = useParams<{ id: string }>();
-    const [_, cartDispatch] = useCart(); 
+  const [_, cartDispatch] = useCart();
   const navigate = useNavigate();
 
   const { data: product } = useQuery({
@@ -48,21 +48,36 @@ const SingleProductPage = () => {
     )
     : null;
 
-    const handleAddToCart = () => {
-      NiceModal.show(ProductModal, {
-        product: product,
-        addToCart: (product: any, quantity: number) => {
-          cartDispatch({
-            type: 'ADD_ITEM',
-            payload: { ...product, quantity },
-          });
-        },
-      });
-    };
+  const handleAddToCart = () => {
+    NiceModal.show(ProductModal, {
+      product: product,
+      addToCart: (product: any, quantity: number) => {
+        cartDispatch({
+          type: 'ADD_ITEM',
+          payload: { ...product, quantity },
+        });
+      },
+    });
+  };
 
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', py: 4, px: { xs: 2, md: 6 } }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, position: 'relative' }}>
+        <Button
+          variant="outlined"
+          onClick={() => navigate(-1)}
+          sx={{
+            borderRadius: '999px',
+            textTransform: 'none',
+            minWidth: 'auto',
+            px: 2,
+            py: 0.5,
+            fontWeight: 'bold',
+            marginBottom: "20px"
+          }}
+        >
+          ← Quay lại
+        </Button>
         <Box display="flex" flexDirection={{ xs: 'column', lg: 'row' }} gap={4}>
           {/* Hình ảnh sản phẩm */}
           <Box flexShrink={0}>

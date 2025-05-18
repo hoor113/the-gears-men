@@ -62,7 +62,7 @@ const AboutUs = () => {
                     textShadow: '2px 2px 6px rgba(0,0,0,0.3)',
                 }}
             >
-                THE GEAR MEN<br /> <br/>
+                THE GEARS MEN<br /> <br/>
                 <Box
                     sx={{
                         p: 3,
@@ -75,7 +75,7 @@ const AboutUs = () => {
                     }}
                 >
                     <Typography variant="body1" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-                        The Gear Men – đội ngũ chuyên gia đam mê công nghệ, luôn tiên phong trong việc lựa chọn và cung cấp những sản phẩm công nghệ hàng đầu, đảm bảo chất lượng và trải nghiệm tối ưu cho khách hàng. Chúng tôi không chỉ là những người bán hàng, mà còn là những người đồng hành cùng bạn trên hành trình khám phá và nâng tầm cuộc sống số. Với tinh thần sáng tạo, trách nhiệm và sự am hiểu sâu sắc về công nghệ, The Gear Men cam kết mang đến giải pháp hoàn hảo, giúp bạn kết nối, làm việc và giải trí một cách thông minh hơn mỗi ngày.
+                        The Gears Men – đội ngũ chuyên gia đam mê công nghệ, luôn tiên phong trong việc lựa chọn và cung cấp những sản phẩm công nghệ hàng đầu, đảm bảo chất lượng và trải nghiệm tối ưu cho khách hàng. Chúng tôi không chỉ là những người bán hàng, mà còn là những người đồng hành cùng bạn trên hành trình khám phá và nâng tầm cuộc sống số. Với tinh thần sáng tạo, trách nhiệm và sự am hiểu sâu sắc về công nghệ, The Gears Men cam kết mang đến giải pháp hoàn hảo, giúp bạn kết nối, làm việc và giải trí một cách thông minh hơn mỗi ngày.
                     </Typography>
                 </Box>
             </Typography>

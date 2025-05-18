@@ -27,7 +27,8 @@ import AuthLayout from '@/pages/auth/layout';
 import LoginPage from '@/pages/auth/login.page';
 import RegisterPage from '@/pages/auth/register.page';
 import NotFoundPage from '@/pages/not-found.page';
-import CartPage from '@/pages/app/customer/cart/page';
+import OrderHistoryPage from '@/pages/app/customer/history/page';
+import AboutUs from '@/pages/app/customer/_components/aboutus';
 
 export const router = createBrowserRouter([
   {
@@ -76,7 +77,6 @@ export const router = createBrowserRouter([
           {
             path: 'aboutus',
             element: <AboutUs/>
-          }
           },
           {
             path: 'payment',

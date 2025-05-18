@@ -22,6 +22,7 @@ const StyledWrapper = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   height: '100dvh',
+  backgroundColor: '#f5f5f5',
 });
 
 const AppLayout = () => {

@@ -38,8 +38,6 @@ export default function CheckoutPage() {
         queryFn: () => voucherService.getDiscountCodesOfCustomer(),
     }) as any;
 
-    console.log('myVouchers', myVouchers);
-
     const [discountCodeMap, setDiscountCodeMap] = useState<{
         [productId: string]: {
             productDiscount: any;

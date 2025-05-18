@@ -22,8 +22,6 @@ type ProductModalProps = {
   addToCart: (product: Product, quantity: number) => void;
 };
 
-const formatCurrency = (value: number) =>
-    value?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'});
 
 const ProductModal = NiceModal.create(
   ({ product, addToCart }: ProductModalProps) => {

@@ -1,4 +1,4 @@
-import { RemoveCircle, Translate } from '@mui/icons-material';
+import { RemoveCircle } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -121,7 +121,7 @@ export default function CustomerTopNav() {
         {/* Menu Drawer */}
         <div className="flex items-center gap-x-4">
           {/* Menu Drawer */}
-          <IconButton onClick={toggleDrawer(true)} sx={{ color: 'white' }}>
+          <IconButton onClick={() => toggleDrawer(true)} sx={{ color: 'white' }}>
             <MenuIcon />
           </IconButton>
 

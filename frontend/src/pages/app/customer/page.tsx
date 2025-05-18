@@ -1,15 +1,10 @@
 import { Box, Button, Container, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import productsService from './_services/product.service';
 import { EProductCategory, Product } from './_services/product.model';
-
-import { Box, Button, Container, Typography } from "@mui/material"
 import BlockProducts from './_components/block-products';
 import { useMemo, useRef } from 'react';
 import AdviceSection from './_components/advice-section';
-import BlockProducts from './_components/block-products';
 import SaleBanner from './_components/sale-banner';
-import { EProductCategory, Product } from './_services/product.model';
 import productsService from './_services/product.service';
 
 interface Category {
@@ -176,7 +171,7 @@ const CustomerPage = () => {
           <AdviceSection />
 
           <BlockProducts
-            path="sale"
+            path="category/sale"
             key={'index'}
             title={`Giá sốc hôm nay`}
             products={
@@ -188,7 +183,7 @@ const CustomerPage = () => {
           {queryResults.map((item, idx) => (
             <BlockProducts
               key={item?.data?.key}
-              path={categories[idx].key}
+              path={`category/categories[idx].key`}
               title={`Danh mục ${item?.data?.title || ""}`}
               products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []}
             />

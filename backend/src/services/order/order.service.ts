@@ -167,11 +167,12 @@ export class OrderService {
 
             if (paymentMethod === EPaymentMethod.Zalopay) {
                 const zalopayData = await this.zalopayService.createPaymentData(order);
+                this.orderCronService.scheduleOrderConfirmation(order._id as mongoose.Types.ObjectId, paymentMethod);
 
                 return BaseResponse.success({ zalopayData }, undefined, 'VNPay payment initialized', EHttpStatusCode.OK);
             }
 
-            this.orderCronService.scheduleOrderConfirmation(order._id as mongoose.Types.ObjectId); // Schedule confirmation job
+            this.orderCronService.scheduleOrderConfirmation(order._id as mongoose.Types.ObjectId, paymentMethod); // Schedule confirmation job
             return BaseResponse.success(orderDto, undefined, 'Order created successfully', EHttpStatusCode.OK);
         } catch (error) {
             return BaseResponse.error('in orderservice' + (error as Error)?.message  || 'Internal Server Error', EHttpStatusCode.INTERNAL_SERVER_ERROR);
@@ -249,7 +250,9 @@ export class OrderService {
     public async getAllOrderByCustomer(customerId: string, dto: GetAllOrderByCustomerDto): Promise<BaseResponse<OrderDto[] | unknown>> {
         try {
             const filter: any = { customerId };
-            filter.orderStatus = dto.isPending ? EOrderStatus.Pending : { $ne: EOrderStatus.Pending };
+            filter.orderStatus = dto.isPending === 1 ? 
+                { $in: [EOrderStatus.Pending, EOrderStatus.WaitingForPayment] } : 
+                { $nin: [EOrderStatus.Pending, EOrderStatus.WaitingForPayment] };
 
             const orders = await Order.find(filter)
                 .populate('items.shipmentId')

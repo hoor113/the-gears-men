@@ -1470,6 +1470,7 @@ export const initial = {
   'sản phẩm': '',
   'Mã giảm giá SP': '',
   'Mã giảm ship': '',
+  'Chờ thanh toán': '',
 };
 
 type TObj = typeof initial;

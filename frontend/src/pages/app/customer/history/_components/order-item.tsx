@@ -83,6 +83,8 @@ export default function OrderItem({ order }: OrderItemProps) {
 
   const getStatusInfo = (status: EOrderStatus) => {
     switch (status) {
+      case EOrderStatus.WaitingForPayment:
+        return { label: t('Chờ thanh toán'), color: 'warning' };
       case EOrderStatus.Pending:
         return { label: t('Đang xử lý'), color: 'warning' };
       case EOrderStatus.Confirmed:

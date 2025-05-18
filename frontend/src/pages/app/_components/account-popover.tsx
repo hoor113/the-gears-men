@@ -1,5 +1,7 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+// Thêm icon voucher
+import HistoryIcon from '@mui/icons-material/History';
 import {
   Divider,
   MenuItem,

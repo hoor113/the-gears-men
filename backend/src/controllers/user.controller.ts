@@ -1,6 +1,13 @@
+<<<<<<< HEAD
+import { authorizeRoles } from '@/middlewares/role.middleware';
+=======
 import { BaseResponse } from '@/common/base-response';
 import { verifyToken } from '@/config/jwt';
-import { authorizeRoles } from '@/middlewares/role.middleware';
+import {
+    authorizeRoles,
+    isSelfOrAuthorizedRoles,
+} from '@/middlewares/role.middleware';
+>>>>>>> e65dd44d474f28c07dc6c6d97dd41a4f565a984c
 import { EUserRole } from '@/models/user.model';
 import { Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
@@ -51,8 +58,12 @@ export class UserController {
     }
 
     @Get('/GetAll')
-    @UseBefore(authorizeRoles([EUserRole.Admin, EUserRole.StoreOwner, EUserRole.DeliveryCompany, EUserRole.DeliveryPersonnel]))
+    @UseBefore(authorizeRoles([EUserRole.Admin]))
+<<<<<<< HEAD
+    // @UseBefore(ValidationMiddleware(GetAllUsersDto))
+=======
     @UseBefore(ValidationMiddleware(GetAllUsersDto))
+>>>>>>> e65dd44d474f28c07dc6c6d97dd41a4f565a984c
     async getAllUsers(
         @QueryParams() dto: GetAllUsersDto,
         @Res() res: Response,
@@ -120,6 +131,22 @@ export class UserController {
             });
         }
     }
+<<<<<<< HEAD
+    
+
+    async deleteManyUser(
+        @QueryParams() query: { id: string },
+        @Res() res: Response,
+    ) {
+        const id = query.id;
+        if (!id) {
+            return res
+                .status(400)
+                .json({ success: false, message: 'Missing id parameter' });
+        }
+        try {
+            const response = await this.userService.deleteUser(id);
+=======
 
     @Get('/MyInfo')
     @UseBefore(TokenDecoderMiddleware)
@@ -154,6 +181,7 @@ export class UserController {
             console.log('decoded', decoded);
             const userId = decoded.id;
             const response = await this.userService.getAllConfiguration(userId);
+>>>>>>> e65dd44d474f28c07dc6c6d97dd41a4f565a984c
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

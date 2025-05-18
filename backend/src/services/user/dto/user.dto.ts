@@ -1,5 +1,6 @@
 import { EntityDto } from '@/common/entity-dto';
 import { EUserRole } from '@/models/user.model';
+import 'reflect-metadata';
 import {
     IsEmail,
     IsEnum,

@@ -57,6 +57,16 @@ export default function CustomerTopNav() {
     setCartAnchorEl(null);
   };
 
+  const handleCartToggle = (event: React.MouseEvent<HTMLElement>) => {
+  if (cartAnchorEl && cartAnchorEl === event.currentTarget) {
+    // Nếu menu đang mở với phần tử này thì đóng lại
+    setCartAnchorEl(null);
+  } else {
+    // Mở menu, gán phần tử vừa click
+    setCartAnchorEl(event.currentTarget);
+  }
+};
+
   const handleCartItemRemove = (id: any) => {
     cartDispatch({ type: 'REMOVE_ITEM', payload: { id: id } });
     currentCartState.items = currentCartState.items.filter(
@@ -324,8 +334,7 @@ export default function CustomerTopNav() {
 
         {/* Giỏ hàng */}
         <Box
-          onMouseEnter={(e) => setCartAnchorEl(e.currentTarget)}
-          onMouseLeave={handleCartClose}
+          onClick={handleCartToggle}
           className="cursor-pointer"
         >
           <IconButton color="inherit">

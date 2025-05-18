@@ -1,7 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
-// Thêm icon voucher
-import HistoryIcon from '@mui/icons-material/History';
 import {
   Divider,
   MenuItem,
@@ -18,8 +16,6 @@ import { useNavigate } from 'react-router-dom';
 import useTranslation from '@/hooks/use-translation';
 import { AuthContext } from '@/services/auth/auth.context';
 import authService from '@/services/auth/auth.service';
-import { EUserRole } from '@/services/auth/auth.model';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 type TAccountPopover = {
   anchorEl: any;
@@ -80,30 +76,6 @@ const AccountPopover = (props: TAccountPopover) => {
           <AccountCircleIcon />
         </MenuItemStyled>
         <Divider />
-        {authState.currentUser?.role == EUserRole.Customer && (
-          <>
-            <MenuItemStyled
-              onClick={() => {
-                onClose?.();
-                navigate('/customer/vouchers');
-              }}
-              className="item-voucher"
-            >
-              <span>{t('Danh sách voucher')}</span>
-              <LocalOfferIcon fontSize="small" />
-            </MenuItemStyled>
-
-            <Divider />
-            <MenuItemStyled
-              onClick={() => navigate('/customer/order-history')}
-              className="item-order-history"
-            >
-              <span>{t('Đơn hàng')}</span>
-              <HistoryIcon />
-            </MenuItemStyled>
-            <Divider />
-          </>
-        )}
 
         <MenuItemStyled onClick={() => handleLogout()} className="item-logout">
           <span>{t('Đăng xuất')}</span>

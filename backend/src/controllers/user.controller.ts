@@ -1,9 +1,6 @@
 import { BaseResponse } from '@/common/base-response';
 import { verifyToken } from '@/config/jwt';
-import {
-    authorizeRoles,
-    isSelfOrAuthorizedRoles,
-} from '@/middlewares/role.middleware';
+import { authorizeRoles } from '@/middlewares/role.middleware';
 import { EUserRole } from '@/models/user.model';
 import { Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
@@ -54,8 +51,7 @@ export class UserController {
     }
 
     @Get('/GetAll')
-    @UseBefore(authorizeRoles([EUserRole.Admin]))
-    // @UseBefore(ValidationMiddleware(GetAllUsersDto))
+    @UseBefore(authorizeRoles([EUserRole.Admin, EUserRole.StoreOwner, EUserRole.DeliveryCompany, EUserRole.DeliveryPersonnel]))
     @UseBefore(ValidationMiddleware(GetAllUsersDto))
     async getAllUsers(
         @QueryParams() dto: GetAllUsersDto,

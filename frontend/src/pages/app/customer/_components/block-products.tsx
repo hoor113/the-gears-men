@@ -54,23 +54,11 @@ const BlockProducts = ({ title, products, path }: BlockProductsProps) => {
 
         <Box className="flex justify-center mt-8">
           <Button
-            variant="contained"
+            variant="outlined"
             size="large"
-            onClick={() => navigate(path)}
-            sx={{
-              px: 5,
-              borderRadius: '999px',
-              background: 'linear-gradient(to right, #f97316, #f59e0b)',
-              color: 'white',
-              textTransform: 'none',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 14px rgba(245, 158, 11, 0.4)',
-              '&:hover': {
-                background: 'linear-gradient(to right, #ea580c, #d97706)', 
-              },
-            }}
+            onClick={() => navigate(`/customer/category/${path}`)}
           >
-            Xem thêm
+            Xem tất cả
           </Button>
         </Box>
       </div>

@@ -19,31 +19,31 @@ import './aboutus.scss';
 const members = [
   {
     id: 1,
-    name: 'Lê Khôi Nguyên',
-    mssv: '20225147',
+    name: 'Nguyễn Văn A',
+    mssv: '2022xxxx',
     quote: 'Luôn học hỏi, không ngừng phát triển.',
-    img: "https://png.pngtree.com/png-clipart/20210225/ourlarge/pngtree-cute-cartoon-character-avatar-wearing-glasses-png-image_2940625.jpg",
+    img: 'https://randomuser.me/api/portraits/men/32.jpg',
   },
   {
     id: 2,
-    name: 'Đặng Hiếu Nguyên',
-    mssv: '20224886',
+    name: 'Trần Văn B',
+    mssv: '2022xxxx',
     quote: 'Code là đam mê, bug là định mệnh.',
-    img: 'https://cdn5.vectorstock.com/i/1000x1000/69/44/isolated-man-cartoon-with-glasses-design-vector-11756944.jpg',
+    img: 'https://randomuser.me/api/portraits/women/44.jpg',
   },
   {
     id: 3,
-    name: 'Trần Trọng Nguyên',
-    mssv: '20225216',
+    name: 'Lê Văn C',
+    mssv: '2022xxxx',
     quote: 'Thử thách tạo nên cơ hội.',
-    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHr7yaMB1n1NZKHODTEVM07ew4jTlQdQS6v2RAmn3DDKVXQMx2aI4g3Phs1sH05v5VqIo&usqp=CAU',
+    img: 'https://randomuser.me/api/portraits/men/45.jpg',
   },
   {
     id: 4,
-    name: 'Nguyễn Thanh Nguyên',
-    mssv: '20225214',
+    name: 'Phạm Văn D',
+    mssv: '2022xxxx',
     quote: 'Tinh thần đồng đội là sức mạnh.',
-    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBh2avTSyL4Cfoqg6XphSt9gFbSSddcSGV_F-2gVZJts773F4dvcoTZWtWkspVFz6XLHk&usqp=CAU',
+    img: 'https://randomuser.me/api/portraits/women/36.jpg',
   },
 ];
 

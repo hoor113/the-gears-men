@@ -13,7 +13,7 @@ const SaleBanner = () => {
     {
       id: 2,
       imageUrl:
-        'https://mafc.com.vn/wp-content/uploads/2024/04/Vui-Don-He-Sang_Website-1-1024x512.png',
+        'https://theme.hstatic.net/1000410088/1001129080/14/slider_2.jpg?v=32',
       alt: 'Sale banner 2',
     },
   ];
@@ -40,7 +40,6 @@ const SaleBanner = () => {
                 height: 'auto',
                 objectFit: 'cover',
                 borderRadius: '12px',
-                maxHeight: "400px"
               }}
             />
           </SwiperSlide>

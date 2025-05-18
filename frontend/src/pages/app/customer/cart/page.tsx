@@ -12,24 +12,10 @@ import {
   Typography,
 } from '@mui/material';
 
-import parse from 'html-react-parser';
-
-
-
 import { useCart } from '../cart/context/cart.context';
-import { useNavigate } from 'react-router-dom';
-
-// Hàm đơn giản để lấy dòng đầu tiên từ HTML
-const getFirstLineFromHTML = (html: string) => {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  const text = div.textContent || '';
-  return text.split('\n')[0]; // lấy dòng đầu tiên
-};
 
 const CartPage = () => {
-    const navigate = useNavigate()
-    const [cartState, cartDispatch] = useCart();
+  const [cartState, cartDispatch] = useCart();
 
   const handleQuantityChange = (id: string, value: number, max: number) => {
     const newQuantity = isNaN(value) ? 1 : Math.min(Math.max(value, 1), max);
@@ -56,137 +42,137 @@ const CartPage = () => {
     (item) => item.quantity > item.stock,
   );
 
-    return (
-        <Box sx={{ p: 2, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-            <Grid container spacing={4} sx={{ p: 4 }}>
-                {/* Danh sách sản phẩm */}
-                <Grid item xs={12} md={8}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom>
-                                Giỏ hàng
+  return (
+    <Box sx={{ p: 2, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+      <Grid container spacing={4} sx={{ p: 4 }}>
+        {/* Danh sách sản phẩm */}
+        <Grid item xs={12} md={8}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>
+                Giỏ hàng
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              {cartState.items.map((item, index) => {
+                const isOverStock = item.quantity > item.stock;
+                return (
+                  <Box key={item.id}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={3} sm={2}>
+                        <img
+                          src={
+                            item.images?.[0] || '/assets/images/no-image.png'
+                          }
+                          alt={item.name}
+                          width="100%"
+                          style={{ objectFit: 'cover', borderRadius: 4 }}
+                        />
+                      </Grid>
+                      <Grid item xs={9} sm={4}>
+                        <Typography variant="subtitle1">{item.name}</Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          noWrap
+                        >
+                          {item.description}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6} sm={2}>
+                        <Typography
+                          variant="subtitle1"
+                          color="primary"
+                          fontWeight="bold"
+                        >
+                          {(
+                            item.priceAfterDiscount || item.price
+                          ).toLocaleString('vi-VN')}
+                          ₫
+                        </Typography>
+                        {item.priceAfterDiscount !== null &&
+                          item.priceAfterDiscount < item.price && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ textDecoration: 'line-through' }}
+                            >
+                              {item.price.toLocaleString('vi-VN')}₫
                             </Typography>
-                            <Divider sx={{ mb: 2 }} />
-                            {cartState.items.map((item, index) => {
-                                const isOverStock = item.quantity > item.stock;
-                                return (
-                                    <Box key={item.id}>
-                                        <Grid container spacing={2} alignItems="center">
-                                            <Grid item xs={3} sm={2}>
-                                                <img
-                                                    src={
-                                                        item.images?.[0] || '/assets/images/no-image.png'
-                                                    }
-                                                    alt={item.name}
-                                                    width="100%"
-                                                    style={{ objectFit: 'cover', borderRadius: 4 }}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={9} sm={4}>
-                                                <Typography variant="subtitle1">{item.name}</Typography>
-                                                <Typography
-                                                    variant="body2"
-                                                    color="text.secondary"
-                                                    noWrap
-                                                >
-                                                      {getFirstLineFromHTML(item.description)}
-                                                </Typography>
-                                            </Grid>
-                                            <Grid item xs={6} sm={2}>
-                                                <Typography
-                                                    variant="subtitle1"
-                                                    color="primary"
-                                                    fontWeight="bold"
-                                                >
-                                                    {(
-                                                        item.priceAfterDiscount || item.price
-                                                    ).toLocaleString('vi-VN')}
-                                                    ₫
-                                                </Typography>
-                                                {item.priceAfterDiscount !== null &&
-                                                    item.priceAfterDiscount < item.price && (
-                                                        <Typography
-                                                            variant="body2"
-                                                            color="text.secondary"
-                                                            sx={{ textDecoration: 'line-through' }}
-                                                        >
-                                                            {item.price.toLocaleString('vi-VN')}₫
-                                                        </Typography>
-                                                    )}
-                                            </Grid>
-                                            <Grid item xs={6} sm={2}>
-                                                <Box display="flex" alignItems="center">
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={() =>
-                                                            handleQuantityChange(
-                                                                item.id,
-                                                                item.quantity - 1,
-                                                                item.stock,
-                                                            )
-                                                        }
-                                                        disabled={item.quantity <= 1}
-                                                    >
-                                                        <Remove />
-                                                    </IconButton>
-                                                    <TextField
-                                                        type="number"
-                                                        size="small"
-                                                        value={item.quantity}
-                                                        error={isOverStock}
-                                                        helperText={
-                                                            isOverStock ? `Tối đa ${item.stock}` : ''
-                                                        }
-                                                        inputProps={{
-                                                            min: 1,
-                                                            max: item.stock,
-                                                            style: { textAlign: 'center', width: 40 },
-                                                        }}
-                                                        onChange={(e) => {
-                                                            const raw = e.target.value;
-                                                            const parsed = parseInt(raw, 10);
-                                                            handleQuantityChange(
-                                                                item.id,
-                                                                isNaN(parsed) ? 1 : parsed,
-                                                                item.stock,
-                                                            );
-                                                        }}
-                                                    />
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={() =>
-                                                            handleQuantityChange(
-                                                                item.id,
-                                                                item.quantity + 1,
-                                                                item.stock,
-                                                            )
-                                                        }
-                                                        disabled={item.quantity >= item.stock}
-                                                    >
-                                                        <Add />
-                                                    </IconButton>
-                                                </Box>
-                                            </Grid>
-                                            <Grid item xs={12} sm={2}>
-                                                <Button
-                                                    variant="outlined"
-                                                    color="error"
-                                                    startIcon={<Delete />}
-                                                    onClick={() => handleRemove(item.id)}
-                                                >
-                                                    Xóa
-                                                </Button>
-                                            </Grid>
-                                        </Grid>
-                                        {index < cartState.items.length - 1 && (
-                                            <Divider sx={{ my: 2 }} />
-                                        )}
-                                    </Box>
-                                );
-                            })}
-                        </CardContent>
-                    </Card>
-                </Grid>
+                          )}
+                      </Grid>
+                      <Grid item xs={6} sm={2}>
+                        <Box display="flex" alignItems="center">
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.quantity - 1,
+                                item.stock,
+                              )
+                            }
+                            disabled={item.quantity <= 1}
+                          >
+                            <Remove />
+                          </IconButton>
+                          <TextField
+                            type="number"
+                            size="small"
+                            value={item.quantity}
+                            error={isOverStock}
+                            helperText={
+                              isOverStock ? `Tối đa ${item.stock}` : ''
+                            }
+                            inputProps={{
+                              min: 1,
+                              max: item.stock,
+                              style: { textAlign: 'center', width: 40 },
+                            }}
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const parsed = parseInt(raw, 10);
+                              handleQuantityChange(
+                                item.id,
+                                isNaN(parsed) ? 1 : parsed,
+                                item.stock,
+                              );
+                            }}
+                          />
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.quantity + 1,
+                                item.stock,
+                              )
+                            }
+                            disabled={item.quantity >= item.stock}
+                          >
+                            <Add />
+                          </IconButton>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={2}>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          startIcon={<Delete />}
+                          onClick={() => handleRemove(item.id)}
+                        >
+                          Xóa
+                        </Button>
+                      </Grid>
+                    </Grid>
+                    {index < cartState.items.length - 1 && (
+                      <Divider sx={{ my: 2 }} />
+                    )}
+                  </Box>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </Grid>
 
         {/* Tổng tiền + ghi chú */}
         <Grid item xs={12} md={4}>
@@ -211,16 +197,15 @@ const CartPage = () => {
                 sx={{ mt: 3 }}
               />
 
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                color="primary"
-                                sx={{ mt: 3 }}
-                                disabled={hasInvalidStock}
-                                onClick={() => {navigate("/customer/payment")}}
-                            >
-                                Tiến hành thanh toán
-                            </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3 }}
+                disabled={hasInvalidStock}
+              >
+                Tiến hành thanh toán
+              </Button>
 
               {hasInvalidStock && (
                 <Typography variant="body2" color="error" sx={{ mt: 1 }}>

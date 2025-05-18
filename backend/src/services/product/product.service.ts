@@ -88,9 +88,9 @@ export class ProductService {
             const product = await Product.findById(id);
             const store = product ? await Store.findById(product.storeId) : null;
 
+
             // RETRIEVE DISCOUNT FROM REDIS
             const discountedList: string[] = await redis.getList('daily_discount') || [];
-
             const productWithDiscount = product ? {
                 id: product._id as string,
                 storeId: product.storeId.toString(),
@@ -98,8 +98,8 @@ export class ProductService {
                 name: product.name,
                 description: product.description,
                 price: product.price,
-                priceAfterDiscount: discountedList.includes(product._id as string) ?
-                    product.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf(product._id as string)]) / 100 : null,
+                priceAfterDiscount: discountedList.includes((product._id as string).toString()) ?
+                    product.price * (100 - DAILY_DISCOUNT_PERCENTAGE[discountedList.indexOf((product._id as string).toString())]) / 100 : null,
                 stock: product.stock,
                 category: product.category,
                 images: product.images,

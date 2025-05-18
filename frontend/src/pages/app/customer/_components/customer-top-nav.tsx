@@ -1,4 +1,4 @@
-import { RemoveCircle } from '@mui/icons-material';
+import { RemoveCircle, Translate } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -126,8 +126,8 @@ export default function CustomerTopNav() {
           <MenuIcon />
         </IconButton>
 
-        <div className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden" onClick={() => navigate('/customer')}/>
-        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer')} style={{"cursor":"pointer"}}>
+        <div className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden" onClick={() => navigate('/customer')} />
+        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer')} style={{ "cursor": "pointer" }}>
           <span className="text-yellow-400 top-nav-group-name"
 
           >
@@ -171,6 +171,12 @@ export default function CustomerTopNav() {
                   maxHeight: 300,
                   overflowY: 'auto',
                   borderRadius: 2,
+                  // width: "300px",
+                  '@media (max-width:500px)': {
+                    width: '300px',
+                    left: "50%",
+                    transform: "TranslateX(-50%)",
+                  },
                 }}
               >
                 {getAllAccessories?.length > 0 ? (
@@ -274,7 +280,25 @@ export default function CustomerTopNav() {
         </ClickAwayListener>
       </div>
 
+      {/* <div className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden" onClick={() => navigate('/customer')}/>
+        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer')} style={{"cursor":"pointer"}}>
+          <span className="text-yellow-400 top-nav-group-name"
+
+          >
+            Về chúng tôi
+          </span>
+        </span> */}
+
+
+
       <div className="flex items-center gap-x-4">
+        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer/aboutus')} style={{ "cursor": "pointer" }}>
+          <span className="text-white-400 top-nav-group-name" style={{ "fontSize": "14px" }}
+          >
+            Về chúng tôi
+          </span>
+        </span>
+
         {/* Tài khoản */}
         <IconButton
           style={{ padding: 0 }}

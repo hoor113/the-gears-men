@@ -22,6 +22,9 @@ import NiceModal from '@ebay/nice-modal-react';
 import ProductModal from '../../_components/product-modal';
 import { useCart } from '../../cart/context/cart.context';
 
+const formatCurrency = (value: number) =>
+    value?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'});
+
 const SingleProductPage = () => {
   const { id } = useParams<{ id: string }>();
   const [_, cartDispatch] = useCart();
@@ -33,12 +36,15 @@ const SingleProductPage = () => {
     enabled: !!id,
   }) as any;
 
+
   console.log('product', product);
 
   const hasImages = product?.images?.length > 0;
   const [selectedImage, setSelectedImage] = useState<string>(
     hasImages ? product.images[0] : '/assets/images/no-image.png',
   );
+
+  
 
   const [showFullDesc, setShowFullDesc] = useState(false);
 
@@ -62,8 +68,7 @@ const SingleProductPage = () => {
 
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', py: 4, px: { xs: 2, md: 6 } }}>
-      <Paper elevation={3} sx={{ p: 4, position: 'relative' }}>
-        <Button
+      <Button
           variant="outlined"
           onClick={() => navigate(-1)}
           sx={{
@@ -73,11 +78,14 @@ const SingleProductPage = () => {
             px: 2,
             py: 0.5,
             fontWeight: 'bold',
-            marginBottom: "20px"
+            marginBottom: "20px",
+            background: 'linear-gradient(to right, #f97316, #f59e0b)',
+            color: "white"
           }}
         >
           ← Quay lại
         </Button>
+      <Paper elevation={3} sx={{ p: 4, position: 'relative' }}>
         <Box display="flex" flexDirection={{ xs: 'column', lg: 'row' }} gap={4}>
           {/* Hình ảnh sản phẩm */}
           <Box flexShrink={0}>
@@ -245,7 +253,7 @@ const SingleProductPage = () => {
               {product?.priceAfterDiscount ? (
                 <>
                   <Typography variant="h6" fontWeight="bold" color="error">
-                    {product?.priceAfterDiscount?.toLocaleString()}₫
+                    {product?.priceAfterDiscount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -254,12 +262,12 @@ const SingleProductPage = () => {
                       color: '#888',
                     }}
                   >
-                    {product?.price?.toLocaleString()}₫
+                    {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                   </Typography>
                 </>
               ) : (
                 <Typography variant="h6" fontWeight="bold">
-                  {product?.price?.toLocaleString()}₫
+                  {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                 </Typography>
               )}
             </Box>

@@ -12,28 +12,28 @@ import { Box, Container, Typography, Card, CardContent, Avatar } from '@mui/mate
 const members = [
     {
         id: 1,
-        name: 'Nguyễn Văn A',
+        name: 'Lê Khôi Nguyên',
         mssv: '2022xxxx',
         quote: 'Luôn học hỏi, không ngừng phát triển.',
         img: 'https://randomuser.me/api/portraits/men/32.jpg',
     },
     {
         id: 2,
-        name: 'Trần Văn B',
+        name: 'Đặng Hiếu Nguyên',
         mssv: '2022xxxx',
         quote: 'Code là đam mê, bug là định mệnh.',
         img: 'https://randomuser.me/api/portraits/women/44.jpg',
     },
     {
         id: 3,
-        name: 'Lê Văn C',
+        name: 'Trần Trọng Nguyên',
         mssv: '2022xxxx',
         quote: 'Thử thách tạo nên cơ hội.',
         img: 'https://randomuser.me/api/portraits/men/45.jpg',
     },
     {
         id: 4,
-        name: 'Phạm Văn D',
+        name: 'Nguyễn Thanh Nguyên',
         mssv: '2022xxxx',
         quote: 'Tinh thần đồng đội là sức mạnh.',
         img: 'https://randomuser.me/api/portraits/women/36.jpg',

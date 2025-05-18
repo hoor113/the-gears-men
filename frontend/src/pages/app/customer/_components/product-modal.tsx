@@ -22,6 +22,9 @@ type ProductModalProps = {
   addToCart: (product: Product, quantity: number) => void;
 };
 
+const formatCurrency = (value: number) =>
+    value?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'});
+
 const ProductModal = NiceModal.create(
   ({ product, addToCart }: ProductModalProps) => {
     const modal = useModal();
@@ -177,15 +180,15 @@ const ProductModal = NiceModal.create(
                 {product.priceAfterDiscount ? (
                   <>
                     <span className="text-red-600">
-                      Giá: {(product.priceAfterDiscount * quantity)?.toLocaleString()} VNĐ
+                      Giá: {(product.priceAfterDiscount * quantity)?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                     </span>
                     <span className="text-gray-500 line-through text-base">
-                      {(product.price * quantity)?.toLocaleString()} VNĐ
+                      {(product.price * quantity)?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                     </span>
                   </>
                 ) : (
                   <span className="text-red-600">
-                    Giá: {(product.price * quantity)?.toLocaleString()} VNĐ
+                    Giá: {(product.price * quantity)?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
                   </span>
                 )}
               </Typography>

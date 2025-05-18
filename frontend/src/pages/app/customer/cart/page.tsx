@@ -12,9 +12,23 @@ import {
     Typography,
 } from '@mui/material';
 
+import parse from 'html-react-parser';
+
+
+
 import { useCart } from '../cart/context/cart.context';
+import { useNavigate } from 'react-router-dom';
+
+// Hàm đơn giản để lấy dòng đầu tiên từ HTML
+const getFirstLineFromHTML = (html: string) => {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  const text = div.textContent || '';
+  return text.split('\n')[0]; // lấy dòng đầu tiên
+};
 
 const CartPage = () => {
+    const navigate = useNavigate()
     const [cartState, cartDispatch] = useCart();
 
     const handleQuantityChange = (id: string, value: number, max: number) => {
@@ -75,7 +89,7 @@ const CartPage = () => {
                                                     color="text.secondary"
                                                     noWrap
                                                 >
-                                                    {item.description}
+                                                      {getFirstLineFromHTML(item.description)}
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={6} sm={2}>
@@ -203,6 +217,7 @@ const CartPage = () => {
                                 color="primary"
                                 sx={{ mt: 3 }}
                                 disabled={hasInvalidStock}
+                                onClick={() => {navigate("/customer/payment")}}
                             >
                                 Tiến hành thanh toán
                             </Button>

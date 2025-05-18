@@ -59,11 +59,14 @@ export default function ShipmentBox({
   const { t } = useTranslation();
   
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', { 
-      style: 'currency', 
-      currency: 'VND' 
-    }).format(amount);
-  };
+  // Round up to the nearest thousand
+  const roundedAmount = Math.ceil(amount / 1000) * 1000;
+  return new Intl.NumberFormat('vi-VN', { 
+    style: 'currency', 
+    currency: 'VND',
+    maximumFractionDigits: 0
+  }).format(roundedAmount);
+};
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
@@ -107,27 +110,53 @@ export default function ShipmentBox({
             {productInfo.name}
           </Typography>
           
-          <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
+          {/* Price calculation breakdown */}
+          <Box sx={{ mt: 1 }}>
             <Typography variant="body2">
               {t('Số lượng')}: {productInfo.quantity}
             </Typography>
-            <Typography variant="body1" fontWeight={600} color="primary.main">
-              {formatCurrency(productInfo.price)}
-            </Typography>
-          </Box>
-          
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {t('Phí vận chuyển')}: {formatCurrency(shippingPrice)}
-          </Typography>
-          
-          {/* Display discount codes if available */}
-          <Box sx={{ mt: 1 }}>
-            {productDiscountCode && (
-              <DiscountBadge discountCode={productDiscountCode} type={EDiscountCodeType.ProductDiscount} />
-            )}
-            {shippingDiscountCode && (
-              <DiscountBadge discountCode={shippingDiscountCode} type={EDiscountCodeType.ShippingDiscount} />
-            )}
+            
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                {t('Đơn giá')}: {formatCurrency(productInfo.price / productInfo.quantity)}
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary">
+                {t('Tổng tiền sản phẩm')}: {formatCurrency(productInfo.price)}
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary">
+                {t('Phí vận chuyển')}: {formatCurrency(shippingPrice)}
+              </Typography>
+              
+              {/* Display discount effects if available */}
+              {(productDiscountCode || shippingDiscountCode) && (
+                <Box sx={{ mt: 0.5, mb: 0.5 }}>
+                  <Divider sx={{ my: 0.5 }} />
+                  <Typography variant="body2" color="text.secondary">
+                    {t('Mã giảm giá')}:
+                  </Typography>
+                  
+                  {productDiscountCode && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <DiscountBadge discountCode={productDiscountCode} type={EDiscountCodeType.ProductDiscount} />
+                    </Box>
+                  )}
+                  
+                  {shippingDiscountCode && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <DiscountBadge discountCode={shippingDiscountCode} type={EDiscountCodeType.ShippingDiscount} />
+                    </Box>
+                  )}
+                  <Divider sx={{ my: 0.5 }} />
+                </Box>
+              )}
+              
+              {/* Total after discounts */}
+              <Typography variant="body1" fontWeight={600} color="primary.main">
+                {t('Thành tiền')}: {formatCurrency(productInfo.price + shippingPrice)}
+              </Typography>
+            </Box>
           </Box>
         </Grid>
       </Grid>

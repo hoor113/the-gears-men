@@ -247,7 +247,9 @@ export class OrderService {
     public async getAllOrderByCustomer(customerId: string, dto: GetAllOrderByCustomerDto): Promise<BaseResponse<OrderDto[] | unknown>> {
         try {
             const filter: any = { customerId };
-            filter.orderStatus = dto.isPending ? EOrderStatus.Pending : { $ne: EOrderStatus.Pending };
+            filter.orderStatus = dto.isPending === 1 ? 
+                { $in: [EOrderStatus.Pending, EOrderStatus.WaitingForPayment] } : 
+                { $nin: [EOrderStatus.Pending, EOrderStatus.WaitingForPayment] };
 
             const orders = await Order.find(filter)
                 .populate('items.shipmentId')

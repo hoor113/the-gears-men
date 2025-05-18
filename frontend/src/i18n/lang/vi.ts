@@ -1461,6 +1461,15 @@ export const initial = {
   'Xác nhận hủy đơn hàng': '',
   'Bạn có chắc chắn muốn hủy đơn hàng này không? Thao tác này không thể hoàn tác.': '',
   'Không': '',
+  'Đơn giá': '',
+  'Tổng tiền sản phẩm': '',
+  'Mã giảm giá': '',
+  'Trạng thái giao hàng': '',
+  'Đã giao vào ngày': '',
+  'Bảng tính giá': '',
+  'sản phẩm': '',
+  'Mã giảm giá SP': '',
+  'Mã giảm ship': '',
 };
 
 type TObj = typeof initial;

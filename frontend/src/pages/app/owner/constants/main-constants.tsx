@@ -25,6 +25,11 @@ export default function OwnerMenuItems() {
             icon: <ListAltIcon fontSize="small" />,
         },
         {
+            label: "Tài khoản",
+            path: `/settings/my-account`,
+            icon: <ListAltIcon fontSize="small" />,
+        },
+        {
             label: "Về chúng tôi",
             path: `/owner/aboutus`,
             icon: <InfoIcon fontSize="small" />,

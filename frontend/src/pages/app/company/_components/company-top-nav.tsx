@@ -13,9 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import usePopover from '@/hooks/use-popover';
 
 import AccountPopover from '../../_components/account-popover';
-import LeftDrawer from './left-drawer';
-import SelectStore from './select-store';
-import { useStore } from '../store/_services/store.context';
+import CompanyLeftDrawer from './left-drawer';
 
 const AvatarStyled = styled(Avatar)(({ theme }) => ({
     border: `1px solid ${alpha(theme.palette.primary.main, 0.6)}`,
@@ -28,27 +26,23 @@ const AvatarStyled = styled(Avatar)(({ theme }) => ({
     },
 }));
 
-export default function OwnerTopNav() {
+export default function CompanyTopNav() {
     const navigate = useNavigate();
     const accountPopover = usePopover();
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [storeState, _] = useStore();
 
     const toggleDrawer = (open: boolean) => {
         setDrawerOpen(open);
     };
-
 
     return (
         <div className="w-full bg-[#ece2df] px-4  md:px-10 py-3 flex justify-between items-center gap-y-3 text-white relative">
             {/* Vùng bên trái (Tiêu đề và Thanh tìm kiếm) */}
             <div className="flex items-center gap-x-4 w-2/3">
                 {/* Menu Drawer */}
-                {storeState.isChosen&& (
-                    <IconButton onClick={() => toggleDrawer(true)} sx={{ color: '#f97316' }}>
-                        <MenuIcon />
-                    </IconButton>
-                )}
+                <IconButton onClick={() => toggleDrawer(true)} sx={{ color: '#f97316' }}>
+                    <MenuIcon />
+                </IconButton>
                 <Typography
                     component="a"
                     onClick={() => navigate('/')}
@@ -70,8 +64,6 @@ export default function OwnerTopNav() {
             </div>
 
             <div className="flex items-center gap-x-4">
-                {/* Select store */}
-                <SelectStore store={storeState.store}/>
                 {/* Tài khoản */}
                 <IconButton
                     style={{ padding: 0 }}
@@ -86,7 +78,7 @@ export default function OwnerTopNav() {
                     open={accountPopover.open}
                     onClose={accountPopover.handleClose}
                 />
-                <LeftDrawer drawerOpen={drawerOpen} toggleDrawer={toggleDrawer} />
+                <CompanyLeftDrawer drawerOpen={drawerOpen} toggleDrawer={toggleDrawer} />
             </div>
         </div>
     );

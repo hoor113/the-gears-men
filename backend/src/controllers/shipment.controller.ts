@@ -146,6 +146,7 @@ export class ShipmentController {
     @UseBefore(authorizeRoles([EUserRole.DeliveryPersonnel]))
     @Get('/personnel/')
     @UseBefore(ValidationMiddleware(GetAssignedShipmentsDto))
+    @UseBefore(TokenDecoderMiddleware)
     async getAssignedShipments(
         @Req() req: Request,
         @QueryParams() dto: GetAssignedShipmentsDto,

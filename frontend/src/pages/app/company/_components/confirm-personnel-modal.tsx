@@ -21,30 +21,29 @@ import { EUserRole } from '@/services/auth/auth.model';
 import appService from '@/services/app/app.service';
 import { EShipmentStatus } from '../_services/shipment.model';
 
-type TConfirmCompanyModalProps = {
+type TConfirmPersonnelModalProps = {
     shipmentId: string;
     status: EShipmentStatus;
-    storeId: string;
 };
 
 type FormData = {
-    deliveryCompanyId: string;
+    deliveryPersonnelId: string;
 };
 
 // ✅ Schema kiểm tra bằng Yup
 const schema = yup.object({
-    deliveryCompanyId: yup.string().required('Vui lòng chọn công ty giao hàng'),
+    deliveryPersonnelId: yup.string().required('Vui lòng chọn nhân viên giao hàng'),
 });
 
-const ConfirmCompanyModal = NiceModal.create((props: TConfirmCompanyModalProps) => {
+const ConfirmPersonnelModal = NiceModal.create((props: TConfirmPersonnelModalProps) => {
     const modal = useModal();
     const queryClient = useQueryClient();
 
-    const { data: companies } = useQuery<any>({
-        queryKey: ['companies/getAll', EUserRole.DeliveryCompany],
+    const { data: personnels } = useQuery<any>({
+        queryKey: ['personnel/getAll', EUserRole.DeliveryPersonnel],
         queryFn: () =>
             ownerUserService.getAll({
-                role: EUserRole.DeliveryCompany,
+                role: EUserRole.DeliveryPersonnel,
                 maxResultCount: 1000,
             }),
     });
@@ -55,31 +54,29 @@ const ConfirmCompanyModal = NiceModal.create((props: TConfirmCompanyModalProps) 
         formState: { isValid },
     } = useForm<FormData>({
         defaultValues: {
-            deliveryCompanyId: '',
+            deliveryPersonnelId: '',
         },
         resolver: yupResolver(schema),
     });
 
     const { mutate, isLoading: confirmLoading } = useMutation({
-        mutationFn: (deliveryCompanyId: string) =>
+        mutationFn: (deliveryPersonnelId: string) =>
             shipmentService.confirmShipment({
                 shipmentId: props.shipmentId,
-                deliveryCompanyId,
+                deliveryPersonnelId: deliveryPersonnelId,
             }),
         onSuccess: () => {
             appService.hideLoadingModal();
             enqueueSnackbar('Xác nhận công ty giao hàng thành công', {
                 variant: 'success',
             });
-            queryClient.refetchQueries(['owner/shipment/getAll', {
+            queryClient.refetchQueries(['company/shipment/getAll', {
                 status: props.status,
-                storeId: props.storeId,
                 page: 0,
                 pageSize: 10,
             }]);
-            queryClient.refetchQueries(['owner/shipment/getAll', {
-                status: EShipmentStatus.Confirmed,
-                storeId: props.storeId,
+            queryClient.refetchQueries(['company/shipment/getAll', {
+                status: EShipmentStatus.Stored,
                 page: 0,
                 pageSize: 10,
             }]);
@@ -95,25 +92,25 @@ const ConfirmCompanyModal = NiceModal.create((props: TConfirmCompanyModalProps) 
 
     const onSubmit = (data: FormData) => {
         appService.showLoadingModal();
-        mutate(data.deliveryCompanyId);
+        mutate(data.deliveryPersonnelId);
     };
 
     return (
         <Dialog {...muiDialogV5(modal)} fullWidth maxWidth="sm">
-            <DialogTitle>{'Chọn công ty giao hàng'}</DialogTitle>
+            <DialogTitle>{'Chọn nhân viên giao hàng'}</DialogTitle>
 
             <DialogContent>
                 <Box sx={{ mt: 2 }}>
                     <BaseFormInput
                         control={control}
                         field={{
-                            name: 'deliveryCompanyId',
-                            label: 'Công ty giao hàng',
+                            name: 'deliveryPersonnelId',
+                            label: 'Nhân viên giao hàng',
                             required: true,
                             type: 'select',
-                            options: companies?.map((company: any) => ({
-                                label: company.fullname,
-                                value: company.id,
+                            options: personnels?.map((personnel: any) => ({
+                                label: personnel.fullname,
+                                value: personnel.id,
                             })),
                             colSpan: 12,
                         }}
@@ -139,6 +136,6 @@ const ConfirmCompanyModal = NiceModal.create((props: TConfirmCompanyModalProps) 
     );
 });
 
-ConfirmCompanyModal.displayName = 'ConfirmCompanyModal';
+ConfirmPersonnelModal.displayName = 'ConfirmPersonnelModal';
 
-export default ConfirmCompanyModal;
+export default ConfirmPersonnelModal;

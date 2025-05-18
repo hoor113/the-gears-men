@@ -104,8 +104,12 @@ export class SendShipmentToDeliveryPersonnelDto extends EntityDto {
 
 export class GetAssignedShipmentsDto extends BaseGetAllDto {
     @IsOptional()
-    @IsMongoId({ message: 'Delivery personnel ID must be a valid MongoDB ID.' })
-    deliveryPersonnelId?: string; // Required
+    @IsMongoId({ message: 'Item ID must be a valid MongoDB ID.' })
+    orderItemId?: string; 
+
+    @IsOptional()
+    @IsEnum(EShipmentStatus, { message: 'Status must be a valid shipment status.' })
+    status?: EShipmentStatus; 
 }
 
 export class ConfirmShipmentDeliveredDto{

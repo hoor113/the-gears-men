@@ -8,9 +8,6 @@ import useTranslation from '@/hooks/use-translation';
 import { EShipmentStatus } from '../_services/shipment.model';
 import shipmentService from '../_services/shipment.service';
 import { ShipmentStatusChip } from './shipment-status-chip';
-import { useStore } from '../../../_services/store.context';
-import ConfirmCompanyModal from './confirm-company-modal';
-import NiceModal from '@ebay/nice-modal-react';
 import { CancelOutlined, LocalShipping } from '@mui/icons-material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import appService from '@/services/app/app.service';
@@ -20,13 +17,11 @@ interface MainShipmentPageProps {
     status: EShipmentStatus | undefined;
 }
 
-const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
+const PersonnelMainShipmentPage = ({ status }: MainShipmentPageProps) => {
     const queryClient = useQueryClient();
     const { t } = useTranslation();
-    const [storeState, _] = useStore();
-    const storeId = useMemo(() => storeState.store ? storeState.store.id : undefined, [storeState.store?.id]);
 
-    const { mutate } = useMutation({
+    const { mutate: cancelMutation } = useMutation({
         mutationFn: (id: string) =>
             shipmentService.cancelShipment({
                 id: id,
@@ -37,20 +32,55 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
                 variant: 'success',
             });
             queryClient.refetchQueries(
-                ['owner/shipment/getAll',
+                ['personnel/shipment/getAll',
                     {
                         status: status,
-                        storeId: storeId,
                         page: 0,
                         pageSize: 10,
                     }
                 ]
             );
             queryClient.refetchQueries(
-                ['owner/shipment/getAll',
+                ['personnel/shipment/getAll',
                     {
                         status: EShipmentStatus.Failed,
-                        storeId: storeId,
+                        page: 0,
+                        pageSize: 10,
+                    }
+                ]
+            );
+        },
+        onError: (err: any) => {
+            appService.hideLoadingModal();
+            enqueueSnackbar(err.response?.data?.message || 'Đã có lỗi xảy ra', {
+                variant: 'error',
+            });
+        },
+    });
+
+        const { mutate: deliverMutation } = useMutation({
+        mutationFn: (id: string) =>
+            shipmentService.confirmShipment({
+                id: id,
+            }),
+        onSuccess: () => {
+            appService.hideLoadingModal();
+            enqueueSnackbar('Cập nhật đơn hàng thành công', {
+                variant: 'success',
+            });
+            queryClient.refetchQueries(
+                ['personnel/shipment/getAll',
+                    {
+                        status: status,
+                        page: 0,
+                        pageSize: 10,
+                    }
+                ]
+            );
+            queryClient.refetchQueries(
+                ['personnel/shipment/getAll',
+                    {
+                        status: EShipmentStatus.Delivered,
                         page: 0,
                         pageSize: 10,
                     }
@@ -90,10 +120,11 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
 
         {
             field: 'estimatedDelivery',
-            headerName: 'Ngày dự kiến giao',
+            headerName: 'Ngày dự kiến giao hàng',
             flex: 1,
             type: 'date',
             valueGetter: ({ value }) => (value ? new Date(value) : undefined),
+            hide: status === EShipmentStatus.Delivered,
         },
         {
             field: 'deliveryCompany',
@@ -123,7 +154,7 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
         {
             field: 'deliveryDate',
             headerName: t('Ngày giao hàng'),
-            flex: 1,
+            flex: 0.6,
             type: 'date',
             valueGetter: ({ value }) => (value ? new Date(value) : undefined),
             hide: status !== EShipmentStatus.Delivered,
@@ -250,16 +281,12 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
 
     const extendActions = [];
 
-    if (status === EShipmentStatus.Pending) {
+    if (status === EShipmentStatus.Confirmed) {
         extendActions.push({
-            title: 'Xác nhận giao hàng',
+            title: 'Chọn nhân viên giao hàng',
             icon: <LocalShipping />,
             onClick: (_row: any) => {
-                NiceModal.show(ConfirmCompanyModal, {
-                    shipmentId: String(_row.id),
-                    status: status,
-                    storeId: storeId,
-                });
+                deliverMutation(_row.id);
             },
         });
     }
@@ -270,7 +297,7 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
             icon: <CancelOutlined />,
             onClick: (_row: any) => {
                 appService.showLoadingModal();
-                mutate(_row.id);
+                cancelMutation(_row.id);
             },
         });
     }
@@ -280,7 +307,7 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
         <BaseCrudPage
             title={'Quản lý đơn giao hàng'}
             unitName={'shipment'}
-            name="owner/shipment"
+            name="personnel/shipment"
             service={shipmentService}
             columns={tableColumns}
             viewFields={viewFields}
@@ -292,12 +319,11 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
             hideEditAction={true}
             hideDeleteAction={false}
             hideViewAction={false}
-            getAllPath="/store"
+            getAllPath="/personnel"
             deletePath="/Delete"
             beautyView
             defaultGetAllParams={{
                 status: status,
-                storeId: storeId,
             }}
             hideSearchInput
             extendActions={[
@@ -307,4 +333,4 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
     );
 };
 
-export default MainShipmentPage;
+export default PersonnelMainShipmentPage;

@@ -51,7 +51,7 @@ export class UserController {
     }
 
     @Get('/GetAll')
-    @UseBefore(authorizeRoles([EUserRole.Admin, EUserRole.StoreOwner]))
+    @UseBefore(authorizeRoles([EUserRole.Admin, EUserRole.StoreOwner, EUserRole.DeliveryCompany, EUserRole.DeliveryPersonnel]))
     @UseBefore(ValidationMiddleware(GetAllUsersDto))
     async getAllUsers(
         @QueryParams() dto: GetAllUsersDto,

@@ -183,7 +183,7 @@ const CustomerPage = () => {
           {queryResults.map((item, idx) => (
             <BlockProducts
               key={item?.data?.key}
-              path={`category/categories[idx].key`}
+              path={`category/${categories[idx].key}`}
               title={`Danh mục ${item?.data?.title || ""}`}
               products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []}
             />

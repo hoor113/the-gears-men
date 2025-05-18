@@ -120,20 +120,30 @@ export default function CustomerTopNav() {
   return (
     <div className="w-full bg-[#e46842] px-4 md:px-10 py-3 flex justify-between items-center gap-y-3 text-white relative">
       {/* Vùng bên trái (Tiêu đề và Thanh tìm kiếm) */}
-      <div className="flex items-center gap-x-4 w-2/3">
+      <div className="flex items-center justify-between gap-x-4 w-2/3">
         {/* Menu Drawer */}
-        <IconButton onClick={toggleDrawer(true)} sx={{ color: 'white' }}>
-          <MenuIcon />
-        </IconButton>
+        <div className="flex items-center gap-x-4">
+          {/* Menu Drawer */}
+          <IconButton onClick={toggleDrawer(true)} sx={{ color: 'white' }}>
+            <MenuIcon />
+          </IconButton>
 
-        <div className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden" onClick={() => navigate('/customer')} />
-        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer')} style={{ "cursor": "pointer" }}>
-          <span className="text-yellow-400 top-nav-group-name"
+          {/* Logo nhỏ cho mobile */}
+          <div
+            className="w-8 h-8 bg-yellow-400 rounded-sm md:hidden"
+            onClick={() => navigate('/customer')}
+          />
 
+          {/* Logo chữ cho desktop */}
+          <span
+            className="hidden md:inline font-bold text-base md:text-lg cursor-pointer"
+            onClick={() => navigate('/customer')}
           >
-            The Gears Men
+            <span className="text-yellow-400 top-nav-group-name">
+              The Gears Men
+            </span>
           </span>
-        </span>
+        </div>
 
         {/* Thanh tìm kiếm */}
         <ClickAwayListener onClickAway={handleSearchBlur}>

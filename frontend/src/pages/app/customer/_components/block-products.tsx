@@ -1,4 +1,4 @@
-import { Box, Button, Typography, useMediaQuery, useTheme  } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -16,8 +16,6 @@ type BlockProductsProps = {
 };
 
 const BlockProducts = ({ title, products, path }: BlockProductsProps) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const navigate = useNavigate();
   return (
     <div className="my-20 px-4 md:px-10">

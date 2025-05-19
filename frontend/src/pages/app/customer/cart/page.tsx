@@ -15,6 +15,10 @@ import { useNavigate } from 'react-router-dom';
 
 import { useCart } from '../cart/context/cart.context';
 
+const roundUpToThousand = (price: number) => {
+  return Math.ceil(price / 1000) * 1000;
+};
+
 // Hàm đơn giản để lấy dòng đầu tiên từ HTML
 const getFirstLineFromHTML = (html: string) => {
   const div = document.createElement('div');
@@ -44,7 +48,7 @@ const CartPage = () => {
 
   const totalPrice = cartState.items.reduce(
     (sum, item) =>
-      sum + (item.priceAfterDiscount || item.price) * item.quantity,
+      sum + roundUpToThousand(item.priceAfterDiscount || item.price) * item.quantity,
     0,
   );
 
@@ -94,7 +98,7 @@ const CartPage = () => {
                           color="primary"
                           fontWeight="bold"
                         >
-                          {(
+                          {roundUpToThousand(
                             item.priceAfterDiscount || item.price
                           ).toLocaleString('vi-VN')}
                           ₫
@@ -106,7 +110,7 @@ const CartPage = () => {
                               color="text.secondary"
                               sx={{ textDecoration: 'line-through' }}
                             >
-                              {item.price.toLocaleString('vi-VN')}₫
+                              {roundUpToThousand(item.price).toLocaleString('vi-VN')}₫
                             </Typography>
                           )}
                       </Grid>

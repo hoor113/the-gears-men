@@ -310,12 +310,6 @@ export default function CustomerTopNav() {
 
 
       <div className="flex items-center gap-x-4">
-        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer/aboutus')} style={{ "cursor": "pointer" }}>
-          <span className="text-white-400 top-nav-group-name" style={{ "fontSize": "14px" }}
-          >
-            Về chúng tôi
-          </span>
-        </span>
 
         {/* Tài khoản */}
         <IconButton

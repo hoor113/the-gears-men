@@ -1,9 +1,9 @@
 export enum EDiscountCodeType {
-    ProductDiscount = 'product',
-    ShippingDiscount = 'shipping'
+  ProductDiscount = 'product',
+  ShippingDiscount = 'shipping',
 }
 
 export enum EDiscountCalculationMethod {
-    Percentage = 'percentage',
-    FixedAmount = 'fixed'
+  Percentage = 'percentage',
+  FixedAmount = 'fixed',
 }

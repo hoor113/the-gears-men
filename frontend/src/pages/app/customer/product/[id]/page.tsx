@@ -24,7 +24,6 @@ import { categoriesObject } from '../../_services/product.model';
 import productsService from '../../_services/product.service';
 import { useCart } from '../../cart/context/cart.context';
 
-
 const SingleProductPage = () => {
   const { id } = useParams<{ id: string }>();
   const [_, cartDispatch] = useCart();
@@ -51,13 +50,12 @@ const SingleProductPage = () => {
     hasImages ? product.images[0] : '/assets/images/no-image.png',
   );
 
-
   const [showFullDesc, setShowFullDesc] = useState(false);
 
   const discountPercent = product?.priceAfterDiscount
     ? Math.round(
-      ((product.price - product.priceAfterDiscount) / product.price) * 100,
-    )
+        ((product.price - product.priceAfterDiscount) / product.price) * 100,
+      )
     : null;
 
   const handleAddToCart = () => {
@@ -84,9 +82,9 @@ const SingleProductPage = () => {
           px: 2,
           py: 0.5,
           fontWeight: 'bold',
-          marginBottom: "20px",
+          marginBottom: '20px',
           background: 'linear-gradient(to right, #f97316, #f59e0b)',
-          color: "white"
+          color: 'white',
         }}
       >
         ← Quay lại
@@ -218,24 +216,24 @@ const SingleProductPage = () => {
               <strong>Danh mục:</strong>{' '}
               {product?.category
                 ? (() => {
-                  console.log(product.category);
-                  const category = categoriesObject.find(
-                    (cat) => cat.key === product.category?.toLowerCase(),
-                  );
-                  return category ? (
-                    <Button
-                      variant="text"
-                      onClick={() =>
-                        navigate(`/customer/category/${product.category}`)
-                      }
-                      sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
-                    >
-                      {category.title}
-                    </Button>
-                  ) : (
-                    'Không có thông tin'
-                  );
-                })()
+                    console.log(product.category);
+                    const category = categoriesObject.find(
+                      (cat) => cat.key === product.category?.toLowerCase(),
+                    );
+                    return category ? (
+                      <Button
+                        variant="text"
+                        onClick={() =>
+                          navigate(`/customer/category/${product.category}`)
+                        }
+                        sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
+                      >
+                        {category.title}
+                      </Button>
+                    ) : (
+                      'Không có thông tin'
+                    );
+                  })()
                 : 'Không có thông tin'}
             </Typography>
 
@@ -262,7 +260,10 @@ const SingleProductPage = () => {
               {product?.priceAfterDiscount ? (
                 <>
                   <Typography variant="h6" fontWeight="bold" color="error">
-                    {product?.priceAfterDiscount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    {product?.priceAfterDiscount?.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND',
+                    })}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -271,12 +272,18 @@ const SingleProductPage = () => {
                       color: '#888',
                     }}
                   >
-                    {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    {product?.price?.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND',
+                    })}
                   </Typography>
                 </>
               ) : (
                 <Typography variant="h6" fontWeight="bold">
-                  {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  {product?.price?.toLocaleString('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                  })}
                 </Typography>
               )}
             </Box>

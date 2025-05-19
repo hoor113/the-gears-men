@@ -121,10 +121,12 @@ export default function CustomerTopNav() {
         {/* Menu Drawer */}
         <div className="flex items-center gap-x-4">
           {/* Menu Drawer */}
-          <IconButton onClick={() => toggleDrawer(true)} sx={{ color: 'white' }}>
+          <IconButton
+            onClick={() => toggleDrawer(true)}
+            sx={{ color: 'white' }}
+          >
             <MenuIcon />
           </IconButton>
-
 
           {/* Logo nhỏ cho mobile */}
           <div
@@ -182,8 +184,8 @@ export default function CustomerTopNav() {
                   // width: "300px",
                   '@media (max-width:500px)': {
                     width: '300px',
-                    left: "50%",
-                    transform: "TranslateX(-50%)",
+                    left: '50%',
+                    transform: 'TranslateX(-50%)',
                   },
                 }}
               >
@@ -297,11 +299,15 @@ export default function CustomerTopNav() {
           </span>
         </span> */}
 
-
-
       <div className="flex items-center gap-x-4">
-        <span className="hidden md:inline font-bold text-base md:text-lg" onClick={() => navigate('/customer/aboutus')} style={{ "cursor": "pointer" }}>
-          <span className="text-white-400 top-nav-group-name" style={{ "fontSize": "14px" }}
+        <span
+          className="hidden md:inline font-bold text-base md:text-lg"
+          onClick={() => navigate('/customer/aboutus')}
+          style={{ cursor: 'pointer' }}
+        >
+          <span
+            className="text-white-400 top-nav-group-name"
+            style={{ fontSize: '14px' }}
           >
             Về chúng tôi
           </span>

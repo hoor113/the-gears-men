@@ -5,22 +5,22 @@ import { httpService } from '@/base/http-service';
 // import { httpService } from '@/base/http-service';
 
 class OwnerProductsService extends BaseCrudService {
-    constructor() {
-        super('/products');
-    }
+  constructor() {
+    super('/products');
+  }
 
-    public async getDailyDiscount<T>(
-        path = '/GetDailyDiscount',
-        params?: Record<string, any>,
-    ): Promise<{ data: T }> {
-        const res = await httpService.request<TBaseResponse<{ data: T }>>({
-            method: 'GET',
-            url: `${this.basePath}${path}`,
-            params, // thêm dòng này để gửi query string
-        });
+  public async getDailyDiscount<T>(
+    path = '/GetDailyDiscount',
+    params?: Record<string, any>,
+  ): Promise<{ data: T }> {
+    const res = await httpService.request<TBaseResponse<{ data: T }>>({
+      method: 'GET',
+      url: `${this.basePath}${path}`,
+      params, // thêm dòng này để gửi query string
+    });
 
-        return res.result;
-    }
+    return res.result;
+  }
 }
 
 const ownerProductsService = new OwnerProductsService();

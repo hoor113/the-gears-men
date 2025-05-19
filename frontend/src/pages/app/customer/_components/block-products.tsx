@@ -66,7 +66,7 @@ const BlockProducts = ({ title, products, path }: BlockProductsProps) => {
               fontWeight: 'bold',
               boxShadow: '0 4px 14px rgba(245, 158, 11, 0.4)',
               '&:hover': {
-                background: 'linear-gradient(to right, #ea580c, #d97706)', 
+                background: 'linear-gradient(to right, #ea580c, #d97706)',
               },
             }}
           >

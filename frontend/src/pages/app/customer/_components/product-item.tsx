@@ -4,10 +4,10 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {
   Box,
   IconButton,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip,
 } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -51,9 +51,7 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
     product.priceAfterDiscount !== null &&
     product.priceAfterDiscount < product.price;
 
-  const displayPrice = hasDiscount
-    ? product.priceAfterDiscount
-    : product.price;
+  const displayPrice = hasDiscount ? product.priceAfterDiscount : product.price;
 
   const discountPercent = hasDiscount
     ? Math.round(

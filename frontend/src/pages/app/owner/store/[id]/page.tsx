@@ -5,9 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { OwnerStoreInfo } from '../_components/store-info';
+import OwnerProductCard from './products/_components/product-card';
 import { ShipmentCard } from './shipment/_components/shipment-card';
 import shipmentService from './shipment/_services/shipment.service';
-import OwnerProductCard from './products/_components/product-card';
 import VoucherBlock from './vouchers/_components/voucher-block';
 
 const OwnerSingleStorePage = () => {
@@ -104,7 +104,6 @@ const OwnerSingleStorePage = () => {
         </Box>
 
         <VoucherBlock />
-
       </Box>
     </>
   );

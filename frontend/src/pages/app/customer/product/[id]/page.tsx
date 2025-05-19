@@ -302,6 +302,7 @@ const SingleProductPage = () => {
               color="warning"
               sx={{ fontWeight: 'bold', mt: 2 }}
               onClick={handleAddToCart}
+              disabled={product?.stock === 0}
             >
               THÊM VÀO GIỎ HÀNG
             </Button>

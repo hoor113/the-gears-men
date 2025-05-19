@@ -1,294 +1,328 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from "react";
 import {
-  Box,
-  Link,
-  MenuItem,
-  Select,
-  Stack,
+  Button,
   TextField,
   Typography,
-} from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+  Card,
+  CardContent,
+  CardActions,
+  InputAdornment,
+  IconButton,
+  Box,
+  MenuItem,
+  Grid,
+} from "@mui/material";
+import {
+  Email,
+  Lock,
+  Visibility,
+  VisibilityOff,
+  Person,
+  Phone,
+  Home,
+  Badge,
+  DirectionsCar,
+} from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import appService from "@/services/app/app.service";
+import { enqueueSnackbar } from "notistack";
+import authService from "@/services/auth/auth.service";
+import { EUserRole } from "@/services/auth/auth.model";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-import LoadingButton from '@/components/button/loading-button';
-import PasswordInput from '@/components/field/password-input';
-import SelectChangeLocale from '@/components/field/select-change-locale';
-import useTranslation from '@/hooks/use-translation';
-import i18n from '@/i18n';
-import appService from '@/services/app/app.service';
-import { IRegisterInput } from '@/services/auth/auth.model';
-import { EUserRole } from '@/services/auth/auth.model';
-import authService from '@/services/auth/auth.service';
+type RegisterFormData = {
+  username: string;
+  fullname: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: EUserRole;
+  phoneNumber: string;
+  addresses: string;
+  vehicleLicenseNumber?: string;
+};
 
-const registerSchema = yup.object({
-  userName: yup.string().required(i18n.t('userNameOrEmailAddress-required')),
-  email: yup
-    .string()
-    .email(i18n.t('email-invalid'))
-    .required(i18n.t('email-required')),
-  fullName: yup.string().required(i18n.t('fullName-required')),
-  password: yup.string().required(i18n.t('password-required')),
+const userRoles = [
+  { label: "Khách hàng", value: EUserRole.Customer },
+  { label: "Nhân viên giao hàng", value: EUserRole.DeliveryPersonnel },
+  { label: "Công ty giao hàng", value: EUserRole.DeliveryCompany },
+  { label: "Chủ cửa hàng", value: EUserRole.StoreOwner },
+];
+
+const schema = yup.object({
+  username: yup.string().required("Vui lòng nhập tên đăng nhập"),
+  fullname: yup.string().required("Vui lòng nhập họ tên"),
+  email: yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
+  password: yup.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự").required("Vui lòng nhập mật khẩu"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password')], i18n.t('Mật khẩu không trùng khớp'))
-    .required(i18n.t('confirmPassword-required')),
-  role: yup
-    .mixed<EUserRole>()
-    .oneOf(Object.values(EUserRole))
-    .required(i18n.t('role-required')),
-  phoneNumber: yup.string().optional(),
-  addresses: yup.array().of(yup.string()).optional(),
-  avatarPicture: yup.string().url(i18n.t('avatarPicture-invalid')).optional(),
-  vehicleLicenseNumber: yup.string().optional(),
+    .oneOf([yup.ref("password")], "Mật khẩu nhập lại không khớp")
+    .required("Vui lòng nhập lại mật khẩu"),
+  role: yup.mixed<EUserRole>().required("Vui lòng chọn vai trò"),
+  phoneNumber: yup
+    .string()
+    .required("Vui lòng nhập số điện thoại")
+    .matches(/^(0|\+84)[0-9]{9,10}$/, "Số điện thoại không hợp lệ"),
+  addresses: yup.string().required("Vui lòng nhập địa chỉ"),
+  vehicleLicenseNumber: yup.string().when("role", {
+    is: EUserRole.DeliveryPersonnel,
+    then: (schema) => schema.required("Vui lòng nhập biển số xe"),
+    otherwise: (schema) => schema.optional(),
+  }),
 });
 
 const RegisterPage = () => {
-  const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
-    formState: { errors },
+    handleSubmit,
     watch,
-    setValue,
-  } = useForm({
-    resolver: yupResolver(registerSchema),
-    mode: 'onChange',
-    defaultValues: {
-      userName: '',
-      email: '',
-      fullName: '',
-      password: '',
-      confirmPassword: '',
-      phoneNumber: '',
-      addresses: [],
-      avatarPicture: '',
-      vehicleLicenseNumber: '',
-    },
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: yupResolver(schema),
   });
 
-  const role = watch('role');
-
-  const { isLoading: loginLoading } = useMutation({
-    mutationFn: (data: IRegisterInput) => authService.register(data),
+  const { mutate } = useMutation({
+    mutationFn: (data: any) => authService.register(data),
     onSuccess: () => {
+      enqueueSnackbar("Đăng ký thành công", { variant: "success" });
+      setTimeout(() => {
+        window.location.href = "/auth/login";
+      }, 5000);
       appService.hideLoadingModal();
-      enqueueSnackbar(t('Đăng ký thành công'), { variant: 'success' });
-      window.location.href = '/auth/login';
     },
     onError: (err: any) => {
-      appService.hideLoadingModal();
-      console.log(err);
-      enqueueSnackbar(err.response.data.message || t('Đã có lỗi xảy ra'), {
-        variant: 'error',
+      enqueueSnackbar(err?.response?.data?.message || "Đã có lỗi xảy ra", {
+        variant: "error",
       });
+      appService.hideLoadingModal();
     },
   });
 
-  // const onSubmit = (data: Partial<IRegisterInput>) => {
-  //   mutate({
-  //     email: data.email!,
-  //     userName: data.userName!,
-  //     fullName: data.fullName!,
-  //     phoneNumber: data.phoneNumber || '',
-  //     addresses: data.addresses?.filter(
-  //       (address): address is string => !!address,
-  //     ),
-  //     password: data.password!,
-  //     role: role,
-  //   }); // Gán roleId theo tab đã chọn
-  //   appService.showLoadingModal();
-  // };
+  const onSubmit = (data: RegisterFormData) => {
+    const finalData = {
+      ...data,
+      addresses: data.addresses
+        .split(",")
+        .map((a) => a.trim())
+        .filter(Boolean),
+    };
+
+    mutate(finalData);
+    appService.showLoadingModal();
+  };
+
+  const toggleShowPassword = () => setShowPassword((prev) => !prev);
+  const selectedRole = watch("role");
 
   return (
-    <Box
-      sx={{
-        height: '100vh',
-        overflow: 'hidden',
-        backgroundColor: 'background.paper',
-        flex: '1 1 auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-      }}
-    >
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'grey.400',
-          backgroundPosition: 'bottom',
-          zIndex: 0,
-        }}
-      ></Box>
-      <Box
-        sx={{
-          maxWidth: 550,
-          px: 3,
-          pt: 4,
-          pb: 6,
-          width: '100%',
-          backgroundColor: 'background.paper',
-          borderRadius: 1,
-          zIndex: 1,
-          position: 'relative',
-        }}
-      >
-        <Box>
-          <Stack
-            spacing={1}
-            sx={{
-              mb: 3,
-              position: 'relative',
-              '.btn-locale': {
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                mt: 0,
-              },
-            }}
-          >
-            <Typography variant="h4">{t('Đăng ký')}</Typography>
-            <SelectChangeLocale
-              buttonProps={{
-                className: 'btn-locale',
-                size: 44,
-                style: {
-                  fontSize: 26,
-                },
-              }}
-            />
-          </Stack>
-          {/* Select để chọn role */}
-          <Box sx={{ marginBottom: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              {'Chọn vai trò'}
-            </Typography>
-            <Select
-              fullWidth
-              value={role || ''}
-              onChange={(e) => setValue('role', e.target.value as EUserRole)}
-              displayEmpty
-            >
-              <MenuItem value="" disabled>
-                {'Chọn vai trò'}
-              </MenuItem>
-              {Object.values(EUserRole).map((roleValue) => (
-                <MenuItem key={roleValue} value={roleValue}>
-                  {(() => {
-                    switch (roleValue) {
-                      case EUserRole.DeliveryCompany:
-                        return 'Công ty vận chuyển';
-                      case EUserRole.Customer:
-                        return 'Người dùng';
-                      case EUserRole.DeliveryPersonnel:
-                        return 'Tài xế';
-                      default:
-                        return 'Người dùng';
-                    }
-                  })()}
-                </MenuItem>
-              ))}
-            </Select>
-          </Box>
-          <Box component="form">
-            <TextField
-              fullWidth
-              label={t('Tên người dùng')}
-              error={!!errors.userName?.message}
-              helperText={errors.userName?.message}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('userName')}
-            />
-            <TextField
-              fullWidth
-              label={t('Họ và tên')}
-              error={!!errors.fullName?.message}
-              helperText={errors.fullName?.message}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('userName')}
-            />
-            <TextField
-              fullWidth
-              label={t('Email')}
-              error={!!errors.email?.message}
-              helperText={errors.email?.message}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('email')}
-            />
-            <TextField
-              fullWidth
-              label={t('Số điện thoại')}
-              error={!!errors.phoneNumber?.message}
-              helperText={errors.phoneNumber?.message}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('phoneNumber')}
-            />
-            <PasswordInput
-              fullWidth
-              label={t('Mật khẩu')}
-              error={!!errors.password?.message}
-              helperText={errors.password?.message}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('password')}
-            />
-            <PasswordInput
-              fullWidth
-              label={t('Nhập lại mật khẩu mới')}
-              error={!!errors.confirmPassword?.message}
-              helperText={errors?.confirmPassword?.message as any}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('confirmPassword')}
-            />
-            <LoadingButton
-              fullWidth
-              size="large"
-              type="submit"
-              variant="contained"
-              loading={loginLoading}
-            >
-              {t('Đăng ký')}
-            </LoadingButton>
+    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-50 via-yellow-100 to-orange-200 px-4">
+      <div className="absolute w-80 h-80 bg-orange-300 opacity-30 rounded-full blur-3xl animate-pulse -z-10 top-10 left-10"></div>
 
-            <Typography
-              color="text.secondary"
-              variant="subtitle2"
-              sx={{ marginTop: 2 }}
-            >
-              {t('Đã có tài khoản')}
-              {'? '}
-              <Link href="/auth/login" underline="hover" variant="subtitle2">
-                {t('Đăng nhập')}
-              </Link>
+      <Card className="w-full max-w-4xl shadow-xl rounded-2xl animate-fade-in transition-all duration-500 hover:shadow-2xl z-10">
+        <CardContent>
+          <Box className="mb-8 text-center">
+            <Typography variant="h4" className="text-orange-600 font-bold">
+              Đăng ký
             </Typography>
           </Box>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Tên đăng nhập *"
+                  fullWidth
+                  {...register("username")}
+                  error={!!errors.username}
+                  helperText={errors.username?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person className="text-orange-500" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Họ và tên *"
+                  fullWidth
+                  {...register("fullname")}
+                  error={!!errors.fullname}
+                  helperText={errors.fullname?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Badge className="text-orange-500" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Email *"
+                  fullWidth
+                  {...register("email")}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email className="text-orange-500" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Số điện thoại *"
+                  fullWidth
+                  {...register("phoneNumber")}
+                  error={!!errors.phoneNumber}
+                  helperText={errors.phoneNumber?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Phone className="text-orange-500" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Mật khẩu *"
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  {...register("password")}
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock className="text-orange-500" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={toggleShowPassword} edge="end">
+                          {showPassword ? (
+                            <VisibilityOff className="text-orange-500" />
+                          ) : (
+                            <Visibility className="text-orange-500" />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Nhập lại mật khẩu *"
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  {...register("confirmPassword")}
+                  error={!!errors.confirmPassword}
+                  helperText={errors.confirmPassword?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock className="text-orange-500" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="Địa chỉ (nhiều địa chỉ ngăn cách bằng dấu phẩy)"
+                  fullWidth
+                  {...register("addresses")}
+                  error={!!errors.addresses}
+                  helperText={errors.addresses?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Home className="text-orange-500" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Vai trò "
+                  fullWidth
+                  select
+                  {...register("role")}
+                  error={!!errors.role}
+                  helperText={errors.role?.message}
+                >
+                  {userRoles.map((role) => (
+                    <MenuItem key={role.value} value={role.value}>
+                      {role.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              {selectedRole === EUserRole.DeliveryPersonnel && (
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    label="Biển số xe "
+                    fullWidth
+                    {...register("vehicleLicenseNumber")}
+                    error={!!errors.vehicleLicenseNumber}
+                    helperText={errors.vehicleLicenseNumber?.message}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <DirectionsCar className="text-orange-500" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              )}
+            </Grid>
+
+            <CardActions className="pt-6">
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                className="!bg-orange-500 hover:!bg-orange-600 text-white font-semibold py-2 rounded-lg transition-all duration-300"
+              >
+                Đăng ký
+              </Button>
+            </CardActions>
+          </form>
+        </CardContent>
+
+        <Box className="text-center text-sm text-gray-600 pb-5 px-4">
+          Đã có tài khoản?{" "}
+          <Link to="/auth/login" className="text-orange-500 hover:underline font-medium">
+            Đăng nhập
+          </Link>
         </Box>
-      </Box>
-    </Box>
+      </Card>
+    </div>
   );
 };
 

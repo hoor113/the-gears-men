@@ -48,7 +48,7 @@ class AuthService {
     try {
       const refreshToken = Cookies.get('refreshToken');
       const response = await axios.post<IBaseHttpResponse<IRefreshTokenResult>>(
-        `${API_ENDPOINT}/auth/Refresh`,
+        `${API_ENDPOINT}/auth/refresh`,
         {
           refreshToken,
         },
@@ -62,6 +62,8 @@ class AuthService {
       return true;
     } catch (error) {
       Cookies.remove('accessToken');
+      localStorage.removeItem('cartState');
+      localStorage.removeItem('selected_store');
       window.location.href = '/auth/login';
       return false;
     }
@@ -74,7 +76,7 @@ class AuthService {
         throw new Error('Access token is required');
       }
       const response = await axios.post<IBaseHttpResponse<null>>(
-        `${API_ENDPOINT}/auth/Logout`,
+        `${API_ENDPOINT}/auth/logout`,
       );
 
       return response.data.result;
@@ -84,6 +86,7 @@ class AuthService {
       Cookies.remove('refreshToken');
       Cookies.remove('accessToken');
       localStorage.removeItem('cartState');
+      localStorage.removeItem('selected_store');
       window.location.href = '/auth/login';
     }
   }

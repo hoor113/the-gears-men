@@ -35,6 +35,9 @@ const LeftDrawer = ({ drawerOpen, toggleDrawer }: any) => {
           {menuItems.map((item: any) => (
             <ListItem key={item?.path} disablePadding>
               <ListItemButton onClick={() => navigate(item?.path)}>
+                {item.icon && (
+                  <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>{item.icon}</Box>
+                )}
                 <ListItemText primary={item?.label} />
               </ListItemButton>
             </ListItem>
@@ -54,6 +57,12 @@ const LeftDrawer = ({ drawerOpen, toggleDrawer }: any) => {
               <ListItemButton
                 onClick={() => navigate(`/customer/category/${category.key}`)}
               >
+                {/* Icon nằm bên trái */}
+                {category.icon && (
+                  <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                    {category.icon}
+                  </Box>
+                )}
                 <ListItemText primary={category.title} />
               </ListItemButton>
             </ListItem>

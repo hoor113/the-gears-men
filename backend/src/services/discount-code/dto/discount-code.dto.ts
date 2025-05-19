@@ -124,10 +124,6 @@ export class GetAllDiscountCodesDto extends BaseGetAllDto {
     type?: EDiscountCodeType;
 
     @IsOptional()
-    @IsBoolean({message: 'isUsed must be a boolean value.'})
-    isUsed?: boolean;
-    
-    @IsOptional()
-    @IsMongoId({message: 'Customer ID must be a valid MongoDB identifier.'})
-    customerId?: mongoose.Types.ObjectId;
+    @IsEnum(EDiscountCalculationMethod, {message: 'Method must be a valid discount method.'})
+    discountCalculationMethod?: EDiscountCalculationMethod;
 }

@@ -38,6 +38,7 @@ import AboutUs from '@/pages/app/_components/aboutus';
 import SingleProductPage from '@/pages/app/customer/product/[id]/page';
 import OwnerProductsPage from '@/pages/app/owner/store/[id]/products/page';
 import OwnerSingleProductPage from '@/pages/app/owner/store/[id]/products/[productId]/page';
+import OwnerVoucherPage from '@/pages/app/owner/store/[id]/vouchers/page';
 
 export const router = createBrowserRouter([
   {
@@ -151,6 +152,10 @@ export const router = createBrowserRouter([
                   {
                     path: 'shipment',
                     element: <OwnerShipmentPage />,
+                  },
+                  {
+                    path: 'vouchers',
+                    element: <OwnerVoucherPage />
                   },
                   {
                     path: 'products',

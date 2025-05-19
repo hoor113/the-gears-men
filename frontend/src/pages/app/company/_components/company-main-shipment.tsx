@@ -297,7 +297,7 @@ const CompanyMainShipmentPage = ({ status }: MainShipmentPageProps) => {
       hideSelectRowCheckbox
       hideAddBtn
       hideEditAction={true}
-      hideDeleteAction={false}
+      hideDeleteAction={true}
       hideViewAction={false}
       getAllPath="/company"
       deletePath="/Delete"

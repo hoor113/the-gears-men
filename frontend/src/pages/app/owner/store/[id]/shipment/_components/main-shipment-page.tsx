@@ -307,7 +307,7 @@ const MainShipmentPage = ({ status }: MainShipmentPageProps) => {
             hideSelectRowCheckbox
             hideAddBtn
             hideEditAction={true}
-            hideDeleteAction={false}
+            hideDeleteAction={true}
             hideViewAction={false}
             getAllPath="/store"
             deletePath="/Delete"

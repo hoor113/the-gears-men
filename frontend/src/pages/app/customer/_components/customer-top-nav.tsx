@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import useAuth from '@/hooks/use-auth';
 import useDebounce from '@/hooks/use-debounce';
 import usePopover from '@/hooks/use-popover';
 import productsService from '@/pages/app/customer/_services/product.service';
@@ -29,7 +30,6 @@ import AccountPopover from '../../_components/account-popover';
 import { useCart } from '../cart/context/cart.context';
 import './custom-top-nav.scss';
 import LeftDrawer from './left-drawer';
-import useAuth from '@/hooks/use-auth';
 
 const AvatarStyled = styled(Avatar)(({ theme }) => ({
   border: `1px solid ${alpha(theme.palette.primary.main, 0.6)}`,

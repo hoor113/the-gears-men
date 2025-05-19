@@ -1,4 +1,3 @@
-
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 
 import BaseBasicPage from '@/base/base-basic-page';

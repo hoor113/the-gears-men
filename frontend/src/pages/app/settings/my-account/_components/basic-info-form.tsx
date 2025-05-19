@@ -96,7 +96,7 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
         onSubmit={methods.handleSubmit((data) => {
           updateBasicMutation.mutate({
             ...authQuery.data,
-            ...data
+            ...data,
           });
         })}
       >

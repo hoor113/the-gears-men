@@ -1,24 +1,26 @@
-import { useContext, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Email, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
 import {
+  Box,
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  IconButton,
+  InputAdornment,
   TextField,
   Typography,
-  Card,
-  CardContent,
-  CardActions,
-  InputAdornment,
-  IconButton,
-  Box,
-} from "@mui/material";
-import { Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
-import { Link } from "react-router-dom"; // hoặc next/link nếu dùng Next.js
-import { ILoginInput } from "@/services/auth/auth.model";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import appService from "@/services/app/app.service";
-import { enqueueSnackbar } from "notistack";
-import { AuthContext } from "@/services/auth/auth.context";
-import authService from "@/services/auth/auth.service";
+} from '@mui/material';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { enqueueSnackbar } from 'notistack';
+import { useContext, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+
+import appService from '@/services/app/app.service';
+import { AuthContext } from '@/services/auth/auth.context';
+// hoặc next/link nếu dùng Next.js
+import { ILoginInput } from '@/services/auth/auth.model';
+import authService from '@/services/auth/auth.service';
 
 type FormData = {
   email: string;
@@ -80,7 +82,7 @@ const LoginPage = () => {
                 label="Email"
                 variant="outlined"
                 fullWidth
-                {...register("email", { required: "Vui lòng nhập email" })}
+                {...register('email', { required: 'Vui lòng nhập email' })}
                 error={!!errors.email}
                 helperText={errors.email?.message}
                 InputProps={{
@@ -96,10 +98,12 @@ const LoginPage = () => {
             <Box>
               <TextField
                 label="Mật khẩu"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 variant="outlined"
                 fullWidth
-                {...register("password", { required: "Vui lòng nhập mật khẩu" })}
+                {...register('password', {
+                  required: 'Vui lòng nhập mật khẩu',
+                })}
                 error={!!errors.password}
                 helperText={errors.password?.message}
                 InputProps={{
@@ -113,7 +117,9 @@ const LoginPage = () => {
                       <IconButton
                         onClick={toggleShowPassword}
                         edge="end"
-                        aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                        aria-label={
+                          showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'
+                        }
                       >
                         {showPassword ? (
                           <VisibilityOff className="text-orange-500" />
@@ -141,7 +147,7 @@ const LoginPage = () => {
         </CardContent>
 
         <Box className="text-center text-sm text-gray-600 pb-5 px-4">
-          Chưa có tài khoản?{" "}
+          Chưa có tài khoản?{' '}
           <Link
             to="/auth/register"
             className="text-orange-500 hover:underline font-medium"
@@ -155,4 +161,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

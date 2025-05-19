@@ -1,23 +1,21 @@
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import HistoryIcon from '@mui/icons-material/History';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PaymentIcon from '@mui/icons-material/Payment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import InfoIcon from '@mui/icons-material/Info';
-
-import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
-import LaptopMacIcon from '@mui/icons-material/LaptopMac';
-import DesktopWindowsIcon from '@mui/icons-material/DesktopWindows';
-import TabletMacIcon from '@mui/icons-material/TabletMac';
-import HeadphonesIcon from '@mui/icons-material/Headphones';
-import WatchIcon from '@mui/icons-material/Watch';
-import TvIcon from '@mui/icons-material/Tv';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import DesktopWindowsIcon from '@mui/icons-material/DesktopWindows';
+import HeadphonesIcon from '@mui/icons-material/Headphones';
+import HistoryIcon from '@mui/icons-material/History';
+import InfoIcon from '@mui/icons-material/Info';
 import KitchenIcon from '@mui/icons-material/Kitchen';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import PaymentIcon from '@mui/icons-material/Payment';
+import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
-
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import TabletMacIcon from '@mui/icons-material/TabletMac';
+import TvIcon from '@mui/icons-material/Tv';
+import WatchIcon from '@mui/icons-material/Watch';
 
 export enum EProductCategory {
   Phone = 'Phone',
@@ -144,9 +142,17 @@ export interface Product {
 
 export const menuItems = [
   { label: 'Vouchers', path: '/customer/vouchers', icon: <LocalOfferIcon /> },
-  { label: 'Lịch sử đơn hàng', path: '/customer/order-history', icon: <HistoryIcon /> },
+  {
+    label: 'Lịch sử đơn hàng',
+    path: '/customer/order-history',
+    icon: <HistoryIcon />,
+  },
   { label: 'Giỏ hàng', path: '/customer/cart', icon: <ShoppingCartIcon /> },
   { label: 'Thanh toán', path: '/customer/payment', icon: <PaymentIcon /> },
-  { label: 'Tài khoản', path: '/settings/my-account', icon: <AccountCircleIcon /> },
+  {
+    label: 'Tài khoản',
+    path: '/settings/my-account',
+    icon: <AccountCircleIcon />,
+  },
   { label: 'Về chúng tôi', path: '/customer/aboutus', icon: <InfoIcon /> },
 ];

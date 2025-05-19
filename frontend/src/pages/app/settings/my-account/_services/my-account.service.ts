@@ -3,9 +3,7 @@ import { httpService } from '@/base/http-service';
 import { IUserInfo } from '@/services/auth/auth.model';
 
 class MyAccountService {
-  public async updateInfo(
-    data: Partial<IUserInfo>,
-  ): Promise<void> {
+  public async updateInfo(data: Partial<IUserInfo>): Promise<void> {
     await httpService.request<TBaseResponse<void>>({
       method: 'PUT',
       url: '/users/Update',
@@ -13,7 +11,7 @@ class MyAccountService {
     });
   }
 
-    public async uploadAvatar(file: File, authData?: IUserInfo) {
+  public async uploadAvatar(file: File, authData?: IUserInfo) {
     const response = await httpService.uploadImage({
       file,
     });

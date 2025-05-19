@@ -1,7 +1,6 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, Button, Typography, styled } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
 
 type TBaseBasicPageProps = {
   title: string;

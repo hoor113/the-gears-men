@@ -1,37 +1,38 @@
-import { useState } from "react";
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
-  Button,
-  TextField,
-  Typography,
-  Card,
-  CardContent,
-  CardActions,
-  InputAdornment,
-  IconButton,
-  Box,
-  MenuItem,
-  Grid,
-} from "@mui/material";
-import {
-  Email,
-  Lock,
-  Visibility,
-  VisibilityOff,
-  Person,
-  Phone,
-  Home,
   Badge,
   DirectionsCar,
-} from "@mui/icons-material";
-import { Link } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import appService from "@/services/app/app.service";
-import { enqueueSnackbar } from "notistack";
-import authService from "@/services/auth/auth.service";
-import { EUserRole } from "@/services/auth/auth.model";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+  Email,
+  Home,
+  Lock,
+  Person,
+  Phone,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Grid,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
+import { enqueueSnackbar } from 'notistack';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import * as yup from 'yup';
+
+import appService from '@/services/app/app.service';
+import { EUserRole } from '@/services/auth/auth.model';
+import authService from '@/services/auth/auth.service';
 
 type RegisterFormData = {
   username: string;
@@ -46,30 +47,36 @@ type RegisterFormData = {
 };
 
 const userRoles = [
-  { label: "Khách hàng", value: EUserRole.Customer },
-  { label: "Nhân viên giao hàng", value: EUserRole.DeliveryPersonnel },
-  { label: "Công ty giao hàng", value: EUserRole.DeliveryCompany },
-  { label: "Chủ cửa hàng", value: EUserRole.StoreOwner },
+  { label: 'Khách hàng', value: EUserRole.Customer },
+  { label: 'Nhân viên giao hàng', value: EUserRole.DeliveryPersonnel },
+  { label: 'Công ty giao hàng', value: EUserRole.DeliveryCompany },
+  { label: 'Chủ cửa hàng', value: EUserRole.StoreOwner },
 ];
 
 const schema = yup.object({
-  username: yup.string().required("Vui lòng nhập tên đăng nhập"),
-  fullname: yup.string().required("Vui lòng nhập họ tên"),
-  email: yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
-  password: yup.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự").required("Vui lòng nhập mật khẩu"),
+  username: yup.string().required('Vui lòng nhập tên đăng nhập'),
+  fullname: yup.string().required('Vui lòng nhập họ tên'),
+  email: yup
+    .string()
+    .email('Email không hợp lệ')
+    .required('Vui lòng nhập email'),
+  password: yup
+    .string()
+    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .required('Vui lòng nhập mật khẩu'),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password")], "Mật khẩu nhập lại không khớp")
-    .required("Vui lòng nhập lại mật khẩu"),
-  role: yup.mixed<EUserRole>().required("Vui lòng chọn vai trò"),
+    .oneOf([yup.ref('password')], 'Mật khẩu nhập lại không khớp')
+    .required('Vui lòng nhập lại mật khẩu'),
+  role: yup.mixed<EUserRole>().required('Vui lòng chọn vai trò'),
   phoneNumber: yup
     .string()
-    .required("Vui lòng nhập số điện thoại")
-    .matches(/^(0|\+84)[0-9]{9,10}$/, "Số điện thoại không hợp lệ"),
-  addresses: yup.string().required("Vui lòng nhập địa chỉ"),
-  vehicleLicenseNumber: yup.string().when("role", {
+    .required('Vui lòng nhập số điện thoại')
+    .matches(/^(0|\+84)[0-9]{9,10}$/, 'Số điện thoại không hợp lệ'),
+  addresses: yup.string().required('Vui lòng nhập địa chỉ'),
+  vehicleLicenseNumber: yup.string().when('role', {
     is: EUserRole.DeliveryPersonnel,
-    then: (schema) => schema.required("Vui lòng nhập biển số xe"),
+    then: (schema) => schema.required('Vui lòng nhập biển số xe'),
     otherwise: (schema) => schema.optional(),
   }),
 });
@@ -89,15 +96,15 @@ const RegisterPage = () => {
   const { mutate } = useMutation({
     mutationFn: (data: any) => authService.register(data),
     onSuccess: () => {
-      enqueueSnackbar("Đăng ký thành công", { variant: "success" });
+      enqueueSnackbar('Đăng ký thành công', { variant: 'success' });
       setTimeout(() => {
-        window.location.href = "/auth/login";
+        window.location.href = '/auth/login';
       }, 5000);
       appService.hideLoadingModal();
     },
     onError: (err: any) => {
-      enqueueSnackbar(err?.response?.data?.message || "Đã có lỗi xảy ra", {
-        variant: "error",
+      enqueueSnackbar(err?.response?.data?.message || 'Đã có lỗi xảy ra', {
+        variant: 'error',
       });
       appService.hideLoadingModal();
     },
@@ -107,7 +114,7 @@ const RegisterPage = () => {
     const finalData = {
       ...data,
       addresses: data.addresses
-        .split(",")
+        .split(',')
         .map((a) => a.trim())
         .filter(Boolean),
     };
@@ -117,7 +124,7 @@ const RegisterPage = () => {
   };
 
   const toggleShowPassword = () => setShowPassword((prev) => !prev);
-  const selectedRole = watch("role");
+  const selectedRole = watch('role');
 
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-50 via-yellow-100 to-orange-200 px-4">
@@ -137,7 +144,7 @@ const RegisterPage = () => {
                 <TextField
                   label="Tên đăng nhập *"
                   fullWidth
-                  {...register("username")}
+                  {...register('username')}
                   error={!!errors.username}
                   helperText={errors.username?.message}
                   InputProps={{
@@ -154,7 +161,7 @@ const RegisterPage = () => {
                 <TextField
                   label="Họ và tên *"
                   fullWidth
-                  {...register("fullname")}
+                  {...register('fullname')}
                   error={!!errors.fullname}
                   helperText={errors.fullname?.message}
                   InputProps={{
@@ -171,7 +178,7 @@ const RegisterPage = () => {
                 <TextField
                   label="Email *"
                   fullWidth
-                  {...register("email")}
+                  {...register('email')}
                   error={!!errors.email}
                   helperText={errors.email?.message}
                   InputProps={{
@@ -188,7 +195,7 @@ const RegisterPage = () => {
                 <TextField
                   label="Số điện thoại *"
                   fullWidth
-                  {...register("phoneNumber")}
+                  {...register('phoneNumber')}
                   error={!!errors.phoneNumber}
                   helperText={errors.phoneNumber?.message}
                   InputProps={{
@@ -204,9 +211,9 @@ const RegisterPage = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   label="Mật khẩu *"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   fullWidth
-                  {...register("password")}
+                  {...register('password')}
                   error={!!errors.password}
                   helperText={errors.password?.message}
                   InputProps={{
@@ -233,9 +240,9 @@ const RegisterPage = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   label="Nhập lại mật khẩu *"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   fullWidth
-                  {...register("confirmPassword")}
+                  {...register('confirmPassword')}
                   error={!!errors.confirmPassword}
                   helperText={errors.confirmPassword?.message}
                   InputProps={{
@@ -252,7 +259,7 @@ const RegisterPage = () => {
                 <TextField
                   label="Địa chỉ (nhiều địa chỉ ngăn cách bằng dấu phẩy)"
                   fullWidth
-                  {...register("addresses")}
+                  {...register('addresses')}
                   error={!!errors.addresses}
                   helperText={errors.addresses?.message}
                   InputProps={{
@@ -270,7 +277,7 @@ const RegisterPage = () => {
                   label="Vai trò "
                   fullWidth
                   select
-                  {...register("role")}
+                  {...register('role')}
                   error={!!errors.role}
                   helperText={errors.role?.message}
                 >
@@ -287,7 +294,7 @@ const RegisterPage = () => {
                   <TextField
                     label="Biển số xe "
                     fullWidth
-                    {...register("vehicleLicenseNumber")}
+                    {...register('vehicleLicenseNumber')}
                     error={!!errors.vehicleLicenseNumber}
                     helperText={errors.vehicleLicenseNumber?.message}
                     InputProps={{
@@ -316,8 +323,11 @@ const RegisterPage = () => {
         </CardContent>
 
         <Box className="text-center text-sm text-gray-600 pb-5 px-4">
-          Đã có tài khoản?{" "}
-          <Link to="/auth/login" className="text-orange-500 hover:underline font-medium">
+          Đã có tài khoản?{' '}
+          <Link
+            to="/auth/login"
+            className="text-orange-500 hover:underline font-medium"
+          >
             Đăng nhập
           </Link>
         </Box>

@@ -36,7 +36,9 @@ const LeftDrawer = ({ drawerOpen, toggleDrawer }: any) => {
             <ListItem key={item?.path} disablePadding>
               <ListItemButton onClick={() => navigate(item?.path)}>
                 {item.icon && (
-                  <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>{item.icon}</Box>
+                  <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                    {item.icon}
+                  </Box>
                 )}
                 <ListItemText primary={item?.label} />
               </ListItemButton>

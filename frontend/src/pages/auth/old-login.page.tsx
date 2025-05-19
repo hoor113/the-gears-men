@@ -17,159 +17,159 @@ import { ILoginInput } from '@/services/auth/auth.model';
 import authService from '@/services/auth/auth.service';
 
 const loginSchema = yup.object({
-    email: yup.string().required(i18n.t('userNameOrEmailAddress-required')),
-    password: yup.string().required(i18n.t('password-required')),
+  email: yup.string().required(i18n.t('userNameOrEmailAddress-required')),
+  password: yup.string().required(i18n.t('password-required')),
 });
 
 const LoginPage = () => {
-    const [, dispatch] = useContext(AuthContext);
+  const [, dispatch] = useContext(AuthContext);
 
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
-    const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(loginSchema),
-        mode: 'onChange',
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+    mode: 'onChange',
+  });
 
-    const { mutate, isLoading: loginLoading } = useMutation({
-        mutationFn: (data: ILoginInput) => authService.login(data),
-        onSuccess: (data) => {
-            dispatch({ type: 'setIsAuth', payload: true });
-            dispatch({ type: 'setCurrentUser', payload: data });
+  const { mutate, isLoading: loginLoading } = useMutation({
+    mutationFn: (data: ILoginInput) => authService.login(data),
+    onSuccess: (data) => {
+      dispatch({ type: 'setIsAuth', payload: true });
+      dispatch({ type: 'setCurrentUser', payload: data });
 
-            appService.hideLoadingModal();
-            enqueueSnackbar(t('Đăng nhập thành công'), { variant: 'success' });
+      appService.hideLoadingModal();
+      enqueueSnackbar(t('Đăng nhập thành công'), { variant: 'success' });
 
-            queryClient.refetchQueries({ queryKey: ['auth/getUserInfo'] });
-        },
-        onError: (err: any) => {
-            appService.hideLoadingModal();
-            enqueueSnackbar(err.response.data.message || t('Đã có lỗi xảy ra'), {
-                variant: 'error',
-            });
-        },
-    });
+      queryClient.refetchQueries({ queryKey: ['auth/getUserInfo'] });
+    },
+    onError: (err: any) => {
+      appService.hideLoadingModal();
+      enqueueSnackbar(err.response.data.message || t('Đã có lỗi xảy ra'), {
+        variant: 'error',
+      });
+    },
+  });
 
-    const onSubmit = (data: ILoginInput) => {
-        mutate(data);
-        appService.showLoadingModal();
-    };
+  const onSubmit = (data: ILoginInput) => {
+    mutate(data);
+    appService.showLoadingModal();
+  };
 
-    return (
-        <Box
+  return (
+    <Box
+      sx={{
+        height: '100vh',
+        overflow: 'hidden',
+        backgroundColor: 'background.paper',
+        flex: '1 1 auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+      }}
+    >
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'grey.400',
+          backgroundPosition: 'bottom',
+          zIndex: 0,
+        }}
+      ></Box>
+      <Box
+        sx={{
+          maxWidth: 550,
+          px: 3,
+          pt: 4,
+          pb: 6,
+          width: '100%',
+          backgroundColor: 'background.paper',
+          borderRadius: 1,
+          zIndex: 1,
+          position: 'relative',
+        }}
+      >
+        <div>
+          <Stack
+            spacing={1}
             sx={{
-                height: '100vh',
-                overflow: 'hidden',
-                backgroundColor: 'background.paper',
-                flex: '1 1 auto',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
+              mb: 3,
+              position: 'relative',
+              '.btn-locale': {
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                mt: 0,
+              },
             }}
-        >
-            <Box
-                sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'grey.400',
-                    backgroundPosition: 'bottom',
-                    zIndex: 0,
-                }}
-            ></Box>
-            <Box
-                sx={{
-                    maxWidth: 550,
-                    px: 3,
-                    pt: 4,
-                    pb: 6,
-                    width: '100%',
-                    backgroundColor: 'background.paper',
-                    borderRadius: 1,
-                    zIndex: 1,
-                    position: 'relative',
-                }}
-            >
-                <div>
-                    <Stack
-                        spacing={1}
-                        sx={{
-                            mb: 3,
-                            position: 'relative',
-                            '.btn-locale': {
-                                position: 'absolute',
-                                top: 0,
-                                right: 0,
-                                mt: 0,
-                            },
-                        }}
-                    >
-                        <Typography variant="h4">{t('Đăng nhập')}</Typography>
-                        <Typography color="text.secondary" variant="subtitle2">
-                            {t('Chưa có tài khoản') + '? '}
-                            <Link href="/auth/register" underline="hover" variant="subtitle2">
-                                {t('Đăng ký ngay')}
-                            </Link>
-                        </Typography>
-                        <SelectChangeLocale
-                            buttonProps={{
-                                className: 'btn-locale',
-                                size: 44,
-                                style: {
-                                    fontSize: 26,
-                                },
-                            }}
-                        />
-                    </Stack>
+          >
+            <Typography variant="h4">{t('Đăng nhập')}</Typography>
+            <Typography color="text.secondary" variant="subtitle2">
+              {t('Chưa có tài khoản') + '? '}
+              <Link href="/auth/register" underline="hover" variant="subtitle2">
+                {t('Đăng ký ngay')}
+              </Link>
+            </Typography>
+            <SelectChangeLocale
+              buttonProps={{
+                className: 'btn-locale',
+                size: 44,
+                style: {
+                  fontSize: 26,
+                },
+              }}
+            />
+          </Stack>
 
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <TextField
-                            fullWidth
-                            label={t('Email')}
-                            error={!!errors.email?.message}
-                            helperText={errors.email?.message}
-                            disabled={loginLoading}
-                            required
-                            margin="dense"
-                            style={{ marginBottom: 12 }}
-                            {...register('email')}
-                        />
-                        <PasswordInput
-                            fullWidth
-                            label={t('Mật khẩu')}
-                            error={!!errors.password?.message}
-                            helperText={errors.password?.message}
-                            disabled={loginLoading}
-                            required
-                            margin="dense"
-                            style={{ marginBottom: 12 }}
-                            {...register('password')}
-                        />
-                        <LoadingButton
-                            fullWidth
-                            size="large"
-                            type="submit"
-                            variant="contained"
-                            loading={loginLoading}
-                        >
-                            {t('Đăng nhập')}
-                        </LoadingButton>
-                    </form>
-                </div>
-            </Box>
-        </Box>
-    );
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <TextField
+              fullWidth
+              label={t('Email')}
+              error={!!errors.email?.message}
+              helperText={errors.email?.message}
+              disabled={loginLoading}
+              required
+              margin="dense"
+              style={{ marginBottom: 12 }}
+              {...register('email')}
+            />
+            <PasswordInput
+              fullWidth
+              label={t('Mật khẩu')}
+              error={!!errors.password?.message}
+              helperText={errors.password?.message}
+              disabled={loginLoading}
+              required
+              margin="dense"
+              style={{ marginBottom: 12 }}
+              {...register('password')}
+            />
+            <LoadingButton
+              fullWidth
+              size="large"
+              type="submit"
+              variant="contained"
+              loading={loginLoading}
+            >
+              {t('Đăng nhập')}
+            </LoadingButton>
+          </form>
+        </div>
+      </Box>
+    </Box>
+  );
 };
 
 export default LoginPage;

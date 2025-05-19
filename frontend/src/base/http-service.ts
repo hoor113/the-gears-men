@@ -118,7 +118,7 @@ class HttpService {
     return response.data;
   }
 
-    async uploadImage({ file }: { file: File }) {
+  async uploadImage({ file }: { file: File }) {
     const formData = new FormData();
 
     formData.append('file', file);

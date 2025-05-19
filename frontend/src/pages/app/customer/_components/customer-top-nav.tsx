@@ -29,6 +29,7 @@ import AccountPopover from '../../_components/account-popover';
 import { useCart } from '../cart/context/cart.context';
 import './custom-top-nav.scss';
 import LeftDrawer from './left-drawer';
+import useAuth from '@/hooks/use-auth';
 
 const AvatarStyled = styled(Avatar)(({ theme }) => ({
   border: `1px solid ${alpha(theme.palette.primary.main, 0.6)}`,
@@ -42,6 +43,7 @@ const AvatarStyled = styled(Avatar)(({ theme }) => ({
 }));
 
 export default function CustomerTopNav() {
+  const authQuery = useAuth();
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword, 300);
@@ -333,7 +335,7 @@ export default function CustomerTopNav() {
           onClick={accountPopover.handleOpen}
           ref={accountPopover.anchorRef}
         >
-          <AvatarStyled src={''} />
+          <AvatarStyled src={authQuery?.data?.avatarPicture || ''} />
         </IconButton>
 
         <AccountPopover

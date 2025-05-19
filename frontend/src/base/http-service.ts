@@ -118,13 +118,29 @@ class HttpService {
     return response.data;
   }
 
+    async uploadImage({ file }: { file: File }) {
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    const config: AxiosRequestConfig = {
+      url: '/file/uploadImage',
+      method: 'POST',
+      data: formData,
+    };
+
+    const response = await this.http.request<TBaseResponse<any>>(config);
+
+    return response.data;
+  }
+
   async uploadFile({ file }: { file: File }) {
     const formData = new FormData();
 
     formData.append('file', file);
 
     const config: AxiosRequestConfig = {
-      url: '/uploadFile',
+      url: '/file/uploadFile',
       method: 'POST',
       data: formData,
     };

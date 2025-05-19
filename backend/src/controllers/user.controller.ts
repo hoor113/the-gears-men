@@ -1,6 +1,6 @@
 import { BaseResponse } from '@/common/base-response';
 import { verifyToken } from '@/config/jwt';
-import { authorizeRoles } from '@/middlewares/role.middleware';
+import { authorizeRoles, isSelfOrAuthorizedRoles } from '@/middlewares/role.middleware';
 import { EUserRole } from '@/models/user.model';
 import { Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
@@ -20,6 +20,7 @@ import {
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import {
+    ChangePasswordDto,
     CreateUserDto,
     GetAllUsersDto,
     UpdateUserDto,
@@ -91,7 +92,7 @@ export class UserController {
     }
 
     @Put('/Update')
-    @UseBefore(authorizeRoles([EUserRole.Admin]))
+    @UseBefore(isSelfOrAuthorizedRoles([EUserRole.Admin]))
     @UseBefore(ValidationMiddleware(UpdateUserDto))
     async updateUser(@Body() dto: UpdateUserDto, @Res() res: Response) {
         try {
@@ -154,6 +155,37 @@ export class UserController {
             console.log('decoded', decoded);
             const userId = decoded.id;
             const response = await this.userService.getAllConfiguration(userId);
+            return res.status(response.statusCode).json(response);
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message:
+                    'controller' + (error as any)?.message ||
+                    'Internal Server Error',
+                statusCode: EHttpStatusCode.INTERNAL_SERVER_ERROR,
+            });
+        }
+    }
+
+    @Put('/ChangePassword')
+    @UseBefore(ValidationMiddleware(ChangePasswordDto))
+    async ChangePassword(
+        @Req() req: Request,
+        @Body() dto: ChangePasswordDto,
+        @Res() res: Response
+    ) {
+        try {
+            const authHeader = (req.headers as any)?.authorization;
+            const token = authHeader?.split(' ')[1];
+            if (!token) {
+                return res
+                    .status(401)
+                    .json(BaseResponse.error('Token missing', 401));
+            }
+            const decoded = verifyToken(token) as JwtPayload;
+            console.log('decoded', decoded);
+            const userId = decoded.id;
+            const response = await this.userService.changePassword(userId, dto);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

@@ -23,8 +23,10 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
 
   const defaultData = useMemo(
     () => ({
-      userName: authQuery.data?.username,
+      username: authQuery.data?.username,
+      fullname: authQuery.data?.fullname,
       email: authQuery.data?.email,
+      phoneNumber: authQuery.data?.phoneNumber,
     }),
     [authQuery.data],
   );
@@ -34,11 +36,15 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
   const schema = useMemo(
     () =>
       yup.object().shape({
-        name: yup.string().required(t('field-required')),
-        userName: yup.string().required(t('field-required')),
+        username: yup.string().required(t('field-required')),
+        fullname: yup.string().required(t('field-required')),
         email: yup
           .string()
           .email(t('Email không hợp lệ'))
+          .required(t('field-required')),
+        phoneNumber: yup
+          .string()
+          .matches(/^[0-9]+$/, 'Số điện thoại không hợp lệ')
           .required(t('field-required')),
       }),
     [t],
@@ -46,9 +52,10 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
 
   const methods = useForm({
     defaultValues: {
-      name: '',
-      userName: '',
+      username: '',
+      fullname: '',
       email: '',
+      phoneNumber: '',
     },
     resolver: yupResolver(schema),
   });
@@ -58,7 +65,7 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
       if (!authQuery.data?.id) {
         throw new Error('User ID is undefined');
       }
-      return myAccountService.updateInfo({ id: authQuery.data.id }, data);
+      return myAccountService.updateInfo(data);
     },
     onSuccess: async () => {
       await authQuery.refetch();
@@ -87,7 +94,10 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
     <Card sx={{ p: 2, height: '100%' }}>
       <form
         onSubmit={methods.handleSubmit((data) => {
-          updateBasicMutation.mutate(data);
+          updateBasicMutation.mutate({
+            ...authQuery.data,
+            ...data
+          });
         })}
       >
         <Stack direction="row" justifyContent="space-between">
@@ -115,13 +125,13 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
           <BaseCrudFormContainer
             fields={[
               {
-                name: 'name',
+                name: 'username',
                 label: t('Tên đăng nhập'),
                 type: 'text',
                 readOnly: true,
               },
               {
-                name: 'userName',
+                name: 'fullname',
                 label: t('Họ tên'),
                 type: 'text',
                 required: true,
@@ -129,6 +139,12 @@ const BasicInfoForm = ({ authQuery }: TBasicInfoFormProps) => {
               {
                 name: 'email',
                 label: t('E-mail'),
+                type: 'text',
+                required: true,
+              },
+              {
+                name: 'phoneNumber',
+                label: 'Số điện thoại',
                 type: 'text',
                 required: true,
               },

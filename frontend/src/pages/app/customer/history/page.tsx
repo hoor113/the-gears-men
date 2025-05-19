@@ -193,6 +193,11 @@ export default function OrderHistoryPage() {
     });
   };
 
+  // Debugging logs
+  console.log("Current history data:", historyData);
+  console.log("Is loading:", historyIsLoading);
+  console.log("Tab value:", tabValue);
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" gutterBottom>

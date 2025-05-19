@@ -109,38 +109,45 @@ export interface IPendingOrderResponse extends IPaginatedItems<IPendingOrder> {
 
 // Transform the raw order data to the format expected by the frontend
 function transformOrderData(orders: IOrderRaw[]): IOrderHistoryItem[] {
+  if (!orders || !Array.isArray(orders)) {
+    return [];
+  }
+  
   return orders.map((order) => {
+    if (!order) return null;
+    
     // Transform each order item to a shipment info
-    const shipments = order.items.map((item) => {
+    const shipments = Array.isArray(order.items) ? order.items.map((item) => {
+      if (!item) return null;
+      
       const shipmentInfo: IShipmentInfo = {
-        id: item.shipmentId?._id || `no-shipment-${item._id}`,
+        id: item.shipmentId?._id || `no-shipment-${item._id || 'unknown'}`,
         status: item.shipmentId?.status || EShipmentStatus.Pending,
-        estimatedDelivery:
-          item.shipmentId?.estimatedDelivery || order.createdAt,
+        estimatedDelivery: item.shipmentId?.estimatedDelivery || order.createdAt || new Date().toISOString(),
         deliveryDate: item.shipmentId?.deliveryDate,
         product: {
-          id: item.productId._id,
-          name: item.productId.name,
-          price: item.price,
-          quantity: item.quantity,
-          imageUrl: item.productId.images[0] || undefined,
+          id: item.productId?._id || 'unknown',
+          name: item.productId?.name || 'Unknown Product',
+          price: item.price || 0,
+          quantity: item.quantity || 0,
+          imageUrl: item.productId?.images?.[0] || undefined,
         },
         productDiscountCode: item.productDiscountCode?.code,
         shippingDiscountCode: item.shippingDiscountCode?.code,
-        shippingPrice: item.shippingPrice,
+        shippingPrice: item.shippingPrice || 0,
       };
       return shipmentInfo;
-    });
+    }).filter(Boolean) : [];
 
     return {
-      id: order._id,
-      date: order.createdAt,
-      status: order.orderStatus,
-      total: order.totalPrice,
-      items: order.items.length,
+      id: order._id || 'unknown',
+      date: order.createdAt || new Date().toISOString(),
+      status: order.orderStatus || EOrderStatus.Pending,
+      total: order.totalPrice || 0,
+      items: Array.isArray(order.items) ? order.items.length : 0,
       shipments: shipments,
     };
-  });
+  }).filter(Boolean) as IOrderHistoryItem[];
 }
 
 class OrderHistoryService extends BaseCrudService {
@@ -194,74 +201,93 @@ class OrderHistoryService extends BaseCrudService {
     pageSize: number,
     isPending: number,
   ): Promise<IPendingOrderResponse | IOrderHistory> {
-    const res = await httpService.request<TBaseResponse<any>>({
-      method: 'GET',
-      url: `${this.basePath}/history`,
-      params: {
-        skipCount: (page - 1 || 0) * pageSize,
-        maxResultCount: pageSize,
-        isPending: isPending,
-      },
-    });
+    try {
+      const res = await httpService.request<TBaseResponse<any>>({
+        method: 'GET',
+        url: `${this.basePath}/history`,
+        params: {
+          skipCount: (page - 1 || 0) * pageSize,
+          maxResultCount: pageSize,
+          isPending: isPending,
+        },
+      });
 
-    // Log the response for debugging
-    console.log(`API Response (isPending=${isPending}):`, res);
+      // Log the response for debugging
+      console.log(`API Response (isPending=${isPending}):`, res);
 
-    const totalRecords = res.resultCount || 0;
-    const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+      const totalRecords = res?.resultCount || 0;
+      const totalPages = Math.ceil(totalRecords / pageSize) || 1;
 
-    if (isPending === 1) {
-      // For pending orders, we return the data in the pending order format
-      // This avoids transformation errors
-      const orders = res.result || [];
+      // Ensure res.result is always an array
+      const resultArray = Array.isArray(res?.result) ? res.result : [];
 
-      return {
-        items: orders.map((order: any) => ({
-          _id: order._id || '',
-          createdAt: order.createdAt || new Date().toISOString(),
-          orderStatus: order.orderStatus || EOrderStatus.Pending,
-          totalPrice: order.totalPrice || 0,
-          items: Array.isArray(order.items)
-            ? order.items.map((item: any) => ({
-                _id: item._id || '',
-                productId: item.productId
-                  ? {
-                      _id: item.productId._id || '',
-                      name: item.productId.name || 'Unknown Product',
-                      price: item.productId.price || 0,
-                      imageUrl: item.productId.images[0] || undefined,
-                    }
-                  : {
-                      _id: '',
-                      name: 'Unknown Product',
-                      price: 0,
-                    },
-                quantity: item.quantity || 1,
-                price: item.price || 0,
-                shippingPrice: item.shippingPrice || 0,
-                productDiscountCode: item.productDiscountCode,
-                shippingDiscountCode: item.shippingDiscountCode,
-              }))
-            : [],
-        })),
-        totalPages,
-        totalCount: totalRecords,
-        totalRecords,
-        data: res.result || [],
-      } as IPendingOrderResponse;
-    } else {
-      // For confirmed orders, use the regular transformation
-      const transformedItems = transformOrderData(
-        Array.isArray(res.result) ? res.result : [],
-      );
+      if (isPending === 1) {
+        // For pending orders, we return the data in the pending order format
+        // This avoids transformation errors
+        const orders = res.result || [];
 
-      return {
-        items: transformedItems,
-        totalPages,
-        totalCount: totalRecords,
-        totalRecords,
-        data: transformedItems,
-      } as IOrderHistory;
+        return {
+          items: orders.map((order: any) => ({
+            _id: order._id || '',
+            createdAt: order.createdAt || new Date().toISOString(),
+            orderStatus: order.orderStatus || EOrderStatus.Pending,
+            totalPrice: order.totalPrice || 0,
+            items: Array.isArray(order.items)
+              ? order.items.map((item: any) => ({
+                  _id: item._id || '',
+                  productId: item.productId
+                    ? {
+                        _id: item.productId._id || '',
+                        name: item.productId.name || 'Unknown Product',
+                        price: item.productId.price || 0,
+                        imageUrl: item.productId.images[0] || undefined,
+                      }
+                    : {
+                        _id: '',
+                        name: 'Unknown Product',
+                        price: 0,
+                      },
+                  quantity: item.quantity || 1,
+                  price: item.price || 0,
+                  shippingPrice: item.shippingPrice || 0,
+                  productDiscountCode: item.productDiscountCode,
+                  shippingDiscountCode: item.shippingDiscountCode,
+                }))
+              : [],
+          })),
+          totalPages,
+          totalCount: totalRecords,
+          totalRecords,
+          data: res.result || [],
+        } as IPendingOrderResponse;
+      } else {
+        // For confirmed orders, use the regular transformation with additional safety
+        try {
+          const transformedItems = transformOrderData(resultArray);
+
+          return {
+            items: transformedItems,
+            totalPages,
+            totalCount: totalRecords,
+            totalRecords,
+            data: transformedItems,
+          } as IOrderHistory;
+        } catch (error) {
+          console.error('Error transforming order data:', error);
+          return {
+            items: [],
+            totalPages: 1,
+            totalCount: 0,
+            totalRecords: 0,
+            data: [],
+          } as IOrderHistory;
+        }
+      }
+    } catch (error) {
+      console.error('Error in getOrdersByStatus:', error);
+      return isPending === 1 
+        ? { items: [], totalPages: 1, totalCount: 0, totalRecords: 0, data: [] } as IPendingOrderResponse
+        : { items: [], totalPages: 1, totalCount: 0, totalRecords: 0, data: [] } as IOrderHistory;
     }
   }
 
@@ -282,7 +308,29 @@ class OrderHistoryService extends BaseCrudService {
     page: number,
     pageSize: number,
   ): Promise<IOrderHistory> {
-    return this.getOrdersByStatus(page, pageSize, 0) as Promise<IOrderHistory>;
+    try {
+      const result = await this.getOrdersByStatus(page, pageSize, 0) as IOrderHistory;
+      console.log('Confirmed orders result:', result);
+      
+      // Ensure we have a valid response object even if something is missing
+      return {
+        items: Array.isArray(result.items) ? result.items : [],
+        totalPages: result.totalPages || 1,
+        totalCount: result.totalCount || 0,
+        totalRecords: result.totalRecords || 0,
+        data: Array.isArray(result.data) ? result.data : [],
+      };
+    } catch (error) {
+      console.error('Error in getConfirmedOrders:', error);
+      // Return empty data structure on error
+      return {
+        items: [],
+        totalPages: 1,
+        totalCount: 0,
+        totalRecords: 0,
+        data: [],
+      };
+    }
   }
 
   // If needed: cancel an order

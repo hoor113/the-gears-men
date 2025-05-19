@@ -118,6 +118,7 @@ export class ZaloPayService {
                 orderStatus: EOrderStatus.Confirmed,
             });
             await order?.save();
+            console.log('order', order);
 
             // Make sth
             await this.cronShipmentService.createShipmentsForOrder(orderId);

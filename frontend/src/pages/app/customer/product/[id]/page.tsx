@@ -120,7 +120,7 @@ const SingleProductPage = () => {
             </Box>
 
             {/* Swiper hình nhỏ */}
-            {hasImages && product.images.length > 1 && (
+            {hasImages && product?.images?.length > 1 && (
               <Box
                 className="w-full mt-2"
                 sx={{

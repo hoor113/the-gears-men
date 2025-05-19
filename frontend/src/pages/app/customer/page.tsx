@@ -185,8 +185,12 @@ const CustomerPage = () => {
             <BlockProducts
               key={item?.data?.key}
               path={`category/${categories[idx].key}`}
-              title={`Danh mục ${item?.data?.title || ""}`}
-              products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []}
+              title={`Danh mục ${item?.data?.title || ''}`}
+              products={
+                Array.isArray(item?.data?.products)
+                  ? (item.data.products as Product[])
+                  : []
+              }
             />
           ))}
 

@@ -1,10 +1,10 @@
+import { Person2 } from '@mui/icons-material';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import InfoIcon from '@mui/icons-material/Info';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
 import { useStore } from '../store/_services/store.context';
-import { Person2 } from '@mui/icons-material';
 
 export default function OwnerMenuItems() {
   const [storeState] = useStore();

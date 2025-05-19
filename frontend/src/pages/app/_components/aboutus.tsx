@@ -22,7 +22,7 @@ const members = [
     name: 'Lê Khôi Nguyên',
     mssv: '20225147',
     quote: 'Luôn học hỏi, không ngừng phát triển.',
-    img: "https://png.pngtree.com/png-clipart/20210225/ourlarge/pngtree-cute-cartoon-character-avatar-wearing-glasses-png-image_2940625.jpg",
+    img: 'https://png.pngtree.com/png-clipart/20210225/ourlarge/pngtree-cute-cartoon-character-avatar-wearing-glasses-png-image_2940625.jpg',
   },
   {
     id: 2,

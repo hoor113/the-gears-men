@@ -58,14 +58,14 @@ export default function CustomerTopNav() {
   };
 
   const handleCartToggle = (event: React.MouseEvent<HTMLElement>) => {
-  if (cartAnchorEl && cartAnchorEl === event.currentTarget) {
-    // Nếu menu đang mở với phần tử này thì đóng lại
-    setCartAnchorEl(null);
-  } else {
-    // Mở menu, gán phần tử vừa click
-    setCartAnchorEl(event.currentTarget);
-  }
-};
+    if (cartAnchorEl && cartAnchorEl === event.currentTarget) {
+      // Nếu menu đang mở với phần tử này thì đóng lại
+      setCartAnchorEl(null);
+    } else {
+      // Mở menu, gán phần tử vừa click
+      setCartAnchorEl(event.currentTarget);
+    }
+  };
 
   const handleCartItemRemove = (id: any) => {
     cartDispatch({ type: 'REMOVE_ITEM', payload: { id: id } });
@@ -210,7 +210,7 @@ export default function CustomerTopNav() {
                     return (
                       <Box
                         onClick={() => {
-                          navigate(`/customer/product/${product.id}`)
+                          navigate(`/customer/product/${product.id}`);
                           handleSearchBlur();
                         }}
                         key={product.id}
@@ -222,7 +222,7 @@ export default function CustomerTopNav() {
                           '&:hover': { backgroundColor: '#f5f5f5' },
                           cursor: 'pointer',
                           borderBottom: '1px solid #eee',
-                        }}              
+                        }}
                       >
                         <Box
                           sx={{
@@ -343,10 +343,7 @@ export default function CustomerTopNav() {
         />
 
         {/* Giỏ hàng */}
-        <Box
-          onClick={handleCartToggle}
-          className="cursor-pointer"
-        >
+        <Box onClick={handleCartToggle} className="cursor-pointer">
           <IconButton color="inherit">
             <Badge
               badgeContent={totalItems}

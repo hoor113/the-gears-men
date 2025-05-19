@@ -1,3 +1,4 @@
+import { Person2 } from '@mui/icons-material';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import InfoIcon from '@mui/icons-material/Info';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -28,7 +29,7 @@ export default function OwnerMenuItems() {
     {
       label: 'Tài khoản',
       path: `/settings/my-account`,
-      icon: <ListAltIcon fontSize="small" />,
+      icon: <Person2 fontSize="small" />,
     },
     {
       label: 'Về chúng tôi',

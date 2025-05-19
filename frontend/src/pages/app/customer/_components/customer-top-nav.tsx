@@ -58,14 +58,14 @@ export default function CustomerTopNav() {
   };
 
   const handleCartToggle = (event: React.MouseEvent<HTMLElement>) => {
-  if (cartAnchorEl && cartAnchorEl === event.currentTarget) {
-    // Nếu menu đang mở với phần tử này thì đóng lại
-    setCartAnchorEl(null);
-  } else {
-    // Mở menu, gán phần tử vừa click
-    setCartAnchorEl(event.currentTarget);
-  }
-};
+    if (cartAnchorEl && cartAnchorEl === event.currentTarget) {
+      // Nếu menu đang mở với phần tử này thì đóng lại
+      setCartAnchorEl(null);
+    } else {
+      // Mở menu, gán phần tử vừa click
+      setCartAnchorEl(event.currentTarget);
+    }
+  };
 
   const handleCartItemRemove = (id: any) => {
     cartDispatch({ type: 'REMOVE_ITEM', payload: { id: id } });
@@ -131,10 +131,12 @@ export default function CustomerTopNav() {
         {/* Menu Drawer */}
         <div className="flex items-center gap-x-4">
           {/* Menu Drawer */}
-          <IconButton onClick={() => toggleDrawer(true)} sx={{ color: 'white' }}>
+          <IconButton
+            onClick={() => toggleDrawer(true)}
+            sx={{ color: 'white' }}
+          >
             <MenuIcon />
           </IconButton>
-
 
           {/* Logo nhỏ cho mobile */}
           <div
@@ -192,8 +194,8 @@ export default function CustomerTopNav() {
                   // width: "300px",
                   '@media (max-width:500px)': {
                     width: '300px',
-                    left: "50%",
-                    transform: "TranslateX(-50%)",
+                    left: '50%',
+                    transform: 'TranslateX(-50%)',
                   },
                 }}
               >
@@ -207,6 +209,10 @@ export default function CustomerTopNav() {
 
                     return (
                       <Box
+                        onClick={() => {
+                          navigate(`/customer/product/${product.id}`);
+                          handleSearchBlur();
+                        }}
                         key={product.id}
                         display="flex"
                         alignItems="center"
@@ -307,9 +313,19 @@ export default function CustomerTopNav() {
           </span>
         </span> */}
 
-
-
       <div className="flex items-center gap-x-4">
+        {/* <span
+          className="hidden md:inline font-bold text-base md:text-lg"
+          onClick={() => navigate('/customer/aboutus')}
+          style={{ cursor: 'pointer' }}
+        >
+          <span
+            className="text-white-400 top-nav-group-name"
+            style={{ fontSize: '14px' }}
+          >
+            Về chúng tôi
+          </span>
+        </span> */}
 
         {/* Tài khoản */}
         <IconButton
@@ -327,10 +343,7 @@ export default function CustomerTopNav() {
         />
 
         {/* Giỏ hàng */}
-        <Box
-          onClick={handleCartToggle}
-          className="cursor-pointer"
-        >
+        <Box onClick={handleCartToggle} className="cursor-pointer">
           <IconButton color="inherit">
             <Badge
               badgeContent={totalItems}

@@ -49,7 +49,6 @@ const OwnerPage = () => {
     },
     onError: (err: any) => {
       appService.hideLoadingModal();
-      window.location.href = `/customer/payment/fail`;
       enqueueSnackbar(err.response.data.message || 'Đã có lỗi xảy ra', {
         variant: 'error',
       });

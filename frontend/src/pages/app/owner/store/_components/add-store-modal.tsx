@@ -6,7 +6,6 @@ import * as yup from 'yup';
 
 import BaseCrudFormModal from '@/base/base-crud-form-modal';
 import { TCrudFormField } from '@/base/crud-form-field.type';
-import useTranslation from '@/hooks/use-translation';
 
 import { IStore } from '../_services/store.model';
 import storeService from '../_services/store.service';
@@ -21,7 +20,6 @@ const AddStoreModal = NiceModal.create((props: TAddStoreModalProps) => {
   const queryClient = useQueryClient();
   const { ownerId, ownerName, row } = props;
   const modal = useModal();
-  const { t } = useTranslation();
 
   const createFields = useMemo<TCrudFormField[]>(
     () => [
@@ -74,12 +72,12 @@ const AddStoreModal = NiceModal.create((props: TAddStoreModalProps) => {
   const createSchema = useMemo(
     () =>
       yup.object().shape({
-        ownerId: yup.string().required(t('Trường này là bắt buộc')),
-        name: yup.string().required(t('Trường này là bắt buộc')),
+        ownerId: yup.string().required('Trường này là bắt buộc'),
+        name: yup.string().required('Trường này là bắt buộc'),
         description: yup.string(),
-        location: yup.string().required(t('Trường này là bắt buộc')),
+        location: yup.string().required('Trường này là bắt buộc'),
       }),
-    [t],
+    [],
   );
 
   return (

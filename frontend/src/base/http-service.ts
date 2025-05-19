@@ -108,7 +108,7 @@ class HttpService {
     });
 
     const config: AxiosRequestConfig = {
-      url: '/UploadListImagePublic',
+      url: '/file/uploadManyImage',
       method: 'POST',
       data: formData,
     };
@@ -124,7 +124,7 @@ class HttpService {
     formData.append('file', file);
 
     const config: AxiosRequestConfig = {
-      url: '/UploadOneFile',
+      url: '/uploadFile',
       method: 'POST',
       data: formData,
     };

@@ -116,14 +116,14 @@ export class DiscountCodeController {
     //     }
     // }
 
-    @Delete('/Delete')
-    @UseBefore(authorizeRoles([EUserRole.Admin]))
+    @Delete('/Delete/:id')
+    @UseBefore(authorizeRoles([EUserRole.Admin, EUserRole.StoreOwner]))
     async deleteDiscountCodeCast(
-        @Body() dto: StringEntityDto,
+        @Param('id') id: string,
         @Res() res: Response,
     ) {
         try {
-            const response = await this.discountCodeService.deleteDiscountCodeCast(dto);
+            const response = await this.discountCodeService.deleteDiscountCodeCast(id);
             return res.status(response.statusCode).json(response);
         } catch (error) {
             return res.status(500).json({

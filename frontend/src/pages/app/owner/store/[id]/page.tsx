@@ -5,8 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { OwnerStoreInfo } from '../_components/store-info';
+import OwnerProductCard from './products/_components/product-card';
 import { ShipmentCard } from './shipment/_components/shipment-card';
 import shipmentService from './shipment/_services/shipment.service';
+import VoucherBlock from './vouchers/_components/voucher-block';
 
 const OwnerSingleStorePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,6 +64,46 @@ const OwnerSingleStorePage = () => {
         </Box>
 
         <ShipmentCard />
+
+        <Box sx={{ my: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 500,
+              color: 'text.primary',
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              '&:hover': {
+                color: 'primary.main',
+              },
+            }}
+            onClick={() => navigate(`/owner/store/${id}/products`)}
+          >
+            Danh sách sản phẩm
+          </Typography>
+        </Box>
+
+        <OwnerProductCard />
+
+        <Box sx={{ my: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 500,
+              color: 'text.primary',
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              '&:hover': {
+                color: 'primary.main',
+              },
+            }}
+            onClick={() => navigate(`/owner/store/${id}/vouchers`)}
+          >
+            Danh sách mã giảm giá
+          </Typography>
+        </Box>
+
+        <VoucherBlock />
       </Box>
     </>
   );

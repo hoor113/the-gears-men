@@ -114,9 +114,10 @@ export class ZaloPayService {
             const embedData = JSON.parse(callbackData.embed_data); // đã là chuỗi JSON
             const orderId = embedData.orderId;
 
-            await Order.findByIdAndUpdate(orderId, {
+            const order = await Order.findByIdAndUpdate(orderId, {
                 orderStatus: EOrderStatus.Confirmed,
             });
+            await order?.save();
 
             // Make sth
             await this.cronShipmentService.createShipmentsForOrder(orderId);

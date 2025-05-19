@@ -119,7 +119,7 @@ export class ZaloPayService {
             });
 
             // Make sth
-            this.cronShipmentService.createShipmentsForOrder(orderId);
+            await this.cronShipmentService.createShipmentsForOrder(orderId);
 
             return BaseResponse.success('Payment successful', EHttpStatusCode.OK);
 

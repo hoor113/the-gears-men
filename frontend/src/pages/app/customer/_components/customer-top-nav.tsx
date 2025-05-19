@@ -207,6 +207,10 @@ export default function CustomerTopNav() {
 
                     return (
                       <Box
+                        onClick={() => {
+                          navigate(`/customer/product/${product.id}`)
+                          handleSearchBlur();
+                        }}
                         key={product.id}
                         display="flex"
                         alignItems="center"
@@ -216,7 +220,7 @@ export default function CustomerTopNav() {
                           '&:hover': { backgroundColor: '#f5f5f5' },
                           cursor: 'pointer',
                           borderBottom: '1px solid #eee',
-                        }}
+                        }}              
                       >
                         <Box
                           sx={{

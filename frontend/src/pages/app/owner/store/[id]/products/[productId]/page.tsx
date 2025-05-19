@@ -1,4 +1,3 @@
-import NiceModal from '@ebay/nice-modal-react';
 import {
   Box,
   Button,
@@ -19,20 +18,17 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 import appService from '@/services/app/app.service';
 
-import ProductModal from '../../_components/product-modal';
-import { categoriesObject } from '../../_services/product.model';
-import productsService from '../../_services/product.service';
-import { useCart } from '../../cart/context/cart.context';
+import { categoriesObject } from '../_services/product.model';
+import ownerProductsService from '../_services/product.service';
 
 const SingleProductPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const [_, cartDispatch] = useCart();
+  const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
 
-  const { data: product, isLoading } = useQuery({
-    queryKey: ['products/getOne', id],
-    queryFn: () => productsService.getOne(id as string),
-    enabled: !!id,
+  const { data: product, isLoading } = useQuery<any>({
+    queryKey: ['products/getOne', productId],
+    queryFn: () => ownerProductsService.getOne(productId as string),
+    enabled: !!productId,
   }) as any;
 
   useEffect(() => {
@@ -43,20 +39,12 @@ const SingleProductPage = () => {
     }
   }, [isLoading]);
 
-  const [selectedImage, setSelectedImage] = useState<string>(
-    '/assets/images/no-image.png',
-  );
-  const [hasImages, setHasImages] = useState<boolean>(false);
+  console.log('product', product);
 
-  useEffect(() => {
-    if (product?.images?.length > 0) {
-      setSelectedImage(product.images[0]);
-      console.log(product.images);
-      if (product.images.length > 1) {
-        setHasImages(true);
-      }
-    }
-  }, [product]);
+  const hasImages = product?.images?.length > 0;
+  const [selectedImage, setSelectedImage] = useState<string>(
+    hasImages ? product.images[0] : '/assets/images/no-image.png',
+  );
 
   const [showFullDesc, setShowFullDesc] = useState(false);
 
@@ -66,33 +54,13 @@ const SingleProductPage = () => {
       )
     : null;
 
-  const handleAddToCart = () => {
-    NiceModal.show(ProductModal, {
-      product: product,
-      addToCart: (product: any, quantity: number) => {
-        cartDispatch({
-          type: 'ADD_ITEM',
-          payload: { ...product, quantity },
-        });
-      },
-    });
-  };
-
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', py: 4, px: { xs: 2, md: 6 } }}>
       <Button
         variant="outlined"
         onClick={() => navigate(-1)}
         sx={{
-          borderRadius: '999px',
-          textTransform: 'none',
-          minWidth: 'auto',
-          px: 2,
-          py: 0.5,
-          fontWeight: 'bold',
-          marginBottom: '20px',
-          background: 'linear-gradient(to right, #f97316, #f59e0b)',
-          color: 'white',
+          mb: 2,
         }}
       >
         ← Quay lại
@@ -107,7 +75,7 @@ const SingleProductPage = () => {
                 mb: 2,
                 position: 'relative',
                 width: 320,
-                height: 320,
+                height: 240,
                 backgroundColor: '#fff',
                 overflow: 'hidden', // quan trọng
               }}
@@ -127,7 +95,7 @@ const SingleProductPage = () => {
             </Box>
 
             {/* Swiper hình nhỏ */}
-            {hasImages && product?.images?.length > 1 && (
+            {hasImages && product.images.length > 1 && (
               <Box
                 className="w-full mt-2"
                 sx={{
@@ -295,16 +263,6 @@ const SingleProductPage = () => {
                 </Typography>
               )}
             </Box>
-
-            {/* Nút thêm vào giỏ (chưa có logic) */}
-            <Button
-              variant="contained"
-              color="warning"
-              sx={{ fontWeight: 'bold', mt: 2 }}
-              onClick={handleAddToCart}
-            >
-              THÊM VÀO GIỎ HÀNG
-            </Button>
           </Box>
         </Box>
 

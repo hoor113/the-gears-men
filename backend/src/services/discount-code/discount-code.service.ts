@@ -9,6 +9,7 @@ import {
     DiscountCodeCastDto,
     GetDiscountCodeCustomerDto,
     CreateDiscountCodeCastDto,
+    GetAllDiscountCodesDto,
 } from './dto/discount-code.dto';
 import { BaseGetAllDto } from '@/common/base-get-all-dto';
 import { buildQuery, EExtraConditionType, IExtraCondition } from '@/utils/utils';
@@ -18,11 +19,15 @@ import User from '@/models/user.model';
 
 @Service()
 export class DiscountCodeService {
-    public async getAllDiscountCodeCasts(dto: BaseGetAllDto): Promise<BaseResponse<DiscountCodeCastDto[]>> {
+    public async getAllDiscountCodeCasts(dto: GetAllDiscountCodesDto): Promise<BaseResponse<DiscountCodeCastDto[]>> {
         try {
             // Fetch all discount codes from the database
             const query = buildQuery(dto);
-            const discountCodes = await DiscountCodeCast.find(query).skip(dto.skipCount).limit(dto.maxResultCount);
+            const totalResultCount = await DiscountCodeCast.countDocuments(query);
+            const discountCodes = await DiscountCodeCast.find(query)
+                .sort({ createdAt: -1 })
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount);
                 // .populate('discountCodeCastId', 'code type quantity discountCalculationMethod discountQuantity expiryDate');
 
             // Check if any discount codes were found
@@ -35,7 +40,7 @@ export class DiscountCodeService {
 
             // Map the discount codes to the response format
             const responseData = discountCodes.map((code) => ({
-                _id: code._id,
+                id: code._id,
                 code: code.code,
                 type: code.type,
                 quantity: code.quantity,
@@ -44,7 +49,7 @@ export class DiscountCodeService {
                 expiryDate: code.expiryDate,
             }));
 
-            return BaseResponse.success(responseData);
+            return BaseResponse.success(responseData, totalResultCount);
         } catch (error: any) {
             return BaseResponse.error(
                 error.message || 'Failed to fetch discount codes',
@@ -156,15 +161,15 @@ export class DiscountCodeService {
     //     }
     // } 
 
-    public async deleteDiscountCodeCast(dto: StringEntityDto): Promise<BaseResponse<boolean>> {
+    public async deleteDiscountCodeCast(id: string): Promise<BaseResponse<boolean>> {
         try {
             // Delete the discount code by ID from the database
-            const discountCodeCast = await DiscountCodeCast.findByIdAndDelete(dto.id);
+            const discountCodeCast = await DiscountCodeCast.findByIdAndDelete(id);
 
             // Check if the discount code was found
             if (!discountCodeCast) {
                 return BaseResponse.error(
-                    `Discount code with ID ${dto.id} not found`,
+                    `Discount code with ID ${id} not found`,
                     EHttpStatusCode.NOT_FOUND
                 );
             }

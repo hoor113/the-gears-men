@@ -148,14 +148,12 @@ export class ProductController {
         }
     }
 
-    @Delete('/Delete')
+    @Delete('/Delete/:id')
     @UseBefore(authorizeRoles([EUserRole.StoreOwner]), TokenDecoderMiddleware)
     async deleteProduct(
-        @QueryParams() query: StringEntityDto,
-        @Req() req: Request,
+        @Param('id') id: string,
         @Res() res: Response,
     ) {
-        const id = query.id;
         if (!id) {
             return res
                 .status(400)

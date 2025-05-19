@@ -1,6 +1,7 @@
 import NiceModal from '@ebay/nice-modal-react';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {
   Box,
   IconButton,
@@ -9,37 +10,68 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import React from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { enqueueSnackbar } from 'notistack';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import ConfirmModal from '@/components/confirm-modal';
+import appService from '@/services/app/app.service';
+
+import { useStore } from '../../../_services/store.context';
 import { Product } from '../_services/product.model';
-import { useCart } from '../cart/context/cart.context';
-import ProductModal from './product-modal';
+import ownerProductsService from '../_services/product.service';
+import UpdateProductModal from './update-product-modal';
 
 type ProductProps = {
   product: Product;
 };
 
-const ProductItem: React.FC<ProductProps> = ({ product }) => {
+const OwnerProductItem: React.FC<ProductProps> = ({ product }) => {
+  const queryClient = useQueryClient();
+  const [storeState, _] = useStore();
+  const storeId = useMemo(() => storeState.store?.id, [storeState.store?.id]);
+  const storeName = useMemo(
+    () => storeState.store?.name,
+    [storeState.store?.name],
+  );
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [_, cartDispatch] = useCart();
   const navigate = useNavigate();
 
-  const handleAddToCart = () => {
-    NiceModal.show(ProductModal, {
-      product: product,
-      addToCart: (product: Product, quantity: number) => {
-        cartDispatch({
-          type: 'ADD_ITEM',
-          payload: { ...product, quantity },
-        });
-      },
-    });
+  const handleViewDetail = () => {
+    navigate(`/owner/store/${storeId}/products/${product.id}`);
   };
 
-  const handleViewDetail = () => {
-    navigate(`/customer/product/${product.id}`);
+  const { mutate, isLoading } = useMutation({
+    mutationFn: (id: any) => ownerProductsService.delete(id),
+    onSuccess: () => {
+      appService.hideLoadingModal();
+      enqueueSnackbar('Xóa sản phẩm thành công', {
+        variant: 'success',
+      });
+      queryClient.refetchQueries(['owner/products/getAll', storeId]);
+    },
+    onError: (err: any) => {
+      appService.hideLoadingModal();
+      enqueueSnackbar(err.response?.data?.message || 'Đã có lỗi xảy ra', {
+        variant: 'error',
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (isLoading) {
+      appService.showLoadingModal();
+    }
+  }, [isLoading]);
+
+  const handleDeleteProduct = (productId: string) => {
+    NiceModal.show(ConfirmModal, {
+      title: 'Bạn có chắc chắn muốn xóa cửa hàng này không?',
+      btn2Click: () => mutate(productId),
+    });
   };
 
   const mainImage =
@@ -50,7 +82,6 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
   const hasDiscount =
     product.priceAfterDiscount !== null &&
     product.priceAfterDiscount < product.price;
-
   const displayPrice = hasDiscount ? product.priceAfterDiscount : product.price;
 
   const discountPercent = hasDiscount
@@ -90,16 +121,27 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
                 <SearchIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Thêm vào giỏ hàng">
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0}
-                >
-                  <ShoppingCartIcon />
-                </IconButton>
-              </span>
+            <Tooltip title="Sửa sản phẩm">
+              <IconButton
+                size="small"
+                onClick={() =>
+                  NiceModal.show(UpdateProductModal, {
+                    storeId: storeId,
+                    storeName: storeName,
+                    row: product,
+                  })
+                }
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Xóa sản phẩm">
+              <IconButton
+                size="small"
+                onClick={() => handleDeleteProduct(product.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
             </Tooltip>
           </Box>
         )}
@@ -153,18 +195,27 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
                 <SearchIcon fontSize="inherit" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Thêm vào giỏ hàng">
-              <span>
-                <IconButton
-                  color="primary"
-                  size="medium"
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0}
-                  aria-label="Thêm vào giỏ hàng"
-                >
-                  <ShoppingCartIcon fontSize="inherit" />
-                </IconButton>
-              </span>
+            <Tooltip title="Sửa sản phẩm">
+              <IconButton
+                size="medium"
+                onClick={() =>
+                  NiceModal.show(UpdateProductModal, {
+                    storeId: storeId,
+                    storeName: storeName,
+                    row: product,
+                  })
+                }
+              >
+                <EditIcon fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title="Xóa sản phẩm"
+              onClick={() => handleDeleteProduct(product.id)}
+            >
+              <IconButton size="medium">
+                <DeleteIcon fontSize="inherit" />
+              </IconButton>
             </Tooltip>
           </Box>
         )}
@@ -173,4 +224,4 @@ const ProductItem: React.FC<ProductProps> = ({ product }) => {
   );
 };
 
-export default ProductItem;
+export default OwnerProductItem;

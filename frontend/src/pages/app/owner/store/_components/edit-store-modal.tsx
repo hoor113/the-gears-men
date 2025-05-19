@@ -105,8 +105,8 @@ const EditStoreModal = NiceModal.create((props: TAddStoreModalProps) => {
       }}
     >
       <BaseCrudFormModal
-        name="addStore"
-        title={'Thêm cửa hàng'}
+        name="editStore"
+        title={'Sửa cửa hàng'}
         mode="edit"
         open={true}
         onClose={() => modal.hide()}

@@ -57,7 +57,7 @@ const PersonnelMainShipmentPage = ({ status }: MainShipmentPageProps) => {
   const { mutate: deliverMutation } = useMutation({
     mutationFn: (id: string) =>
       shipmentService.confirmShipment({
-        id: id,
+        shipmentId: id,
       }),
     onSuccess: () => {
       appService.hideLoadingModal();
@@ -288,9 +288,9 @@ const PersonnelMainShipmentPage = ({ status }: MainShipmentPageProps) => {
 
   const extendActions = [];
 
-  if (status === EShipmentStatus.Confirmed) {
+  if (status === EShipmentStatus.Stored) {
     extendActions.push({
-      title: 'Chọn nhân viên giao hàng',
+      title: 'Xác nhận giao hàng',
       icon: <LocalShipping />,
       onClick: (_row: any) => {
         deliverMutation(_row.id);
@@ -327,7 +327,7 @@ const PersonnelMainShipmentPage = ({ status }: MainShipmentPageProps) => {
       hideSelectRowCheckbox
       hideAddBtn
       hideEditAction={true}
-      hideDeleteAction={false}
+      hideDeleteAction={true}
       hideViewAction={false}
       getAllPath="/personnel"
       deletePath="/Delete"

@@ -20,6 +20,7 @@ export type TInputType =
   | 'rte'
   | 'uploadimage'
   | 'uploadlistimage'
+  | 'fixeduploadlistimage'
   | 'custom'
   | 'blank'
   | 'uploadfile'

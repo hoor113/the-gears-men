@@ -1,10 +1,11 @@
 import { Box, Button, Container, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { EProductCategory, Product } from './_services/product.model';
-import BlockProducts from './_components/block-products';
 import { useMemo, useRef } from 'react';
+
 import AdviceSection from './_components/advice-section';
+import BlockProducts from './_components/block-products';
 import SaleBanner from './_components/sale-banner';
+import { EProductCategory, Product } from './_services/product.model';
 import productsService from './_services/product.service';
 
 interface Category {
@@ -15,7 +16,6 @@ interface Category {
 }
 
 const CustomerPage = () => {
-
   const saleRef = useRef<HTMLDivElement | null>(null);
 
   const handleScrollToSale = () => {
@@ -138,11 +138,12 @@ const CustomerPage = () => {
 
   return (
     <>
-      <Box ref={saleRef}
-      // sx={{
-      //   minHeight: '100vh',
-      //   background: `url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat`, py: 4,
-      // }}
+      <Box
+        ref={saleRef}
+        // sx={{
+        //   minHeight: '100vh',
+        //   background: `url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat`, py: 4,
+        // }}
       >
         <Container maxWidth={'lg'}>
           {/* Hero banner */}
@@ -184,8 +185,12 @@ const CustomerPage = () => {
             <BlockProducts
               key={item?.data?.key}
               path={`category/${categories[idx].key}`}
-              title={`Danh mục ${item?.data?.title || ""}`}
-              products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []}
+              title={`Danh mục ${item?.data?.title || ''}`}
+              products={
+                Array.isArray(item?.data?.products)
+                  ? (item.data.products as Product[])
+                  : []
+              }
             />
           ))}
 
@@ -216,7 +221,6 @@ const CustomerPage = () => {
               size="large"
               onClick={handleScrollToSale}
             >
-            
               Xem sản phẩm của chúng tôi
             </Button>
           </Box>

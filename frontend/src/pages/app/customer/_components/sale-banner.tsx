@@ -40,7 +40,7 @@ const SaleBanner = () => {
                 height: 'auto',
                 objectFit: 'cover',
                 borderRadius: '12px',
-                maxHeight: "400px"
+                maxHeight: '400px',
               }}
             />
           </SwiperSlide>

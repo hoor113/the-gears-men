@@ -96,7 +96,7 @@ const UpdateProductModal = NiceModal.create((props: TUpdateStoreModalProps) => {
       description: row?.description || '',
       price: row?.price || 0,
       stock: row?.stock || 0,
-      category: EProductCategory.Others,
+      category: row?.category || EProductCategory.Others,
       imageUrl: row?.imageUrl,
     },
     resolver: yupResolver(schema),
@@ -197,6 +197,7 @@ const UpdateProductModal = NiceModal.create((props: TUpdateStoreModalProps) => {
                 type: 'autocomplete',
                 required: true,
                 options: categoryOptions,
+                readOnly: true,
               }}
             />
           </Grid>

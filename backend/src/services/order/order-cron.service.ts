@@ -11,15 +11,15 @@ export class OrderCronService {
     private shipmentService: CronShipmentService;
 
     // For testing: 3 minutes instead of 24 hours
-    private readonly CONFIRMATION_TIMEOUT_CASH_MS = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
-    private readonly CONFIRMATION_TIMEOUT_DIGITAL_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
+    private readonly CONFIRMATION_TIMEOUT_CASH_MS = 5 * 60 * 1000; // 12 hours in milliseconds
+    private readonly CONFIRMATION_TIMEOUT_DIGITAL_MS = 15 * 60 * 1000; // 10 minutes in milliseconds
     // private readonly CONFIRMATION_TIMEOUT_CASH_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
     constructor() {
         this.shipmentService = Container.get(CronShipmentService);
 
         // Run every hour to check for orders that need confirmation (more frequent for testing)
-        this.orderConfirmationJob = new CronJob('*/10 * * * *', async () => {
+        this.orderConfirmationJob = new CronJob('*/1 * * * *', async () => {
             await this.processOrderConfirmations();
             await this.processDigitalOrderCountdown();
         });
@@ -117,7 +117,12 @@ export class OrderCronService {
             const confirmationTime = new Date();
 
             // Set confirmation time to 3 minutes from now (for testing)
-            confirmationTime.setTime(confirmationTime.getTime() + this.CONFIRMATION_TIMEOUT_CASH_MS);
+            if (paymentMethod === EPaymentMethod.Cash) {
+                confirmationTime.setTime(confirmationTime.getTime() + this.CONFIRMATION_TIMEOUT_CASH_MS);
+            }
+            else {
+                confirmationTime.setTime(confirmationTime.getTime() + this.CONFIRMATION_TIMEOUT_DIGITAL_MS);
+            }
 
             // For production: 24 hours from now
             // confirmationTime.setHours(confirmationTime.getHours() + 24);

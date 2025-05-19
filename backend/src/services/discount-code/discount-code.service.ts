@@ -22,7 +22,11 @@ export class DiscountCodeService {
         try {
             // Fetch all discount codes from the database
             const query = buildQuery(dto);
-            const discountCodes = await DiscountCodeCast.find(query).skip(dto.skipCount).limit(dto.maxResultCount);
+            query.quantity = { $gt: 0 }; // Ensure quantity is greater than 0
+            const discountCodes = await DiscountCodeCast
+                .find(query)
+                .skip(dto.skipCount)
+                .limit(dto.maxResultCount);
                 // .populate('discountCodeCastId', 'code type quantity discountCalculationMethod discountQuantity expiryDate');
 
             // Check if any discount codes were found

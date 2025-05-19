@@ -11,7 +11,7 @@ export interface IOrderItem {
     _id: string;
     name: string;
     price: number;
-    imageUrl?: string;
+    images: string[];
   };
   quantity: number;
   price: number;
@@ -123,7 +123,7 @@ function transformOrderData(orders: IOrderRaw[]): IOrderHistoryItem[] {
           name: item.productId.name,
           price: item.price,
           quantity: item.quantity,
-          imageUrl: item.productId.imageUrl,
+          imageUrl: item.productId.images[0] || undefined,
         },
         productDiscountCode: item.productDiscountCode?.code,
         shippingDiscountCode: item.shippingDiscountCode?.code,
@@ -229,7 +229,7 @@ class OrderHistoryService extends BaseCrudService {
                       _id: item.productId._id || '',
                       name: item.productId.name || 'Unknown Product',
                       price: item.productId.price || 0,
-                      imageUrl: item.productId.imageUrl,
+                      imageUrl: item.productId.images[0] || undefined,
                     }
                   : {
                       _id: '',

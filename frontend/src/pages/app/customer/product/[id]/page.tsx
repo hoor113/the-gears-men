@@ -16,11 +16,15 @@ import 'swiper/css';
 import 'swiper/css/autoplay';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-
 import ProductModal from '../../_components/product-modal';
 import { categoriesObject } from '../../_services/product.model';
 import productsService from '../../_services/product.service';
 import { useCart } from '../../cart/context/cart.context';
+
+const roundUpToThousand = (price: number) => {
+  return Math.ceil(price / 1000) * 1000;
+};
+
 
 const SingleProductPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +59,7 @@ const SingleProductPage = () => {
 
   const discountPercent = product?.priceAfterDiscount
     ? Math.round(
-      ((product.price - product.priceAfterDiscount) / product.price) * 100,
+      ((roundUpToThousand(product.price) - roundUpToThousand(product.priceAfterDiscount)) / roundUpToThousand(product.price)) * 100,
     )
     : null;
 
@@ -261,7 +265,7 @@ const SingleProductPage = () => {
               {product?.priceAfterDiscount ? (
                 <>
                   <Typography variant="h6" fontWeight="bold" color="error">
-                    {product?.priceAfterDiscount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    {roundUpToThousand(product?.priceAfterDiscount)?.toLocaleString('vi-VN')}₫
                   </Typography>
                   <Typography
                     variant="body1"
@@ -270,12 +274,12 @@ const SingleProductPage = () => {
                       color: '#888',
                     }}
                   >
-                    {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    {roundUpToThousand(product?.price)?.toLocaleString('vi-VN')}₫
                   </Typography>
                 </>
               ) : (
                 <Typography variant="h6" fontWeight="bold">
-                  {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  {roundUpToThousand(product?.price)?.toLocaleString('vi-VN')}₫
                 </Typography>
               )}
             </Box>

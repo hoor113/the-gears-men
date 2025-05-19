@@ -30,6 +30,11 @@ import ProductItem from '../../_components/product-item';
 import { Product } from '../../_services/product.model';
 import productsService from '../../_services/product.service';
 
+const roundUpToThousand = (price: number) => {
+  return Math.ceil(price / 1000) * 1000;
+};
+
+
 const sortOptions = [
   { label: 'Giá tăng dần', value: 'priceAsc' },
   { label: 'Giá giảm dần', value: 'priceDesc' },
@@ -97,7 +102,7 @@ const SingleCategoryPage = () => {
   useEffect(() => {
     if (getAllCategoryProduct?.length && !hasInitializedPriceRange.current) {
       const prices = getAllCategoryProduct.map(
-        (p: any) => p?.priceAfterDiscount ?? p?.price,
+        (p: any) => roundUpToThousand(p?.priceAfterDiscount ?? p?.price),
       );
       const maxPrice = Math.max(...prices);
       const step = Math.ceil(maxPrice / 5 / 10000) * 10000;
@@ -121,8 +126,8 @@ const SingleCategoryPage = () => {
 
   const sortedProducts = useMemo(() => {
     return [...getAllCategoryProduct].sort((a: any, b: any) => {
-      const price_A = a.priceAfterDiscount ?? a.price;
-      const price_B = b.priceAfterDiscount ?? b.price;
+      const price_A = roundUpToThousand(a.priceAfterDiscount ?? a.price);
+      const price_B = roundUpToThousand(b.priceAfterDiscount ?? b.price);
 
       switch (sortOrder) {
         case 'priceAsc':
@@ -130,8 +135,8 @@ const SingleCategoryPage = () => {
         case 'priceDesc':
           return price_B - price_A;
         case 'discountDesc':
-          const discount_A = (a.price - a.priceAfterDiscount) / a.price || 0;
-          const discount_B = (b.price - b.priceAfterDiscount) / b.price || 0;
+          const discount_A = (roundUpToThousand(a.price) - roundUpToThousand(a.priceAfterDiscount)) / roundUpToThousand(a.price) || 0;
+          const discount_B = (roundUpToThousand(b.price) - roundUpToThousand(b.priceAfterDiscount)) / roundUpToThousand(b.price) || 0;
           return discount_B - discount_A;
         case 'nameAsc':
           return a.name.localeCompare(b.name);

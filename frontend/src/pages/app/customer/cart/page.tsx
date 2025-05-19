@@ -98,7 +98,7 @@ const CartPage = () => {
                           color="primary"
                           fontWeight="bold"
                         >
-                          {(
+                          {roundUpToThousand(
                             item.priceAfterDiscount || item.price
                           ).toLocaleString('vi-VN')}
                           ₫
@@ -110,7 +110,7 @@ const CartPage = () => {
                               color="text.secondary"
                               sx={{ textDecoration: 'line-through' }}
                             >
-                              {item.price.toLocaleString('vi-VN')}₫
+                              {roundUpToThousand(item.price).toLocaleString('vi-VN')}₫
                             </Typography>
                           )}
                       </Grid>

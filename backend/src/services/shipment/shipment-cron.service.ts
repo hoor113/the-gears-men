@@ -69,38 +69,38 @@ export class CronShipmentService {
         }
     }
 
-    /**
-     * Assign delivery personnel to a shipment
-     */
-    public async assignDeliveryPersonnel(
-        shipmentId: string | mongoose.Types.ObjectId,
-        deliveryPersonnelId: string | mongoose.Types.ObjectId
-    ): Promise<BaseResponse<ShipmentDto | unknown>> {
-        try {
-            const shipment = await Shipment.findByIdAndUpdate(
-                shipmentId,
-                {
-                    deliveryPersonnel: deliveryPersonnelId,
-                    status: EShipmentStatus.Confirmed
-                },
-                { new: true }
-            );
+    // /**
+    //  * Assign delivery personnel to a shipment
+    //  */
+    // public async assignDeliveryPersonnel(
+    //     shipmentId: string | mongoose.Types.ObjectId,
+    //     deliveryPersonnelId: string | mongoose.Types.ObjectId
+    // ): Promise<BaseResponse<ShipmentDto | unknown>> {
+    //     try {
+    //         const shipment = await Shipment.findByIdAndUpdate(
+    //             shipmentId,
+    //             {
+    //                 deliveryPersonnel: deliveryPersonnelId,
+    //                 status: EShipmentStatus.Confirmed
+    //             },
+    //             { new: true }
+    //         );
 
-            if (!shipment) {
-                return BaseResponse.error(`Shipment with id ${shipmentId} not found`, EHttpStatusCode.NOT_FOUND);
-            }
+    //         if (!shipment) {
+    //             return BaseResponse.error(`Shipment with id ${shipmentId} not found`, EHttpStatusCode.NOT_FOUND);
+    //         }
 
-            return BaseResponse.success(
-                shipment,
-                undefined,
-                `Delivery personnel successfully assigned to shipment ${shipmentId}`,
-                EHttpStatusCode.OK
-            );
-        } catch (error) {
-            return BaseResponse.error(
-                (error as Error)?.message || 'Internal Server Error',
-                EHttpStatusCode.INTERNAL_SERVER_ERROR
-            );
-        }
-    }
+    //         return BaseResponse.success(
+    //             shipment,
+    //             undefined,
+    //             `Delivery personnel successfully assigned to shipment ${shipmentId}`,
+    //             EHttpStatusCode.OK
+    //         );
+    //     } catch (error) {
+    //         return BaseResponse.error(
+    //             (error as Error)?.message || 'Internal Server Error',
+    //             EHttpStatusCode.INTERNAL_SERVER_ERROR
+    //         );
+    //     }
+    // }
 }

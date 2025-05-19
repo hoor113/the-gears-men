@@ -7,9 +7,16 @@ import axios from 'axios';
 import { zalopayConfig } from '@/config/zalopay';
 import Order from '@/models/order.model';
 import moment from 'moment';
+import { CronShipmentService } from '../shipment/shipment-cron.service';
 
 @Service()
 export class ZaloPayService {
+    private cronShipmentService: CronShipmentService;
+
+    constructor() {
+        this.cronShipmentService = new CronShipmentService();
+    }
+
     public async createPaymentData(orderData: IOrder): Promise<any> {
         try {
             const transID = Math.floor(Math.random() * 1000000);
@@ -108,8 +115,11 @@ export class ZaloPayService {
             const orderId = embedData.orderId;
 
             await Order.findByIdAndUpdate(orderId, {
-                orderStatus: EOrderStatus.Pending,
+                orderStatus: EOrderStatus.Confirmed,
             });
+
+            // Make sth
+            this.cronShipmentService.createShipmentsForOrder(orderId);
 
             return BaseResponse.success('Payment successful', EHttpStatusCode.OK);
 

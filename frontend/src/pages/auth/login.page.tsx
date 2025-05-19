@@ -1,58 +1,57 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Link, Stack, TextField, Typography } from '@mui/material';
+import { Email, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
-import { useContext } from 'react';
+import { enqueueSnackbar } from 'notistack';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import { Link } from 'react-router-dom';
 
-import LoadingButton from '@/components/button/loading-button';
-import PasswordInput from '@/components/field/password-input';
-import SelectChangeLocale from '@/components/field/select-change-locale';
-import useTranslation from '@/hooks/use-translation';
-import i18n from '@/i18n';
 import appService from '@/services/app/app.service';
 import { AuthContext } from '@/services/auth/auth.context';
+// hoặc next/link nếu dùng Next.js
 import { ILoginInput } from '@/services/auth/auth.model';
 import authService from '@/services/auth/auth.service';
 
-const loginSchema = yup.object({
-  email: yup.string().required(i18n.t('userNameOrEmailAddress-required')),
-  password: yup.string().required(i18n.t('password-required')),
-});
+type FormData = {
+  email: string;
+  password: string;
+};
 
 const LoginPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const [, dispatch] = useContext(AuthContext);
-
-  const { t } = useTranslation();
-
-  const { enqueueSnackbar } = useSnackbar();
-
   const queryClient = useQueryClient();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
-    resolver: yupResolver(loginSchema),
-    mode: 'onChange',
-  });
+  } = useForm<FormData>();
 
-  const { mutate, isLoading: loginLoading } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: (data: ILoginInput) => authService.login(data),
     onSuccess: (data) => {
       dispatch({ type: 'setIsAuth', payload: true });
       dispatch({ type: 'setCurrentUser', payload: data });
 
       appService.hideLoadingModal();
-      enqueueSnackbar(t('Đăng nhập thành công'), { variant: 'success' });
+      enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
 
       queryClient.refetchQueries({ queryKey: ['auth/getUserInfo'] });
     },
     onError: (err: any) => {
       appService.hideLoadingModal();
-      enqueueSnackbar(err.response.data.message || t('Đã có lỗi xảy ra'), {
+      enqueueSnackbar(err.response.data.message || 'Đã có lỗi xảy ra', {
         variant: 'error',
       });
     },
@@ -63,112 +62,101 @@ const LoginPage = () => {
     appService.showLoadingModal();
   };
 
-  return (
-    <Box
-      sx={{
-        height: '100vh',
-        overflow: 'hidden',
-        backgroundColor: 'background.paper',
-        flex: '1 1 auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-      }}
-    >
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'grey.400',
-          backgroundPosition: 'bottom',
-          zIndex: 0,
-        }}
-      ></Box>
-      <Box
-        sx={{
-          maxWidth: 550,
-          px: 3,
-          pt: 4,
-          pb: 6,
-          width: '100%',
-          backgroundColor: 'background.paper',
-          borderRadius: 1,
-          zIndex: 1,
-          position: 'relative',
-        }}
-      >
-        <div>
-          <Stack
-            spacing={1}
-            sx={{
-              mb: 3,
-              position: 'relative',
-              '.btn-locale': {
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                mt: 0,
-              },
-            }}
-          >
-            <Typography variant="h4">{t('Đăng nhập')}</Typography>
-            <Typography color="text.secondary" variant="subtitle2">
-              {t('Chưa có tài khoản') + '? '}
-              <Link href="/auth/register" underline="hover" variant="subtitle2">
-                {t('Đăng ký ngay')}
-              </Link>
-            </Typography>
-            <SelectChangeLocale
-              buttonProps={{
-                className: 'btn-locale',
-                size: 44,
-                style: {
-                  fontSize: 26,
-                },
-              }}
-            />
-          </Stack>
+  const toggleShowPassword = () => setShowPassword((show) => !show);
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <TextField
-              fullWidth
-              label={t('Email')}
-              error={!!errors.email?.message}
-              helperText={errors.email?.message}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('email')}
-            />
-            <PasswordInput
-              fullWidth
-              label={t('Mật khẩu')}
-              error={!!errors.password?.message}
-              helperText={errors.password?.message}
-              disabled={loginLoading}
-              required
-              margin="dense"
-              style={{ marginBottom: 12 }}
-              {...register('password')}
-            />
-            <LoadingButton
-              fullWidth
-              size="large"
-              type="submit"
-              variant="contained"
-              loading={loginLoading}
-            >
-              {t('Đăng nhập')}
-            </LoadingButton>
+  return (
+    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-50 via-yellow-100 to-orange-200 px-4">
+      <div className="absolute w-80 h-80 bg-orange-300 opacity-30 rounded-full blur-3xl animate-pulse -z-10 top-10 left-10"></div>
+
+      <Card className="w-full max-w-md shadow-xl rounded-2xl animate-fade-in transition-all duration-500 hover:shadow-2xl z-10">
+        <CardContent>
+          <Box className="mb-8 text-center">
+            <Typography variant="h4" className="text-orange-600 font-bold">
+              Đăng nhập
+            </Typography>
+          </Box>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <Box>
+              <TextField
+                label="Email"
+                variant="outlined"
+                fullWidth
+                {...register('email', { required: 'Vui lòng nhập email' })}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Email className="text-orange-500" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
+            <Box>
+              <TextField
+                label="Mật khẩu"
+                type={showPassword ? 'text' : 'password'}
+                variant="outlined"
+                fullWidth
+                {...register('password', {
+                  required: 'Vui lòng nhập mật khẩu',
+                })}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock className="text-orange-500" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={toggleShowPassword}
+                        edge="end"
+                        aria-label={
+                          showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'
+                        }
+                      >
+                        {showPassword ? (
+                          <VisibilityOff className="text-orange-500" />
+                        ) : (
+                          <Visibility className="text-orange-500" />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
+            <CardActions className="pt-2">
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                className="!bg-orange-500 hover:!bg-orange-600 text-white font-semibold py-2 rounded-lg transition-all duration-300"
+              >
+                Đăng nhập
+              </Button>
+            </CardActions>
           </form>
-        </div>
-      </Box>
-    </Box>
+        </CardContent>
+
+        <Box className="text-center text-sm text-gray-600 pb-5 px-4">
+          Chưa có tài khoản?{' '}
+          <Link
+            to="/auth/register"
+            className="text-orange-500 hover:underline font-medium"
+          >
+            Đăng ký ngay
+          </Link>
+        </Box>
+      </Card>
+    </div>
   );
 };
 

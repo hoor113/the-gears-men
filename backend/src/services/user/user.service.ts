@@ -5,6 +5,7 @@ import { EHttpStatusCode } from '@/utils/enum';
 import { buildQuery } from '@/utils/utils';
 import { Service } from 'typedi';
 import {
+    ChangePasswordDto,
     CreateUserDto,
     GetAllUsersDto,
     UpdateUserDto,
@@ -259,6 +260,34 @@ export class UserService {
         } catch (error) {
             return BaseResponse.error(
                 'Error fetching configuration',
+                EHttpStatusCode.INTERNAL_SERVER_ERROR,
+                error,
+            );
+        }
+    }
+    public async changePassword(
+        id: string,
+        dto: ChangePasswordDto
+    ): Promise<BaseResponse<boolean>> {
+        try {
+            const user = await User.findById(id);
+            if (!user) {
+                return BaseResponse.error('User not found');
+            }
+
+            const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
+            if (!isMatch) {
+                return BaseResponse.error('Current password is incorrect');
+            }
+
+            const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+            user.password = hashedPassword;
+            await user.save();
+
+            return BaseResponse.success(true, undefined, 'Password changed successfully');
+        } catch (error) {
+            return BaseResponse.error(
+                'Error changing password',
                 EHttpStatusCode.INTERNAL_SERVER_ERROR,
                 error,
             );

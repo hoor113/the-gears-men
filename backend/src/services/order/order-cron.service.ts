@@ -11,7 +11,7 @@ export class OrderCronService {
     private shipmentService: CronShipmentService;
 
     // For testing: 3 minutes instead of 24 hours
-    private readonly CONFIRMATION_TIMEOUT_CASH_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    private readonly CONFIRMATION_TIMEOUT_CASH_MS = 1 * 60 * 1000; // 24 hours in milliseconds
     private readonly CONFIRMATION_TIMEOUT_DIGITAL_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
     // private readonly CONFIRMATION_TIMEOUT_CASH_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 

@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import useAuth from '@/hooks/use-auth';
 import useDebounce from '@/hooks/use-debounce';
 import usePopover from '@/hooks/use-popover';
 import productsService from '@/pages/app/customer/_services/product.service';
@@ -42,6 +43,7 @@ const AvatarStyled = styled(Avatar)(({ theme }) => ({
 }));
 
 export default function CustomerTopNav() {
+  const authQuery = useAuth();
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword, 300);
@@ -333,7 +335,7 @@ export default function CustomerTopNav() {
           onClick={accountPopover.handleOpen}
           ref={accountPopover.anchorRef}
         >
-          <AvatarStyled src={''} />
+          <AvatarStyled src={authQuery?.data?.avatarPicture || ''} />
         </IconButton>
 
         <AccountPopover

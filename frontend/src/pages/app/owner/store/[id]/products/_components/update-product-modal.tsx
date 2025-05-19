@@ -125,6 +125,7 @@ const UpdateProductModal = NiceModal.create((props: TUpdateStoreModalProps) => {
       }
       const dataToSubmit = {
         ...data,
+        id: row?.id,
         imageUrl: imageUrlResult,
       };
       mutate(dataToSubmit);

@@ -17,22 +17,17 @@ import 'swiper/css/autoplay';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import appService from '@/services/app/app.service';
-
 import ProductModal from '../../_components/product-modal';
 import { categoriesObject } from '../../_services/product.model';
 import productsService from '../../_services/product.service';
 import { useCart } from '../../cart/context/cart.context';
-
-const formatCurrency = (value: number) =>
-    value?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'});
 
 const SingleProductPage = () => {
   const { id } = useParams<{ id: string }>();
   const [_, cartDispatch] = useCart();
   const navigate = useNavigate();
 
-  const { data: product, isLoading } = useQuery({
+  const { data: product } = useQuery({
     queryKey: ['products/getOne', id],
     queryFn: () => productsService.getOne(id as string),
     enabled: !!id,
@@ -40,19 +35,28 @@ const SingleProductPage = () => {
 
   console.log('product', product);
 
-  const hasImages = product?.images?.length > 0;
-  const [selectedImage, setSelectedImage] = useState<string>(
-    hasImages ? product.images[0] : '/assets/images/no-image.png',
-  );
+  const [selectedImage, setSelectedImage] = useState<string>('/assets/images/no-image.png');
+  const [hasImages, setHasImages] = useState<boolean>(false)
 
-  
+  useEffect(() => {
+    if (product?.images?.length > 0) {
+      setSelectedImage(product.images[0]);
+      console.log(product.images);
+      if(product.images.length > 1) {
+        setHasImages(true)
+      }
+    }
+  }, [product]);
+
+
+
 
   const [showFullDesc, setShowFullDesc] = useState(false);
 
   const discountPercent = product?.priceAfterDiscount
     ? Math.round(
-        ((product.price - product.priceAfterDiscount) / product.price) * 100,
-      )
+      ((product.price - product.priceAfterDiscount) / product.price) * 100,
+    )
     : null;
 
   const handleAddToCart = () => {
@@ -70,22 +74,22 @@ const SingleProductPage = () => {
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', py: 4, px: { xs: 2, md: 6 } }}>
       <Button
-          variant="outlined"
-          onClick={() => navigate(-1)}
-          sx={{
-            borderRadius: '999px',
-            textTransform: 'none',
-            minWidth: 'auto',
-            px: 2,
-            py: 0.5,
-            fontWeight: 'bold',
-            marginBottom: "20px",
-            background: 'linear-gradient(to right, #f97316, #f59e0b)',
-            color: "white"
-          }}
-        >
-          ← Quay lại
-        </Button>
+        variant="outlined"
+        onClick={() => navigate(-1)}
+        sx={{
+          borderRadius: '999px',
+          textTransform: 'none',
+          minWidth: 'auto',
+          px: 2,
+          py: 0.5,
+          fontWeight: 'bold',
+          marginBottom: "20px",
+          background: 'linear-gradient(to right, #f97316, #f59e0b)',
+          color: "white"
+        }}
+      >
+        ← Quay lại
+      </Button>
       <Paper elevation={3} sx={{ p: 4, position: 'relative' }}>
         <Box display="flex" flexDirection={{ xs: 'column', lg: 'row' }} gap={4}>
           {/* Hình ảnh sản phẩm */}
@@ -96,7 +100,7 @@ const SingleProductPage = () => {
                 mb: 2,
                 position: 'relative',
                 width: 320,
-                height: 240,
+                height: 320,
                 backgroundColor: '#fff',
                 overflow: 'hidden', // quan trọng
               }}
@@ -213,24 +217,24 @@ const SingleProductPage = () => {
               <strong>Danh mục:</strong>{' '}
               {product?.category
                 ? (() => {
-                    console.log(product.category);
-                    const category = categoriesObject.find(
-                      (cat) => cat.key === product.category?.toLowerCase(),
-                    );
-                    return category ? (
-                      <Button
-                        variant="text"
-                        onClick={() =>
-                          navigate(`/customer/category/${product.category}`)
-                        }
-                        sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
-                      >
-                        {category.title}
-                      </Button>
-                    ) : (
-                      'Không có thông tin'
-                    );
-                  })()
+                  console.log(product.category);
+                  const category = categoriesObject.find(
+                    (cat) => cat.key === product.category?.toLowerCase(),
+                  );
+                  return category ? (
+                    <Button
+                      variant="text"
+                      onClick={() =>
+                        navigate(`/customer/category/${product.category}`)
+                      }
+                      sx={{ textTransform: 'none', p: 0, minWidth: 0 }}
+                    >
+                      {category.title}
+                    </Button>
+                  ) : (
+                    'Không có thông tin'
+                  );
+                })()
                 : 'Không có thông tin'}
             </Typography>
 
@@ -257,7 +261,7 @@ const SingleProductPage = () => {
               {product?.priceAfterDiscount ? (
                 <>
                   <Typography variant="h6" fontWeight="bold" color="error">
-                    {product?.priceAfterDiscount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
+                    {product?.priceAfterDiscount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -266,12 +270,12 @@ const SingleProductPage = () => {
                       color: '#888',
                     }}
                   >
-                    {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
+                    {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                   </Typography>
                 </>
               ) : (
                 <Typography variant="h6" fontWeight="bold">
-                  {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND'})}
+                  {product?.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                 </Typography>
               )}
             </Box>

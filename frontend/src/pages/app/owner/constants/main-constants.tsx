@@ -4,6 +4,7 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
 import { useStore } from '../store/_services/store.context';
+import { Person2 } from '@mui/icons-material';
 
 export default function OwnerMenuItems() {
   const [storeState] = useStore();
@@ -28,7 +29,7 @@ export default function OwnerMenuItems() {
     {
       label: 'Tài khoản',
       path: `/settings/my-account`,
-      icon: <ListAltIcon fontSize="small" />,
+      icon: <Person2 fontSize="small" />,
     },
     {
       label: 'Về chúng tôi',

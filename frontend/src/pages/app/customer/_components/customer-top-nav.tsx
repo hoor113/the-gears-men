@@ -57,6 +57,16 @@ export default function CustomerTopNav() {
     setCartAnchorEl(null);
   };
 
+  const handleCartToggle = (event: React.MouseEvent<HTMLElement>) => {
+  if (cartAnchorEl && cartAnchorEl === event.currentTarget) {
+    // Nếu menu đang mở với phần tử này thì đóng lại
+    setCartAnchorEl(null);
+  } else {
+    // Mở menu, gán phần tử vừa click
+    setCartAnchorEl(event.currentTarget);
+  }
+};
+
   const handleCartItemRemove = (id: any) => {
     cartDispatch({ type: 'REMOVE_ITEM', payload: { id: id } });
     currentCartState.items = currentCartState.items.filter(
@@ -199,6 +209,10 @@ export default function CustomerTopNav() {
 
                     return (
                       <Box
+                        onClick={() => {
+                          navigate(`/customer/product/${product.id}`)
+                          handleSearchBlur();
+                        }}
                         key={product.id}
                         display="flex"
                         alignItems="center"
@@ -208,7 +222,7 @@ export default function CustomerTopNav() {
                           '&:hover': { backgroundColor: '#f5f5f5' },
                           cursor: 'pointer',
                           borderBottom: '1px solid #eee',
-                        }}
+                        }}              
                       >
                         <Box
                           sx={{
@@ -300,7 +314,7 @@ export default function CustomerTopNav() {
         </span> */}
 
       <div className="flex items-center gap-x-4">
-        <span
+        {/* <span
           className="hidden md:inline font-bold text-base md:text-lg"
           onClick={() => navigate('/customer/aboutus')}
           style={{ cursor: 'pointer' }}
@@ -311,7 +325,7 @@ export default function CustomerTopNav() {
           >
             Về chúng tôi
           </span>
-        </span>
+        </span> */}
 
         {/* Tài khoản */}
         <IconButton
@@ -330,8 +344,7 @@ export default function CustomerTopNav() {
 
         {/* Giỏ hàng */}
         <Box
-          onMouseEnter={(e) => setCartAnchorEl(e.currentTarget)}
-          onMouseLeave={handleCartClose}
+          onClick={handleCartToggle}
           className="cursor-pointer"
         >
           <IconButton color="inherit">

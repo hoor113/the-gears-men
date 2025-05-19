@@ -38,7 +38,7 @@ const CustomerPage = () => {
         category: EProductCategory.Laptop,
         products: [],
       },
-      { key: 'pc', title: 'PC', category: EProductCategory.PC, products: [] },
+      { key: 'pC', title: 'PC', category: EProductCategory.PC, products: [] },
       {
         key: 'tablet',
         title: 'máy tính bảng',
@@ -185,12 +185,8 @@ const CustomerPage = () => {
             <BlockProducts
               key={item?.data?.key}
               path={`category/${categories[idx].key}`}
-              title={`Danh mục ${item?.data?.title || ''}`}
-              products={
-                Array.isArray(item?.data?.products)
-                  ? (item.data.products as Product[])
-                  : []
-              }
+              title={`Danh mục ${item?.data?.title || ""}`}
+              products={Array.isArray(item?.data?.products) ? item.data.products as Product[] : []}
             />
           ))}
 
